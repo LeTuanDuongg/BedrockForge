@@ -11,7 +11,7 @@ class Packages(unittest.TestCase):
             'id':'fixture_one','display_name':'Framework Fixture','author':'BedrockForge tests',
             'version':'0.1.0','framework_api':'1.0.0','minecraft_versions':['1.26.30.5'],
             'dependencies':{},'optional_dependencies':{},'capabilities':['core.items.v1'],
-            'native':{'library':'libfixture_one.so','entry_point':'bf_mod_entry','abi':'arm64-v8a'}
+            'native':{'library':'libfixture_one.so','entry_point':'bf_mod_entry','abi':'arm64-v8a','mod_api':2}
         }
         self.first=copy.deepcopy(self.base)
         self.second=copy.deepcopy(self.base)

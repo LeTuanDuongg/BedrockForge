@@ -26,7 +26,19 @@ public final class HostApplication extends Application {
    public void onActivityPreCreated(android.app.Activity activity,android.os.Bundle state){
     if(activity.getClass().getName().equals("com.mojang.minecraftpe.MainActivity")) {
      activity.setTheme(0x7f0e0007); // Theme from the hash-pinned installed APK manifest.
-     HostNative.start(new File(getFilesDir(),"mod-data").getPath());
+     File modules=new File(getFilesDir(),"mods/enabled");
+     File[] libraries=modules.listFiles((dir,name)->name.endsWith(".so"));
+     if(libraries==null)libraries=new File[0];
+     java.util.Arrays.sort(libraries,java.util.Comparator.comparing(File::getName));
+     String[] paths=new String[libraries.length];
+     for(int i=0;i<libraries.length;i++)paths[i]=libraries[i].getAbsolutePath();
+     File errorFile=new File(getFilesDir(),"last-loader-error.txt");
+     try {HostNative.start(new File(getFilesDir(),"mod-data").getPath(),paths);errorFile.delete();}
+     catch(IllegalStateException error){
+      android.util.Log.e("BedrockForge","Mod loading failed; continuing without the loader",error);
+      try {Files.write(errorFile.toPath(),error.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));}
+      catch(Exception writeError){android.util.Log.e("BedrockForge","Could not save loader diagnostic",writeError);}
+     }
     }
    }
    public void onActivityCreated(android.app.Activity a,android.os.Bundle b){

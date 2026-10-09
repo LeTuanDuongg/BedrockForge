@@ -34,7 +34,7 @@ def manifest(data):
     if set(data['dependencies']) & set(data['optional_dependencies']): raise ValueError("dependency specified twice")
     if not isinstance(data['capabilities'],list) or any(not isinstance(c,str) or not re.fullmatch(r'[a-z0-9_.]+',c) for c in data['capabilities']): raise ValueError("capabilities")
     native=data['native']
-    if set(native)!={'library','entry_point','abi'} or native['entry_point']!='bf_mod_entry' or native['abi']!='arm64-v8a': raise ValueError("native entry")
+    if set(native)!={'library','entry_point','abi','mod_api'} or native['entry_point']!='bf_mod_entry' or native['abi']!='arm64-v8a' or native['mod_api']!=2: raise ValueError("native entry")
     if not re.fullmatch(r'lib[a-z0-9_]+\.so',native['library']): raise ValueError("library path")
     return data
 

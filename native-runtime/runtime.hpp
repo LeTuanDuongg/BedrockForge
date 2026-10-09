@@ -17,6 +17,7 @@ class BF_CORE Runtime {
   std::filesystem::path root_;
   bool safe_;
   std::vector<const bf_mod*> order_;
+  std::vector<void*> libraries_;
 public:
   Registry registry;
   Events events;
@@ -26,6 +27,7 @@ public:
   ~Runtime();
   Session& session(const std::string& owner);
   void start(const std::vector<const bf_mod*>& mods);
+  void start_libraries(const std::vector<std::filesystem::path>& libraries);
   void stop();
   void tick(uint64_t tick);
 };

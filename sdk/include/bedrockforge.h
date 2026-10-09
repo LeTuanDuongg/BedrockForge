@@ -10,7 +10,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define BF_API_VERSION 1u
+#define BF_API_VERSION 2u
 typedef uint64_t bf_handle;
 typedef int32_t bf_result;
 enum { BF_OK=0, BF_INVALID=1, BF_NOT_FOUND=2, BF_CONFLICT=3,
@@ -49,12 +49,13 @@ typedef struct {
   uint32_t size, api_version;
   const char* id;
   const char* version;
-  const char* required_mod; /* v1 supports one required mod, manifests support many */
+  const char* const* dependencies;
+  uint32_t dependency_count;
   bf_result (*load)(const bf_api*);
   void (*unload)(void);
 } bf_mod;
 typedef const bf_mod* (*bf_mod_entry_fn)(void);
-/* Each independent library exports bf_mod_entry. Exceptions must not escape. */
+/* ABI v2 supports multiple required dependencies. Exceptions must not escape. */
 BF_EXPORT const bf_mod* bf_mod_entry(void);
 #ifdef __cplusplus
 }

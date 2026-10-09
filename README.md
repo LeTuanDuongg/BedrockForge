@@ -7,11 +7,11 @@ storage abstraction, persistence, packaging và công cụ build. Không phát h
 gameplay mod mẫu trong repository.
 
 Mục tiêu dài hạn là để cộng đồng dùng SDK/framework của BedrockForge phát triển,
-đóng gói, cài đặt và quản lý mod riêng. Hiện tại đây vẫn là prototype: profile
-manager, package discovery/import trên Android, scripting runtime Android và
-adapter gameplay cho engine chưa hoàn chỉnh. APK host không được mô tả là đã
-chạy được mod do người dùng cài. Native plugin có quyền của process host và
-không được sandbox.
+đóng gói, cài đặt và quản lý mod riêng. Android host hiện nhập được gói `.bfmod`
+native vào vùng riêng và nạp thư viện khi mở game; profile manager, scripting
+runtime Android và adapter gameplay cho engine chưa hoàn chỉnh. Chưa xác minh
+mod có thể thay đổi gameplay trong Minecraft. Native plugin có quyền của process
+host và không được sandbox.
 
 BedrockForge chỉ sở hữu mã nguồn runtime/launcher/SDK. Không chứa Minecraft APK,
 engine libraries hay runtime độc quyền của NetEase; không sửa binary game hoặc
@@ -46,9 +46,8 @@ profile riêng và không đóng gói game binary.
 python tools/build-host.py
 ```
 
-APK này kiểm chứng lớp host/runtime, chưa phải bản launcher phân phối: chưa có
-Android package manager/profile UI hoàn chỉnh, mod discovery/import, scripting
-runtime Android hoặc gameplay adapter được xác minh. Tình trạng và giới hạn nằm
+APK này là launcher prototype: có import gói native cơ bản nhưng chưa có profile
+manager hoàn chỉnh, scripting runtime Android hoặc gameplay adapter được xác minh. Tình trạng và giới hạn nằm
 trong [báo cáo kiểm chứng](docs/testing/VALIDATION_REPORT.md) và
 [ma trận khả năng](docs/research/CAPABILITY_MATRIX.md).
 
@@ -57,7 +56,9 @@ trong [báo cáo kiểm chứng](docs/testing/VALIDATION_REPORT.md) và
 - Kiến trúc: [overview](docs/architecture/OVERVIEW.md),
   [Android host](docs/architecture/ANDROID_HOST.md),
   [scripting runtime](docs/architecture/SCRIPTING_RUNTIME.md),
-  [game component API/GAL](docs/architecture/GAME_COMPONENT_API.md)
+  [game component API/GAL](docs/architecture/GAME_COMPONENT_API.md),
+  [native module ABI](docs/architecture/NATIVE_MODULE_ABI.md)
+- Gói mod: [package format](docs/development/PACKAGE_FORMAT.md)
 - Nghiên cứu: [NetEase Mod SDK](docs/research/NETEASE_MODSDK_ANALYSIS.md),
   [so sánh hệ sinh thái](docs/research/MODDING_FRAMEWORK_COMPARISON.md),
   [bài học Inner Core/Horizon](docs/architecture/ECOSYSTEM_LESSONS.md)

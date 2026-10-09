@@ -14,19 +14,34 @@ import java.util.zip.ZipFile;
 
 public final class LauncherActivity extends Activity {
  private TextView status;
+ private static final int PICK_MOD_PACKAGE=1001;
  private static final String EXPECTED_VERSION="1.26.30.5";
  private static final String EXPECTED_ENGINE="433c79ce83e9862b45405b09a215e2e10f5dc9858b681c75f4ce3ea670236970";
  @Override public void onCreate(Bundle saved) {
   super.onCreate(saved);
   LinearLayout layout=new LinearLayout(this);layout.setOrientation(1);layout.setPadding(24,24,24,24);
-  status=new TextView(this);status.setText("BedrockForge system prototype. Mod discovery/import chưa tích hợp. Game dùng profile riêng.");
+  status=new TextView(this);status.setText("BedrockForge native loader prototype. Gameplay integration chưa được xác minh; native mod chạy cùng quyền với Minecraft.");
+  Button install=new Button(this);install.setText("Cài gói mod .bfmod");
   Button launch=new Button(this);launch.setText("Khởi chạy Minecraft PE đã ghim");
-  layout.addView(status);layout.addView(launch);setContentView(layout);
+  layout.addView(status);layout.addView(install);layout.addView(launch);setContentView(layout);
+  install.setOnClickListener(v -> {Intent pick=new Intent(Intent.ACTION_OPEN_DOCUMENT);pick.addCategory(Intent.CATEGORY_OPENABLE);pick.setType("*/*");startActivityForResult(pick,PICK_MOD_PACKAGE);});
   launch.setOnClickListener(v -> {launch.setEnabled(false);status.setText("Đang chuẩn bị engine…");new Thread(() -> {
    try {prepare();runOnUiThread(() -> {startActivity(new Intent().setClassName(this,"com.mojang.minecraftpe.MainActivity"));launch.setEnabled(true);});}
    catch(Exception error) {android.util.Log.e("BedrockForge", "Preparation failed",error);runOnUiThread(() -> {status.setText(error.toString());launch.setEnabled(true);});}
   }).start();});
   if(getIntent().getBooleanExtra("test_launch",false))launch.performClick();
+ }
+ @Override protected void onResume(){
+  super.onResume();File error=new File(getFilesDir(),"last-loader-error.txt");
+  if(error.isFile())try{status.setText("Mod loader không nạp được; game tiếp tục không có mod. "+new String(Files.readAllBytes(error.toPath()),java.nio.charset.StandardCharsets.UTF_8));}
+  catch(Exception ignored){}
+ }
+ @Override protected void onActivityResult(int requestCode,int resultCode,Intent data) {
+  super.onActivityResult(requestCode,resultCode,data);
+  if(requestCode!=PICK_MOD_PACKAGE||resultCode!=RESULT_OK||data==null||data.getData()==null)return;
+  status.setText("Đang kiểm tra gói mod…");android.net.Uri uri=data.getData();
+  new Thread(() -> {try {String result=PackageInstaller.install(this,uri);runOnUiThread(() -> status.setText(result));}
+   catch(Exception error){android.util.Log.e("BedrockForge","Package install failed",error);runOnUiThread(() -> status.setText("Không cài được gói mod: "+error.getMessage()));}}).start();
  }
  private void prepare() throws Exception {
   PackageInfo pkg=getPackageManager().getPackageInfo("com.mojang.minecraftpe",0);

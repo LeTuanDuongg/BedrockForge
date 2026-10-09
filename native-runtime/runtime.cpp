@@ -1,7 +1,40 @@
 #include "runtime.hpp"
 #include <cstring>
 #include <algorithm>
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
 namespace bf {
+namespace {
+void* open_library(const std::filesystem::path& path) {
+#ifdef _WIN32
+  auto handle=LoadLibraryW(path.c_str());
+  if(!handle) throw Error(BF_IO,"cannot load native module: "+path.string());
+  return reinterpret_cast<void*>(handle);
+#else
+  dlerror();auto handle=dlopen(path.c_str(),RTLD_NOW|RTLD_LOCAL);
+  if(!handle){const char* error=dlerror();throw Error(BF_IO,error?error:"cannot load native module");}
+  return handle;
+#endif
+}
+void* find_symbol(void* handle,const char* name) {
+#ifdef _WIN32
+  return reinterpret_cast<void*>(GetProcAddress(reinterpret_cast<HMODULE>(handle),name));
+#else
+  dlerror();auto symbol=dlsym(handle,name);if(dlerror())return nullptr;return symbol;
+#endif
+}
+void close_library(void* handle) noexcept {
+  if(!handle)return;
+#ifdef _WIN32
+  FreeLibrary(reinterpret_cast<HMODULE>(handle));
+#else
+  dlclose(handle);
+#endif
+}
+}
 static Session& active(void* ctx){if(!ctx)throw Error(BF_INVALID,"null context");auto& s=*static_cast<Session*>(ctx);if(!s.enabled)throw Error(BF_DISABLED,"mod disabled");return s;}
 template<class F> static bf_result guard(void* ctx,F fn) noexcept {
   try{auto& s=active(ctx);fn(s);return BF_OK;}catch(const Error& e){return e.code;}catch(const std::filesystem::filesystem_error&){return BF_IO;}catch(...){return BF_INTERNAL;}
@@ -40,13 +73,24 @@ void Runtime::start(const std::vector<const bf_mod*>& mods){
   for(auto m:mods){if(!m||m->size<sizeof(bf_mod)||m->api_version!=BF_API_VERSION||!m->load||!m->unload)throw Error(BF_INVALID,"mod ABI mismatch");auto id=str(m->id);identifier(id);str(m->version);if(!pending.emplace(id,m).second)throw Error(BF_CONFLICT,"duplicate mod");}
   // Resolve whole graph before invoking arbitrary mod code.
   std::vector<const bf_mod*> sorted;std::set<std::string> ready;
-  while(!pending.empty()){bool progress=false;for(auto it=pending.begin();it!=pending.end();){auto dep=str(it->second->required_mod);if(dep.empty()||ready.contains(dep)){ready.insert(it->first);sorted.push_back(it->second);it=pending.erase(it);progress=true;}else ++it;}if(!progress)throw Error(BF_CONFLICT,"dependency missing or cycle");}
+  while(!pending.empty()){bool progress=false;for(auto it=pending.begin();it!=pending.end();){auto m=it->second;bool satisfied=true; if(m->dependency_count>128|| (m->dependency_count&&!m->dependencies))throw Error(BF_INVALID,"invalid dependency list");for(uint32_t i=0;i<m->dependency_count;i++){auto dep=str(m->dependencies[i]);identifier(dep);if(!ready.contains(dep)){satisfied=false;break;}}if(satisfied){ready.insert(it->first);sorted.push_back(m);it=pending.erase(it);progress=true;}else ++it;}if(!progress)throw Error(BF_CONFLICT,"dependency missing or cycle");}
   auto before=registry;
   try{for(auto m:sorted){auto& s=session(m->id);order_.push_back(m);auto result=m->load(&s.api);if(result!=BF_OK)throw Error(result,"mod load failed");}}
   catch(...){stop();registry=std::move(before);throw;}
 }
+void Runtime::start_libraries(const std::vector<std::filesystem::path>& paths){
+  if(!order_.empty()||!sessions.empty()||!libraries_.empty())throw Error(BF_CONFLICT,"runtime already started");
+  if(safe_){if(!paths.empty())throw Error(BF_DISABLED,"safe mode: plugin loading disabled");return;}
+  std::vector<const bf_mod*> descriptors;std::vector<void*> opened;
+  try {
+    if(paths.size()>128)throw Error(BF_INVALID,"mod count limit");
+    for(const auto& path:paths){auto handle=open_library(path);opened.push_back(handle);auto symbol=find_symbol(handle,"bf_mod_entry");if(!symbol)throw Error(BF_INVALID,"module entrypoint missing: "+path.string());auto entry=reinterpret_cast<bf_mod_entry_fn>(symbol);auto mod=entry();if(!mod)throw Error(BF_INVALID,"module returned null descriptor");descriptors.push_back(mod);}
+    start(descriptors);libraries_=std::move(opened);
+  } catch(...) {for(auto it=opened.rbegin();it!=opened.rend();++it)close_library(*it);throw;}
+}
 void Runtime::stop(){for(auto it=order_.rbegin();it!=order_.rend();++it){auto owner=str((*it)->id);try{(*it)->unload();}catch(...){diagnostics.push_back(owner+": unload exception");}if(sessions.contains(owner)){sessions.at(owner)->enabled=false;events.clear(owner);}}
   order_.clear();for(auto& [owner,s]:sessions){s->enabled=false;events.clear(owner);} // keep context cookies alive until Runtime destruction
+  for(auto it=libraries_.rbegin();it!=libraries_.rend();++it)close_library(*it);libraries_.clear();
 }
 Runtime::~Runtime(){stop();}
 void Runtime::tick(uint64_t n){events.publish("framework:tick",std::to_string(n));}
