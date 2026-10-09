@@ -1,0 +1,6 @@
+{
+  "desktop": {"cmake": "3.31.6", "ninja": "1.11.1.4", "ziglang": "0.13.0", "clang_bundled_in_zig": "18.1.6"},
+  "android": {"ndk_expected": "27.2.12479018", "platform": "android-28", "abi": "arm64-v8a", "tested": false},
+  "preloader_commit": "5d108da350ce3e7f13f51415f81e65344ecd5d14",
+  "levilaunchroid_audit_commit": "3710dc4eed7bd884542fdacdecf76efc7b6bc02b"
+}

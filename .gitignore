@@ -1,0 +1,8 @@
+.research/
+.tools/
+build*/
+__pycache__/
+*.levipack
+*.bfmod
+test-data/
+/mods/

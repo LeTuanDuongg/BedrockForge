@@ -1,0 +1,253 @@
+{
+  "LeviLaunchroid": {
+    "repository": "LiteLDev/LeviLaunchroid",
+    "commit": "3710dc4eed7bd884542fdacdecf76efc7b6bc02b",
+    "commit_date": "2026-10-09",
+    "sources": [
+      {
+        "path": "LICENSE",
+        "url": "https://github.com/LiteLDev/LeviLaunchroid/blob/3710dc4eed7bd884542fdacdecf76efc7b6bc02b/LICENSE"
+      },
+      {
+        "path": "docs/guide/compatibility.md",
+        "url": "https://github.com/LiteLDev/LeviLaunchroid/blob/3710dc4eed7bd884542fdacdecf76efc7b6bc02b/docs/guide/compatibility.md"
+      },
+      {
+        "path": "docs/guide/developer.md",
+        "url": "https://github.com/LiteLDev/LeviLaunchroid/blob/3710dc4eed7bd884542fdacdecf76efc7b6bc02b/docs/guide/developer.md"
+      },
+      {
+        "path": "examples/full-cpp-mod/CMakeLists.txt",
+        "url": "https://github.com/LiteLDev/LeviLaunchroid/blob/3710dc4eed7bd884542fdacdecf76efc7b6bc02b/examples/full-cpp-mod/CMakeLists.txt"
+      },
+      {
+        "path": "examples/full-cpp-mod/manifest.json",
+        "url": "https://github.com/LiteLDev/LeviLaunchroid/blob/3710dc4eed7bd884542fdacdecf76efc7b6bc02b/examples/full-cpp-mod/manifest.json"
+      },
+      {
+        "path": "app/src/main/java/org/levimc/launcher/util/LauncherStorage.java",
+        "url": "https://github.com/LiteLDev/LeviLaunchroid/blob/3710dc4eed7bd884542fdacdecf76efc7b6bc02b/app/src/main/java/org/levimc/launcher/util/LauncherStorage.java"
+      }
+    ]
+  },
+  "preloader-android": {
+    "repository": "LiteLDev/preloader-android",
+    "commit": "5d108da350ce3e7f13f51415f81e65344ecd5d14",
+    "commit_date": "2026-09-30",
+    "sources": [
+      {
+        "path": "CMakeLists.txt",
+        "url": "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/CMakeLists.txt"
+      },
+      {
+        "path": "include/pl/Mod.hpp",
+        "url": "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/include/pl/Mod.hpp"
+      },
+      {
+        "path": "include/pl/ModMenu.hpp",
+        "url": "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/include/pl/ModMenu.hpp"
+      },
+      {
+        "path": "src/pl/internal/NativeModLifecycle.cpp",
+        "url": "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/src/pl/internal/NativeModLifecycle.cpp"
+      },
+      {
+        "path": "src/pl/PreLoader.cpp",
+        "url": "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/src/pl/PreLoader.cpp"
+      }
+    ]
+  },
+  "innercore-mod-toolchain": {
+    "repository": "zheka2304/innercore-mod-toolchain",
+    "commit": "1a7bf2e2e58960f7fe794b2e53c4ebcf6c87bf13",
+    "commit_date": "2026-09-05",
+    "sources": [
+      {
+        "path": "README.md",
+        "url": "https://github.com/zheka2304/innercore-mod-toolchain/blob/1a7bf2e2e58960f7fe794b2e53c4ebcf6c87bf13/README.md"
+      },
+      {
+        "path": "toolchain-setup.py",
+        "url": "https://github.com/zheka2304/innercore-mod-toolchain/blob/1a7bf2e2e58960f7fe794b2e53c4ebcf6c87bf13/toolchain-setup.py"
+      }
+    ]
+  },
+  "RedPowerPE": {
+    "repository": "MineExplorer/RedPowerPE",
+    "commit": "1bd9c20821ac228fa0d723f1390e00cb906cf34b",
+    "commit_date": "2026-09-08",
+    "sources": [
+      {
+        "path": "README.md",
+        "url": "https://github.com/MineExplorer/RedPowerPE/blob/1bd9c20821ac228fa0d723f1390e00cb906cf34b/README.md"
+      },
+      {
+        "path": "src/dev/items/bags.ts",
+        "url": "https://github.com/MineExplorer/RedPowerPE/blob/1bd9c20821ac228fa0d723f1390e00cb906cf34b/src/dev/items/bags.ts"
+      },
+      {
+        "path": "src/dev/api/MachineRegistry.ts",
+        "url": "https://github.com/MineExplorer/RedPowerPE/blob/1bd9c20821ac228fa0d723f1390e00cb906cf34b/src/dev/api/MachineRegistry.ts"
+      },
+      {
+        "path": "src/dev/integration/recipe_viewer.ts",
+        "url": "https://github.com/MineExplorer/RedPowerPE/blob/1bd9c20821ac228fa0d723f1390e00cb906cf34b/src/dev/integration/recipe_viewer.ts"
+      },
+      {
+        "path": "make.json",
+        "url": "https://github.com/MineExplorer/RedPowerPE/blob/1bd9c20821ac228fa0d723f1390e00cb906cf34b/make.json"
+      }
+    ]
+  },
+  "JEI-Bedrock": {
+    "repository": "Satoshi442/JEI-Bedrock",
+    "commit": "3e4ef8e1429bc31e44b6eb6bae131f159ee501ef",
+    "commit_date": "2026-09-06",
+    "sources": [
+      {
+        "path": "LICENSE",
+        "url": "https://github.com/Satoshi442/JEI-Bedrock/blob/3e4ef8e1429bc31e44b6eb6bae131f159ee501ef/LICENSE"
+      },
+      {
+        "path": "README.md",
+        "url": "https://github.com/Satoshi442/JEI-Bedrock/blob/3e4ef8e1429bc31e44b6eb6bae131f159ee501ef/README.md"
+      },
+      {
+        "path": "CMakeLists.txt",
+        "url": "https://github.com/Satoshi442/JEI-Bedrock/blob/3e4ef8e1429bc31e44b6eb6bae131f159ee501ef/CMakeLists.txt"
+      },
+      {
+        "path": "manifest.json",
+        "url": "https://github.com/Satoshi442/JEI-Bedrock/blob/3e4ef8e1429bc31e44b6eb6bae131f159ee501ef/manifest.json"
+      }
+    ]
+  },
+  "InnerCore-horizon-sources": {
+    "repository": "CheatBoss/InnerCore-horizon-sources",
+    "commit": "84b72431e7cb702b7d929c61c340a8db07d6ece1",
+    "commit_date": "2021-04-10",
+    "sources": [
+      {
+        "path": "com/zhekasmirnov/horizon/HorizonLibrary.java",
+        "url": "https://github.com/CheatBoss/InnerCore-horizon-sources/blob/84b72431e7cb702b7d929c61c340a8db07d6ece1/com/zhekasmirnov/horizon/HorizonLibrary.java"
+      },
+      {
+        "path": "com/zhekasmirnov/innercore/api/NativeAPI.java",
+        "url": "https://github.com/CheatBoss/InnerCore-horizon-sources/blob/84b72431e7cb702b7d929c61c340a8db07d6ece1/com/zhekasmirnov/innercore/api/NativeAPI.java"
+      },
+      {
+        "path": "com/zhekasmirnov/innercore/api/runtime/Callback.java",
+        "url": "https://github.com/CheatBoss/InnerCore-horizon-sources/blob/84b72431e7cb702b7d929c61c340a8db07d6ece1/com/zhekasmirnov/innercore/api/runtime/Callback.java"
+      },
+      {
+        "path": "com/zhekasmirnov/innercore/api/mod/ui/container/Container.java",
+        "url": "https://github.com/CheatBoss/InnerCore-horizon-sources/blob/84b72431e7cb702b7d929c61c340a8db07d6ece1/com/zhekasmirnov/innercore/api/mod/ui/container/Container.java"
+      },
+      {
+        "path": "com/zhekasmirnov/innercore/api/runtime/saver/world/WorldDataSaver.java",
+        "url": "https://github.com/CheatBoss/InnerCore-horizon-sources/blob/84b72431e7cb702b7d929c61c340a8db07d6ece1/com/zhekasmirnov/innercore/api/runtime/saver/world/WorldDataSaver.java"
+      }
+    ]
+  },
+  "netease-modsdk-wiki": {
+    "repository": "easecation/netease-modsdk-wiki",
+    "commit": "6dd1233e2773d745862cd085e5cf4bc42817d387",
+    "commit_date": "2026-06-04",
+    "sources": [
+      {
+        "path": "README.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/README.md"
+      },
+      {
+        "path": "docs/wiki/modsdk/modsdk-intro.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/wiki/modsdk/modsdk-intro.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/通用/System.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E9%80%9A%E7%94%A8/System.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/通用/事件.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E9%80%9A%E7%94%A8/%E4%BA%8B%E4%BB%B6.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/物品.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E7%89%A9%E5%93%81.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/方块/容器.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E6%96%B9%E5%9D%97/%E5%AE%B9%E5%99%A8.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/世界/配方.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E4%B8%96%E7%95%8C/%E9%85%8D%E6%96%B9.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/世界/自定义数据.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E4%B8%96%E7%95%8C/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%95%B0%E6%8D%AE.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/自定义UI/通用.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E8%87%AA%E5%AE%9A%E4%B9%89UI/%E9%80%9A%E7%94%A8.md"
+      },
+      {
+        "path": "docs/mcdocs/1-ModAPI/接口/自定义UI/UI控件.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcdocs/1-ModAPI/%E6%8E%A5%E5%8F%A3/%E8%87%AA%E5%AE%9A%E4%B9%89UI/UI%E6%8E%A7%E4%BB%B6.md"
+      },
+      {
+        "path": "docs/mcguide/20-玩法开发/13-模组SDK编程/2-Python脚本开发/0-脚本开发入门.md",
+        "url": "https://github.com/easecation/netease-modsdk-wiki/blob/6dd1233e2773d745862cd085e5cf4bc42817d387/docs/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/0-%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91%E5%85%A5%E9%97%A8.md"
+      }
+    ]
+  },
+  "nuoyanlib": {
+    "repository": "charminglee/nuoyanlib",
+    "commit": "944735d59a4e527ba788bf559e293689bc3a5713",
+    "commit_date": "2026-10-04",
+    "sources": [
+      {
+        "path": "LICENSE",
+        "url": "https://github.com/charminglee/nuoyanlib/blob/944735d59a4e527ba788bf559e293689bc3a5713/LICENSE"
+      },
+      {
+        "path": "README.md",
+        "url": "https://github.com/charminglee/nuoyanlib/blob/944735d59a4e527ba788bf559e293689bc3a5713/README.md"
+      },
+      {
+        "path": "src/nuoyanlib/core/server/comp.py",
+        "url": "https://github.com/charminglee/nuoyanlib/blob/944735d59a4e527ba788bf559e293689bc3a5713/src/nuoyanlib/core/server/comp.py"
+      },
+      {
+        "path": "src/nuoyanlib/common/communicate.py",
+        "url": "https://github.com/charminglee/nuoyanlib/blob/944735d59a4e527ba788bf559e293689bc3a5713/src/nuoyanlib/common/communicate.py"
+      },
+      {
+        "path": "src/nuoyanlib/core/listener.py",
+        "url": "https://github.com/charminglee/nuoyanlib/blob/944735d59a4e527ba788bf559e293689bc3a5713/src/nuoyanlib/core/listener.py"
+      },
+      {
+        "path": "src/nuoyanlib/client/ui/nyc/button.py",
+        "url": "https://github.com/charminglee/nuoyanlib/blob/944735d59a4e527ba788bf559e293689bc3a5713/src/nuoyanlib/client/ui/nyc/button.py"
+      }
+    ]
+  },
+  "netease-bedrock-wiki": {
+    "repository": "MCNeteaseDevs/netease-bedrock-wiki",
+    "commit": "894160bb5849e0b3c2be8d46351ca6e49f812fc8",
+    "commit_date": "2026-08-26",
+    "sources": [
+      {
+        "path": "README.md",
+        "url": "https://github.com/MCNeteaseDevs/netease-bedrock-wiki/blob/894160bb5849e0b3c2be8d46351ca6e49f812fc8/README.md"
+      },
+      {
+        "path": "mcguide/20-玩法开发/13-模组SDK编程/2-Python脚本开发/0-脚本开发入门.md",
+        "url": "https://github.com/MCNeteaseDevs/netease-bedrock-wiki/blob/894160bb5849e0b3c2be8d46351ca6e49f812fc8/mcguide/20-%E7%8E%A9%E6%B3%95%E5%BC%80%E5%8F%91/13-%E6%A8%A1%E7%BB%84SDK%E7%BC%96%E7%A8%8B/2-Python%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91/0-%E8%84%9A%E6%9C%AC%E5%BC%80%E5%8F%91%E5%85%A5%E9%97%A8.md"
+      },
+      {
+        "path": "mcguide/27-手机网络游戏/课程9：服务器上线/第2节：PE测试.md",
+        "url": "https://github.com/MCNeteaseDevs/netease-bedrock-wiki/blob/894160bb5849e0b3c2be8d46351ca6e49f812fc8/mcguide/27-%E6%89%8B%E6%9C%BA%E7%BD%91%E7%BB%9C%E6%B8%B8%E6%88%8F/%E8%AF%BE%E7%A8%8B9%EF%BC%9A%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%BA%BF/%E7%AC%AC2%E8%8A%82%EF%BC%9APE%E6%B5%8B%E8%AF%95.md"
+      }
+    ]
+  }
+}

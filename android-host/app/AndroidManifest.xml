@@ -1,0 +1,26 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.bedrockforge.host">
+ <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="35"/>
+ <uses-permission android:name="android.permission.INTERNET"/>
+ <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+ <uses-permission android:name="android.permission.WAKE_LOCK"/>
+ <uses-permission android:name="android.permission.VIBRATE"/>
+ <queries><package android:name="com.mojang.minecraftpe"/></queries>
+ <application android:name=".HostApplication" android:label="BedrockForge development" android:debuggable="true" android:allowBackup="false" android:appComponentFactory=".GameFactory" android:extractNativeLibs="true">
+  <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false"/>
+  <meta-data android:name="firebase_analytics_collection_enabled" android:value="false"/>
+  <activity android:name=".LauncherActivity" android:exported="true">
+   <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
+  </activity>
+  <activity android:name="com.mojang.minecraftpe.MainActivity" android:process=":game" android:exported="false" android:screenOrientation="sensorLandscape" android:configChanges="orientation|screenSize|keyboardHidden|keyboard|navigation|uiMode|density">
+   <meta-data android:name="android.app.lib_name" android:value="minecraftpe"/>
+  </activity>
+  <service android:name="com.google.firebase.components.ComponentDiscoveryService" android:process=":game" android:exported="false">
+   <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+   <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar"/>
+  </service>
+  <service android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery" android:process=":game" android:exported="false">
+   <meta-data android:name="backend:com.google.android.datatransport.cct.CctBackendFactory" android:value="cct"/>
+  </service>
+ </application>
+</manifest>
