@@ -12,18 +12,17 @@ requirements. There is no hard-coded gameplay plugin list in the host.
 
 ## Not yet a complete mod launcher
 
-The current prototype does not yet provide:
+The current prototype can import a native package, but does not yet provide:
 
-- package discovery, validation, import and removal UI on Android;
-- persistent mod profiles and dependency resolution wired into launch;
+- profile selection and mod removal UI on Android;
+- persistent multi-profile management and dependency-aware activation controls;
 - Android scripting interpreter or script lifecycle/quotas;
 - verified game tick, block interaction, item registry or inventory adapters;
 - safe enable/disable recovery for arbitrary third-party plugins.
 
-The package format and desktop resolver are development tools, not proof that
-an arbitrary package can be installed or safely run on Android. Native plugins
-are trusted code with host process privileges. The exact target is not a promise
-of support for other Minecraft versions.
+The package importer has not yet been exercised with a `.bfmod` on device.
+Native plugins are trusted code with host process privileges. The exact target
+is not a promise of support for other Minecraft versions.
 
 Levi is documented as a possible lifecycle integration point only. The
 optional bridge remains a research prototype and must retain upstream license

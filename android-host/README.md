@@ -5,7 +5,7 @@ host integration reuses the audited Levi native module boundary rather than
 inventing an APK loader. `levi_bridge.cpp` is an Android-only lifecycle bridge
 that starts the engine-independent runtime.
 
-This remains an unverified development host. It launches the separately
+The launcher-to-Minecraft path was verified on a Samsung M51. It launches the separately
 installed Minecraft package through an isolated process and never includes game
 binaries. The Java launcher can import a flat `.bfmod` archive, validate its
 manifest, SHA-256 list, target ABI and required dependencies, then install the

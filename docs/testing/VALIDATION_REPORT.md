@@ -19,14 +19,17 @@ cleanup or Android host changes.
 
 ## Current system-only source state
 
-The repository is being refocused on the runtime, launcher host, public SDK,
-package tools and framework tests. It no longer hard-codes demo gameplay
-plugins into the Android host. This refocus has not yet been rebuilt or tested.
+The repository is focused on the runtime, launcher host, public SDK, package
+tools and framework tests. It does not hard-code demo gameplay plugins.
 
-The Android host remains a prototype for one pinned target, not a released
-launcher. Package discovery/import and profile UI, Android scripting, crash
-recovery, and verified world/inventory adapters are not implemented. No gameplay
-capability is claimed as working by this repository snapshot.
+On 2026-10-10, the current development APK was installed on Samsung M51
+(`RF8R31WEK5A`). The launcher started Minecraft's `MainActivity` in
+`org.bedrockforge.host:game`; device logs reported `Native loader started; active
+native modules: 0`. This verifies APK install and host-to-game activity startup
+only. No `.bfmod` was installed and no gameplay change was tested. The Java
+package importer is in the APK but has not been exercised with a package on the
+phone. Profile controls, Android scripting, crash recovery and verified
+world/inventory/UI adapters remain unimplemented.
 
 ## Reproduction commands
 
@@ -39,5 +42,4 @@ python -m unittest discover -s tests/unit -p 'test_*.py' -v
 
 Android host builds require the pinned NDK described in
 [`tools/versions.json`](../../tools/versions.json). A successful host build or
-launch is not evidence that arbitrary community plugins can yet be imported or
-run.
+launch does not establish that community plugins can alter gameplay.

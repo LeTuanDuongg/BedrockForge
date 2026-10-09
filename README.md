@@ -59,6 +59,7 @@ trong [báo cáo kiểm chứng](docs/testing/VALIDATION_REPORT.md) và
   [game component API/GAL](docs/architecture/GAME_COMPONENT_API.md),
   [native module ABI](docs/architecture/NATIVE_MODULE_ABI.md)
 - Gói mod: [package format](docs/development/PACKAGE_FORMAT.md)
+- JEI reference: [feature and compatibility analysis](docs/research/JEI_REFERENCE_ANALYSIS.md)
 - Nghiên cứu: [NetEase Mod SDK](docs/research/NETEASE_MODSDK_ANALYSIS.md),
   [so sánh hệ sinh thái](docs/research/MODDING_FRAMEWORK_COMPARISON.md),
   [bài học Inner Core/Horizon](docs/architecture/ECOSYSTEM_LESSONS.md)

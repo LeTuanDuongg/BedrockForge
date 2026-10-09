@@ -12,6 +12,7 @@ game-library hash. Không có offset/symbol nào được giả định.
 | Inventory | owner/world/container ID, slot, expected revision, transaction ID | game.inventory.v1 | Blocked by game integration |
 | RecipeProvider | provider/version, output, ingredients, category, completeness | game.recipes.v1 | Blocked by game integration |
 | CustomUI | view token, declarative controls, touch intent, text input | game.ui.v1 | Blocked by game integration |
+| Item/Recipe Browser overlay | catalog provider IDs, filter query, page cursor, recipe/uses focus, touch intents | game.ui.inventory_overlay.v1 + game.items.enumerate.v1 + game.recipes.enumerate.v1 | Blocked; the current host has no live registry or overlay adapter |
 | Persistence | mod/world scope, schema, commit generation | core.persistence.v1 | Implemented and tested desktop journal |
 | Events/Simulation | subscription token, copied event value, tick number | core.events.v1 | Implemented and tested manual ticks |
 | Messaging | mod channel, side, sender identity, payload and correlation ID | game.messaging.v1 | Not implemented |
