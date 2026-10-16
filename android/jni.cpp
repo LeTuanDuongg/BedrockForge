@@ -56,6 +56,7 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalEnabled(JNIEnv*, jcl
 extern "C" JNIEXPORT jstring JNICALL
 Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe(JNIEnv* env, jclass, jstring path) {
 #ifndef HYBRID_EXPERIMENTAL_NATIVE
+extern "C" int hybrid_experimental_button_control(unsigned) { return -4; }
     (void)path;
     return env->NewStringUTF("experimental_module_load=disabled");
 #else
@@ -92,6 +93,21 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalCandidateTraceStart(
 #endif
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s", result);
     return env->NewStringUTF(result);
+}
+extern "C" JNIEXPORT jint JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonTrigger(JNIEnv*, jclass, jint operation) {
+#ifdef HYBRID_EXPERIMENTAL_NATIVE
+    if (operation < 0 || operation > 2) return -1;
+    void* module=dlopen("libhybrid_experimental_registry_probe.so",RTLD_NOW|RTLD_NOLOAD);
+    if (!module) return -4;
+    auto trigger=reinterpret_cast<int (*)(unsigned)>(dlsym(module,"hybrid_experimental_trigger_button"));
+    const int result=trigger?trigger(static_cast<unsigned>(operation)):-4;
+    dlclose(module);
+    return result;
+#else
+    (void)operation;
+    return -4;
+#endif
 }
 #ifndef HYBRID_EXPERIMENTAL_NATIVE
 extern "C" const char* hybrid_experimental_candidate_trace_start() { return "candidate_trace=disabled"; }

@@ -2,6 +2,7 @@
 #include "engine_bridge.h"
 #include "experimental_hooks.h"
 #include <android/log.h>
+#include <atomic>
 #include <mutex>
 #include <thread>
 #include <time.h>
@@ -10,6 +11,8 @@
 namespace {
 std::mutex lookup_probe_mutex;
 std::thread lookup_probe_thread;
+std::thread button_thread;
+std::atomic<bool> button_running{false};
 bool lookup_probe_active=false;
 bool lookup_probe_used=false;
 uint64_t monotonic_ns() {
@@ -44,6 +47,8 @@ void stop() {
         std::lock_guard<std::mutex> lock(lookup_probe_mutex);
         lookup_probe_active=false;
         if (lookup_probe_thread.joinable()) lookup_probe_thread.join();
+        if (button_thread.joinable()) button_thread.join();
+        hybrid_experimental_button_control(2);
     }
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s pid=%d",
         hybrid_experimental_engine_candidate_hook_stop(), getpid());
@@ -74,4 +79,21 @@ extern "C" __attribute__((visibility("default"))) int hybrid_experimental_trigge
         lookup_probe_used=true;
         return 0;
     } catch (...) { return -3; }
+}
+
+extern "C" __attribute__((visibility("default"))) int hybrid_experimental_trigger_button(unsigned operation) {
+    std::lock_guard<std::mutex> lock(lookup_probe_mutex);
+    if (!lookup_probe_active || operation > 2) return -1;
+    if (button_running.load()) return -2;
+    if (button_thread.joinable()) button_thread.join();
+    button_running.store(true);
+    try {
+        button_thread=std::thread([operation] {
+            const int result=hybrid_experimental_button_control(operation);
+            __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "button_command=complete;operation=%u;result=%d;pid=%d;tid=%d",
+                operation, result, getpid(), gettid());
+            button_running.store(false);
+        });
+        return 0;
+    } catch (...) { button_running.store(false); return -3; }
 }

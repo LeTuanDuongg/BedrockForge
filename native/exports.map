@@ -13,6 +13,7 @@
     hybrid_experimental_hook_self_test;
     hybrid_experimental_engine_candidate_hook_start;
     hybrid_experimental_engine_candidate_hook_stop;
+    hybrid_experimental_button_control;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeProfile;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnostic;
@@ -21,6 +22,7 @@
     Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalEnabled;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger;
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonTrigger;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalCandidateTraceStart;
     PLGetModRegistration;
   local: *;
