@@ -1,0 +1,30 @@
+{
+  "variant": "A-original",
+  "serial": "RF8R31WEK5A",
+  "package": "com.mojang.minecraftpe",
+  "apk_sha256": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "signing_certificate_sha256": "a40da80a59d170caa950cf15c18c454d47a39b26989d8b640ecd745ba71bf5dc",
+  "original_apk_sha256": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "original_apk_backup": "C:\\Users\\letua\\Documents\\ChatGPT\\HybridMCPE\\build\\backups\\installed-minecraft-base.apk",
+  "worlds": "Original app retained; private worlds are inaccessible to non-root ADB and are not copied.",
+  "signing_configuration": "original installed signer",
+  "launch": "Starting: Intent { cmp=com.mojang.minecraftpe/.MainActivity }\nWarning: Activity not started, intent has been delivered to currently running top-most instance.\nStatus: ok\nLaunchState: UNKNOWN (0)\nActivity: com.mojang.minecraftpe/.MainActivity\nTotalTime: 0\nWaitTime: 16\nComplete",
+  "preexisting_pids": [
+    "13778"
+  ],
+  "final_pid": "13778",
+  "observed_pids": [
+    "13778"
+  ],
+  "runtime_constructor_observed": false,
+  "mapped_engine_observed": false,
+  "mod_lifecycle_observed": false,
+  "same_process_mapping_pids": [],
+  "fingerprint_profile_verified": false,
+  "stable_process": true,
+  "system_exit_lines": [],
+  "last_successful_stage": "Android activity launch only",
+  "exit_reason": "not established",
+  "original_install_unchanged": true,
+  "ui_text": []
+}

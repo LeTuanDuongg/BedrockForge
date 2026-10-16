@@ -1,0 +1,25 @@
+{
+  "minecraft_version": "1.26.52.3",
+  "abi": "arm64-v8a",
+  "package": "dev.hybridmcpe.research",
+  "source_engine_sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
+  "engine_sha256": "a8942061e3743fce10952627c76615c9e5c0cb07b897efc33f8dabaec96bf4d6",
+  "engine_size": 328419680,
+  "patch": "ELF dynamic dependency libhybridmcpe.so; metadata and existing padding only",
+  "engine_function_calls_added": false,
+  "original_dex_and_other_native_payloads_preserved": true,
+  "device_observation": {
+    "model": "SM-M515F",
+    "android": "12",
+    "proof_pid": 7312,
+    "module_mapping": true,
+    "engine_hash_verified": true,
+    "validated_layouts": 5,
+    "native_mod_abi": 1,
+    "mod_start_stop": true,
+    "duplicate_mod_result": -6,
+    "stable_game_startup": false,
+    "world_test": false
+  },
+  "blocker": "The clone calls System.exit(0) and restarts; a control without HybridMCPE reproduces it. Exact requesting caller unresolved."
+}

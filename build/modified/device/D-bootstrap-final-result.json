@@ -1,0 +1,37 @@
+{
+  "variant": "D-bootstrap-final",
+  "serial": "RF8R31WEK5A",
+  "package": "dev.hybridmcpe.research",
+  "apk_sha256": "421717d6c8e66592f4a7910dfba9486648f6dd13ed30138f5639cfe9c05dc0de",
+  "signing_certificate_sha256": "b8c8577caa7aa124fb1aeee7ba8dd244159cb2c352c8b1b098f570bd91eb3c68",
+  "original_apk_sha256": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "original_apk_backup": "C:\\Users\\letua\\Documents\\ChatGPT\\HybridMCPE\\build\\backups\\installed-minecraft-base.apk",
+  "worlds": "Original app retained; private worlds are inaccessible to non-root ADB and are not copied.",
+  "signing_configuration": "local HybridMCPE research key",
+  "install": "Performing Streamed Install\nSuccess",
+  "launch": "Starting: Intent { cmp=dev.hybridmcpe.research/com.mojang.minecraftpe.MainActivity }\nStatus: ok\nLaunchState: UNKNOWN (0)\nActivity: dev.hybridmcpe.research/com.mojang.minecraftpe.MainActivity\nWaitTime: 9593\nComplete",
+  "preexisting_pids": [],
+  "final_pid": "19569",
+  "observed_pids": [
+    "19498",
+    "19569"
+  ],
+  "runtime_constructor_observed": true,
+  "mapped_engine_observed": true,
+  "mod_lifecycle_observed": true,
+  "same_process_mapping_pids": [
+    "19395",
+    "19498",
+    "19569"
+  ],
+  "fingerprint_profile_verified": true,
+  "stable_process": false,
+  "system_exit_lines": [
+    "10-16 04:06:19.207 19498 19498 I idmcpe.researc: System.exit called, status: 0",
+    "10-16 04:06:19.207 19498 19498 I AndroidRuntime: VM exiting with result code 0, cleanup skipped."
+  ],
+  "last_successful_stage": "HybridMCPE lifecycle complete",
+  "exit_reason": "System.exit(0) observed; Java caller not captured",
+  "original_install_unchanged": true,
+  "research_clone_stopped_after_failure": true
+}

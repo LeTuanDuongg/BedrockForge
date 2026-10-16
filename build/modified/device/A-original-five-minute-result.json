@@ -1,0 +1,198 @@
+{
+  "package": "com.mojang.minecraftpe",
+  "serial": "RF8R31WEK5A",
+  "apk_sha256_before": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "apk_sha256_after": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "installed_hash_unchanged": true,
+  "start": "2026-10-16T04:14:27.3772080+07:00",
+  "end": "2026-10-16T04:19:31.3983554+07:00",
+  "initial_pids": "13778",
+  "unique_pids": [
+    "13778"
+  ],
+  "samples": [
+    {
+      "sample": 1,
+      "timestamp": "2026-10-16T04:14:37.4985226+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 2,
+      "timestamp": "2026-10-16T04:14:47.6397825+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 3,
+      "timestamp": "2026-10-16T04:14:57.7719531+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 4,
+      "timestamp": "2026-10-16T04:15:07.8962280+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 5,
+      "timestamp": "2026-10-16T04:15:18.0239388+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 6,
+      "timestamp": "2026-10-16T04:15:28.1556316+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 7,
+      "timestamp": "2026-10-16T04:15:38.2811694+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 8,
+      "timestamp": "2026-10-16T04:15:48.4014363+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 9,
+      "timestamp": "2026-10-16T04:15:58.5225047+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 10,
+      "timestamp": "2026-10-16T04:16:08.6484894+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 11,
+      "timestamp": "2026-10-16T04:16:18.7736843+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 12,
+      "timestamp": "2026-10-16T04:16:28.9128254+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 13,
+      "timestamp": "2026-10-16T04:16:39.0347284+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 14,
+      "timestamp": "2026-10-16T04:16:49.1711364+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 15,
+      "timestamp": "2026-10-16T04:16:59.3138123+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 16,
+      "timestamp": "2026-10-16T04:17:09.4388626+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 17,
+      "timestamp": "2026-10-16T04:17:19.5852807+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 18,
+      "timestamp": "2026-10-16T04:17:29.6987390+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 19,
+      "timestamp": "2026-10-16T04:17:39.8279343+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 20,
+      "timestamp": "2026-10-16T04:17:49.9755321+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 21,
+      "timestamp": "2026-10-16T04:18:00.1227712+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 22,
+      "timestamp": "2026-10-16T04:18:10.2857807+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 23,
+      "timestamp": "2026-10-16T04:18:20.4267988+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 24,
+      "timestamp": "2026-10-16T04:18:30.5805350+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 25,
+      "timestamp": "2026-10-16T04:18:40.7184577+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 26,
+      "timestamp": "2026-10-16T04:18:50.8449170+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 27,
+      "timestamp": "2026-10-16T04:19:00.9823193+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 28,
+      "timestamp": "2026-10-16T04:19:11.1128572+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 29,
+      "timestamp": "2026-10-16T04:19:21.2579251+07:00",
+      "pids": "13778"
+    },
+    {
+      "sample": 30,
+      "timestamp": "2026-10-16T04:19:31.3978016+07:00",
+      "pids": "13778"
+    }
+  ],
+  "relevant_log_lines": [
+    "10-16 04:06:19.277  1179  2724 I ActivityManager: Process dev.hybridmcpe.research (pid 19498) has died: fg  TOP (1038,3240)",
+    "10-16 04:09:27.234  1179  4433 I ActivityManager: Process com.sec.unifiedwfc (pid 18177) has died: cch+85 CEM (228,3834)",
+    "10-16 04:09:27.399  1179  2721 I ActivityManager: Process com.google.process.gservices (pid 17427) has died: cch+85 CEM (214,3858)",
+    "10-16 04:09:27.487  1179  2721 I ActivityManager: Process app.revanced.android.gms (pid 18952) has died: cch+85 CEM (212,3869)",
+    "10-16 04:09:41.385  1179  4380 I ActivityManager: Process com.tencent.mm:support (pid 19774) has died: svc SVC (306,3885)",
+    "10-16 04:10:28.452  1179  3235 I ActivityManager: Process com.samsung.android.app.galaxyfinder:appservice (pid 20345) has died: fg  SVC (156,3970)",
+    "10-16 04:10:30.538  1179  4380 I ActivityManager: Process com.samsung.android.privacydashboard (pid 18827) has died: cch+85 CEM (44,3944)",
+    "10-16 04:10:30.578  1179  2296 I ActivityManager: Process com.google.android.cellbroadcastreceiver (pid 19265) has died: cch+85 CEM (52,3933)",
+    "10-16 04:10:30.596  1179  3235 I ActivityManager: Process com.facebook.appmanager (pid 18984) has died: cch+85 CEM (69,3923)",
+    "10-16 04:10:30.619  1179  4380 I ActivityManager: Process com.facebook.system (pid 19069) has died: cch+85 CEM (74,3919)",
+    "10-16 04:10:30.679  1179  4425 I ActivityManager: Process com.samsung.android.localeoverlaymanager (pid 18296) has died: cch+75 CEM (84,3916)",
+    "10-16 04:10:30.712  1179  3235 I ActivityManager: Process com.android.keychain (pid 18301) has died: cch+75 CEM (90,3919)",
+    "10-16 04:10:30.776  1179  3235 I ActivityManager: Process com.whatsapp (pid 18988) has died: cch+65 CEM (155,3918)",
+    "10-16 04:10:30.819  1179  2725 I ActivityManager: Process com.samsung.android.app.galaxyfinder:appservice (pid 20587) has died: fg  SVC (182,3918)",
+    "10-16 04:11:58.832  1179  2725 I ActivityManager: Process com.android.vending:background (pid 18487) has died: cch+75 CEM (163,4022)",
+    "10-16 04:11:58.957  1179  4433 I ActivityManager: Process com.samsung.android.sm.devicesecurity (pid 15801) has died: cch+65 CEM (122,4058)",
+    "10-16 04:11:58.992  1179  4380 I ActivityManager: Process com.samsung.android.bbc.bbcagent (pid 17303) has died: cch+65 CEM (126,4077)",
+    "10-16 04:11:59.156  1179  4433 I ActivityManager: Process com.android.settings:remote (pid 18338) has died: cch+65 CEM (151,4073)",
+    "10-16 04:11:59.183  1179  2725 I ActivityManager: Process com.samsung.android.game.gamehome (pid 17348) has died: cch+55 CEM (146,4076)",
+    "10-16 04:11:59.417  1179  3235 I ActivityManager: Process com.samsung.android.provider.filterprovider (pid 17452) has died: cch+85 CEM (129,4080)",
+    "10-16 04:11:59.488  1179  4405 I ActivityManager: Process com.sec.android.app.samsungapps (pid 13994) has died: cch+75 CEM (129,4087)",
+    "10-16 04:11:59.537  1179  4433 I ActivityManager: Process com.samsung.android.app.smartcapture:screenrecorder (pid 18799) has died: cch+75 CEM (135,4082)",
+    "10-16 04:11:59.659  1179  4433 I ActivityManager: Process com.sec.android.app.soundalive (pid 17628) has died: cch+65 CEM (133,4085)",
+    "10-16 04:11:59.787  1179  2711 I ActivityManager: Process com.osp.app.signin (pid 17509) has died: cch+65 CEM (143,4085)",
+    "10-16 04:12:02.160  1179  4425 I ActivityManager: Process com.samsung.android.app.galaxyfinder:appservice (pid 21382) has died: fg  SVC (177,3973)",
+    "10-16 04:13:55.508  1179  2825 I ActivityManager: Process com.samsung.android.dqagent (pid 19696) has died: cch+55 CEM (75,4115)",
+    "10-16 04:13:55.548  1179  2825 I ActivityManager: Process com.android.systemui:edgelighting (pid 20310) has died: cch+65 CEM (94,4110)",
+    "10-16 04:13:55.621  1179  2825 I ActivityManager: Process com.reddit.frontpage (pid 19761) has died: cch+65 CEM (136,4106)",
+    "10-16 04:14:22.853  1179  2725 I ActivityManager: Process com.samsung.android.app.galaxyfinder:appservice (pid 21661) has died: fg  SVC (167,4044)",
+    "10-16 04:14:30.670  1179  2711 I ActivityManager: Process com.samsung.android.app.galaxyfinder:appservice (pid 21717) has died: fg  SVC (177,4055)"
+  ],
+  "full_log": "C:\\Users\\letua\\Documents\\ChatGPT\\HybridMCPE\\build\\modified\\device\\A-original-five-minute-full.log"
+}

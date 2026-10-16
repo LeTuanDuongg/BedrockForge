@@ -1,0 +1,34 @@
+{
+  "serial": "RF8R31WEK5A",
+  "tests": [
+    {
+      "variant": "B-control",
+      "apk_sha256_local": "f4e898f44e4328221aa63cbf7f2886e29f5681749f971beac0c30fefab38a968",
+      "apk_sha256_installed": "f4e898f44e4328221aa63cbf7f2886e29f5681749f971beac0c30fefab38a968",
+      "package_path": "/data/app/~~Z5yir0wJP_DdSm9kpUMozA==/dev.hybridmcpe.research-9UTdcO9ZECnlhIx-VY7b9Q==/base.apk",
+      "match": true,
+      "install": "Performing Streamed Install Success"
+    },
+    {
+      "variant": "C-payload-only",
+      "apk_sha256_local": "6ccae6f4100f1167c31a317879ed7f4b38f5c873ed40d5a2ddc109669cc2cd92",
+      "apk_sha256_installed": "6ccae6f4100f1167c31a317879ed7f4b38f5c873ed40d5a2ddc109669cc2cd92",
+      "package_path": "/data/app/~~KbTaJeEYuxTS6eTMEoAwLQ==/dev.hybridmcpe.research-6jDiIbmz4Xmxc75tOJbJuw==/base.apk",
+      "match": true,
+      "install": "Performing Streamed Install Success"
+    },
+    {
+      "variant": "D-bootstrap",
+      "apk_sha256_local": "421717d6c8e66592f4a7910dfba9486648f6dd13ed30138f5639cfe9c05dc0de",
+      "apk_sha256_installed": "421717d6c8e66592f4a7910dfba9486648f6dd13ed30138f5639cfe9c05dc0de",
+      "package_path": "/data/app/~~8y-jv1BXohOtLJzXbhuX9w==/dev.hybridmcpe.research-BMyAKJ_gKJSDiYlfcumDcQ==/base.apk",
+      "match": true,
+      "install": "Performing Streamed Install Success"
+    }
+  ],
+  "original_sha256_before": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "original_sha256_after": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+  "original_unchanged": true,
+  "clone_restored_to_D": true,
+  "restore_error": null
+}

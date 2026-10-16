@@ -1,0 +1,187 @@
+{
+  "sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
+  "architecture": "AArch64",
+  "rtti": {
+    "21ChestScreenController": {
+      "found": true,
+      "name_va": "0x29c775d",
+      "vtables": [
+        {
+          "typeinfo": "0x12ab6b18",
+          "vtable_address_point": "0x12ab50a8",
+          "slots": [
+            "0x86232d4",
+            "0x862b0c4",
+            "0x9b15f34",
+            "0x9a24938",
+            "0x9b14fec",
+            "0x9b15eb0",
+            "0x9b15ebc",
+            "0x9a25444"
+          ]
+        }
+      ]
+    },
+    "25ContainerScreenController": {
+      "found": true,
+      "name_va": "0x2c0da8f",
+      "vtables": [
+        {
+          "typeinfo": "0x12bee608",
+          "vtable_address_point": "0x12be1720",
+          "slots": [
+            "0x9a245c8",
+            "0x9a24930",
+            "0x9b15f34",
+            "0x9a24938",
+            "0x9b14fec",
+            "0x9b15eb0",
+            "0x9b15ebc",
+            "0x9a25444"
+          ]
+        }
+      ]
+    },
+    "15ChestBlockActor": {
+      "found": true,
+      "name_va": "0x33bf839",
+      "vtables": [
+        {
+          "typeinfo": "0x1312ed98",
+          "vtable_address_point": "0x1312aaa8",
+          "slots": [
+            "0x106edb8c",
+            "0x106edc74",
+            "0x106ee5fc",
+            "0x106eea98",
+            "0x106eedf8",
+            "0x106dfc18",
+            "0x106dfc1c",
+            "0x106dfc20"
+          ]
+        }
+      ]
+    },
+    "21ContainerManagerModel": {
+      "found": true,
+      "name_va": "0x32e6232",
+      "vtables": [
+        {
+          "typeinfo": "0x130297b0",
+          "vtable_address_point": "0x13028768",
+          "slots": [
+            "0xf9582c0",
+            "0xf95852c",
+            "0xf9591d0",
+            "0xf9591d8",
+            "0xf9591e0",
+            "0xf9591e8",
+            "0xf9592a0",
+            "0xf959814"
+          ]
+        }
+      ]
+    },
+    "9Inventory": {
+      "found": true,
+      "name_va": "0x33121e3",
+      "vtables": [
+        {
+          "typeinfo": "0x13034fd0",
+          "vtable_address_point": "0x13034568",
+          "slots": [
+            "0xf9da350",
+            "0xf9da354",
+            "0xf9da378",
+            "0xf884004",
+            "0xf6e28f0",
+            "0xf6e2944",
+            "0xf6e2a88",
+            "0xf6e2a90"
+          ]
+        }
+      ]
+    },
+    "16ScreenController": {
+      "found": true,
+      "name_va": "0x2c27175",
+      "vtables": [
+        {
+          "typeinfo": "0x12bfd310",
+          "vtable_address_point": "0x12bf8840",
+          "slots": [
+            "0x9b13d9c",
+            "0x9b145f8",
+            "0x9b15f34",
+            "0x9b15f38",
+            "0x9b14fec",
+            "0x9b15eb0",
+            "0x9b15ebc",
+            "0x9b1461c"
+          ]
+        }
+      ]
+    },
+    "27ComplexInventoryTransaction": {
+      "found": true,
+      "name_va": "0x3356cb3",
+      "vtables": [
+        {
+          "typeinfo": "0x1309d308",
+          "vtable_address_point": "0x1309e2c8",
+          "slots": [
+            "0x10027c18",
+            "0x10027c28",
+            "0x10027c58",
+            "0x10027c74",
+            "0x10020c88",
+            "0x1001bf38",
+            "0x1001bf24"
+          ]
+        }
+      ]
+    },
+    "27ItemUseInventoryTransaction": {
+      "found": true,
+      "name_va": "0x3356cf3",
+      "vtables": [
+        {
+          "typeinfo": "0x1309d330",
+          "vtable_address_point": "0x1309e280",
+          "slots": [
+            "0xb845738",
+            "0x10027e34",
+            "0x100222c4",
+            "0x10024eac",
+            "0x10025084",
+            "0x100215bc",
+            "0x10021578"
+          ]
+        }
+      ]
+    },
+    "26InventoryTransactionPacket": {
+      "found": true,
+      "name_va": "0x2f5b145",
+      "vtables": [
+        {
+          "typeinfo": "0x12e07838",
+          "vtable_address_point": "0x12e0d430",
+          "slots": [
+            "0xc14eb80",
+            "0xc14eb90",
+            "0xc149810",
+            "0xc149818",
+            "0xc14a2f4",
+            "0xc64b740",
+            "0xc149838",
+            "0xc149a30"
+          ]
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "RTTI/vtable candidates only; virtual method meanings and signatures are unverified."
+  ]
+}

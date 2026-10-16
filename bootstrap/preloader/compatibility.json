@@ -1,0 +1,21 @@
+{
+  "adapter": "preloader-c-lifecycle",
+  "contract_commit": "5d108da350ce3e7f13f51415f81e65344ecd5d14",
+  "contract_sources": [
+    "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/src/pl/legacy/LegacyMod.h",
+    "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/src/pl/internal/NativeModLifecycle.cpp"
+  ],
+  "third_party_implementation_vendored": false,
+  "evaluated_host": "LeviLaunchroid v1.5.27",
+  "host_deployment_allowed": false,
+  "host_evidence": [
+    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.27/minecraft/src/main/java/com/mojang/minecraftpe/store/StoreFactory.java#L13",
+    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.27/minecraft/src/main/java/com/mojang/minecraftpe/store/StubStore.java#L59",
+    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.27/app/src/main/java/org/levimc/launcher/util/NativeImageGuard.java#L41"
+  ],
+  "blockers": [
+    "The hosted game replaces the Google Play store with StubStore, whose license checks unconditionally return true.",
+    "NativeImageGuard may rewrite cached engine libraries through bundled gxcore; byte preservation and integrity behavior are unverified.",
+    "No LICENSE file was found in the pinned standalone Preloader source tree; no implementation or headers are copied or redistributed."
+  ]
+}
