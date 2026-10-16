@@ -74,10 +74,11 @@ if(BUILD_TESTING)
     target_compile_options(hybrid_runtime_test_mod PRIVATE -Wall -Wextra -Werror -fexceptions)
     add_executable(hybrid_runtime_lifecycle_tests
       native/runtime.cpp
+      bootstrap/preloader/adapter.cpp
       tests/runtime_engine_stub.cpp
       tests/runtime_lifecycle_tests.cpp)
-    target_include_directories(hybrid_runtime_lifecycle_tests PRIVATE sdk native)
-    target_link_libraries(hybrid_runtime_lifecycle_tests PRIVATE ${CMAKE_DL_LIBS})
+    target_include_directories(hybrid_runtime_lifecycle_tests PRIVATE sdk native bootstrap/preloader)
+    target_link_libraries(hybrid_runtime_lifecycle_tests PRIVATE ${CMAKE_DL_LIBS} log)
     target_compile_options(hybrid_runtime_lifecycle_tests PRIVATE -Wall -Wextra -Werror -fexceptions)
     add_test(NAME hybrid_runtime_lifecycle_tests COMMAND hybrid_runtime_lifecycle_tests
       $<TARGET_FILE:hybrid_runtime_test_mod>)

@@ -94,7 +94,6 @@ bool on_disable(void* instance, pl::mod::ModContext&) noexcept {
         record("disable", "runtime_stopped");
         return true;
     } catch (...) {
-        bridge.enabled = false;
         record("disable_failed", "exception_caught");
         return false;
     }
@@ -110,14 +109,18 @@ bool on_unload(void* instance, pl::mod::ModContext&) noexcept {
             return false;
         }
         hybrid_shutdown();
+        const char* status = hybrid_probe();
+        constexpr char incomplete[] = "runtime_shutdown_incomplete:";
+        if (!status || std::strncmp(status, incomplete, sizeof(incomplete) - 1) == 0) {
+            record("unload_failed", status ? status : "probe_returned_null");
+            return false;
+        }
         bridge.enabled = false;
         bridge.loaded = false;
         record("unload", "runtime_stopped");
         return true;
     } catch (...) {
-        bridge.enabled = false;
-        bridge.loaded = false;
-        record("unload_failed", "exception_caught_state_cleared");
+        record("unload_failed", "exception_caught_state_retained");
         return false;
     }
 }

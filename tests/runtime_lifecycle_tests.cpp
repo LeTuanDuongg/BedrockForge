@@ -1,9 +1,14 @@
 #include "hybrid_mod.h"
+#include "adapter.h"
 
 #include <dlfcn.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+
+namespace pl::mod {
+class ModContext {};
+}
 
 namespace {
 void check(bool condition, const char* message) {
@@ -58,8 +63,26 @@ int main(int argc, char** argv) {
     fail_stop(false);
     hybrid_shutdown();
     check(stops() == 4, "shutdown retry stops retained module");
-    check(std::strcmp(hybrid_probe(), "engine_verified:test;capabilities=0") == 0,
+    check(std::strcmp(hybrid_probe(), "engine_verified:1.26.52.3;layout_validated=5;profile=isolated_test_stub;capabilities=0") == 0,
           "successful retry completes shutdown and permits fresh verification");
+
+    auto* registration = PLGetModRegistration();
+    check(registration != nullptr, "Preloader registration available");
+    pl::mod::ModContext context;
+    check(registration->load(registration->instance, context), "adapter loads runtime fixture");
+    check(hybrid_load_mod(argv[1]) == 0, "reload real mod lifecycle fixture");
+    check(registration->enable(registration->instance, context), "adapter enables runtime");
+    fail_stop(true);
+    check(!registration->unload(registration->instance, context), "adapter rejects failed runtime shutdown");
+    check(!registration->unload(registration->instance, context), "permanent stop failure rejects repeated unload");
+    check(!registration->load(registration->instance, context), "failed adapter unload retains loaded state");
+    check(!registration->enable(registration->instance, context), "failed adapter unload rejects enable");
+    check(hybrid_load_mod(argv[1]) == -8, "adapter unload failure keeps runtime blocked");
+    check(std::strcmp(hybrid_probe(), "runtime_shutdown_incomplete:mod_stop_failed;handles_retained") == 0,
+          "adapter does not overwrite shutdown failure");
+    fail_stop(false);
+    check(registration->unload(registration->instance, context), "adapter unload retry succeeds after cleanup");
+    check(!registration->unload(registration->instance, context), "completed unload rejects duplicate callback");
     check(dlclose(test_mod) == 0, "close test module");
-    std::puts("PASS: failed mod stops retain active state and module handles; shutdown retry succeeds.");
+    std::puts("PASS: failed stops retain handles; Preloader unload reports failure and retains state until cleanup succeeds. Isolated engine fixture only.");
 }

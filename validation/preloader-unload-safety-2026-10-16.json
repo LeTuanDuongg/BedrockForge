@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-16",
+  "baseline_commits": ["1e251cd", "fa8fc05"],
+  "target": "Minecraft Bedrock 1.26.52.3 ARM64",
+  "device": {"serial": "RF8R31WEK5A", "model": "SM-M515F", "android": "12"},
+  "toolchain": "Android NDK 28.2.13676358; existing arm64-v8a CMake build",
+  "defect": "Preloader on_unload cleared its state and returned true after hybrid_shutdown retained active modules because stop failed.",
+  "fix": "Reject unload on runtime_shutdown_incomplete or null diagnostics; retain adapter state on failure or exception; allow cleanup retry. No forced dlclose or Mod ABI change.",
+  "tests": {
+    "runtime_and_adapter_lifecycle": "PASS: actual HybridMCPE runtime and failing-stop shared module; repeated unload rejected; loaded state and blocked runtime retained; successful cleanup permits unload retry",
+    "pinned_preloader_abi": "PASS: existing registration and callback harness",
+    "iron_chest_core": "PASS",
+    "native_engine_profile_tests": "PASS",
+    "sha_and_layout_tests": "PASS"
+  },
+  "binary_sha256": {
+    "libhybridmcpe.so": "95aa731b6693f9b7b5813f4776d9fb30f39bad7057e93e6b0f2307f83e8a4ffe",
+    "hybrid_runtime_lifecycle_tests": "4b80f14603850b6035b8c5a3e46fa92bf2ea16376016502fb9110f9cb4d3e509",
+    "hybrid_preloader_tests": "d2f07c3f86fb9cf9a66276cf0debb4e8b40ca9a741af86a723a71e4beb76c872",
+    "libhybridmcpe_preloader_test.so": "f707a511f1f6a7095d7b02408093471d694e6e561de31e96452e507e4ede57a7"
+  },
+  "scope": "Isolated native processes on M51. Engine verification is an explicitly named test fixture. No live Minecraft or production Preloader host execution is established.",
+  "device_changes": "Only dedicated /data/local/tmp/hybridmcpe-block-boundary-20261016 test files, removed after tests. No package installation, game launch or world access.",
+  "upstream_callback_failure_handling": "Pinned NativeModLifecycle.cpp returns false when the C++ unload callback rejects cleanup. Adapter callback behavior is tested locally; a complete production host unload is not tested.",
+  "source": "https://github.com/LiteLDev/preloader-android/blob/7ca94daedfa30d6d4c265fc9b591768e8dc1f5af/src/pl/internal/NativeModLifecycle.cpp"
+}
