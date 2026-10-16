@@ -28,3 +28,18 @@ NDK 28.2 ARM64 build with the pinned Preloader adapter succeeded. Native tests a
 No new world interaction or block placement was tested in this milestone. Mod ABI 1 remains unchanged, gameplay capabilities remain disabled, and `hybridmcpe:test_block` does not exist in-game yet.
 
 Registration remains blocked on the actual insertion contract: definition/factory construction and ownership, argument/return ABI, initialization window and engine thread, and finalization/persistence handling. Diagnostic strings and registry getters do not establish these contracts. No callable registration address is enabled.
+
+## Bounded registration-path follow-up
+
+The following caller chain is from this exact 1.26.50.4 ELF, corroborated by bounded LLVM disassembly. All listed code RVAs fall inside its executable `PT_LOAD` range. This is a candidate path, not a proven vanilla block-registration call chain.
+
+- At `0xfb3c0b4`, a caller obtains the global registry through `0x103e2d54`, then calls `0x103e3cd0` at `0xfb3c0c8`. The latter reads the registry's `+0x148` state under a reference-counted lock and traverses a linked collection, invoking a stored callback indirectly through a node field. The callback's semantic type and lifetime are unknown; this is not approved as a mod callback interface.
+- The caller then makes two virtual calls through its own object and passes the `+0xf0` subobject, one virtual result, an incoming argument and a stack-held pair to `0x10487d40` (`0xfb3c1ac`). It calls `0x10481320` with that same `+0xf0` subobject at `0xfb3c224`.
+- `0x10481320` traverses a collection rooted at object `+0x38`; for each node it loads a value at `+0x28` and calls `0x1048135c`. That routine gets the global registry (`0x103e2d60`), derives a key from input `+0x50`, then calls `0x103e285c`. `0x103e285c` clears three control arguments and tail-branches to `0x103e5cac`; the latter locks state at registry `+0x148` and performs a key-tree search. This supports lookup/use of existing entries; it does not show insertion.
+- Candidate `0x10487d40` contains the duplicate block-identifier diagnostic at `0x1048c580`. In that path, `0x1048c514` obtains the global registry, and `0x1048c520` calls `0x103e5648`, which likewise clears control arguments and tail-branches to the tree-search routine. This is direct evidence of duplicate checking against existing registry data in this candidate, not proof that the candidate inserts a new block.
+
+At the real menu snapshot in PID 4849, registry ownership/type checks passed but the field at registry `+0x130` was null. This is consistent with its accessor's observed null/error path. It establishes only that this particular direct-access field had not been initialized when sampled at the menu; it does not establish the full registry's readiness, a freeze point, or the registration window.
+
+### Registration decision
+
+No safe registration code is justified. The current trace does not establish which virtual implementation supplies the objects passed into `0x10487d40`, how a new block definition/factory is constructed, which operation writes it into the registry, how block states/runtime IDs are assigned, whether definitions are owned or borrowed, or which thread and startup phase may perform insertion. The later `0x10481320` pass is not proven to be finalization. Mod startup at the menu is not evidence of a pre-finalization callback. Preserve the registry observer as a prerequisite and keep all gameplay capabilities disabled until a vanilla successful insertion path and its lifetime/timing contracts are recovered.
