@@ -59,9 +59,13 @@ int main(int argc, char** argv) {
     set_probe("engine_absent");
     check(!registration->load(registration->instance, context), "reject absent engine");
     check(!registration->enable(registration->instance, context), "reject enable before load");
+    set_probe("engine_verified:1.26.50.5;layout_validated=0;capabilities=0;gameplay_binding=unavailable");
+    check(!registration->load(registration->instance, context), "reject unsupported engine profile");
 
     constexpr char verified[] =
-        "engine_verified:1.26.52.3;layout_validated=5;capabilities=0";
+        "engine_verified:1.26.50.4;layout_validated=0;profile=bedrock-1.26.50.4-arm64;"
+        "sha256=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1;"
+        "arch=AArch64;introspection=fingerprint_only;capabilities=0;gameplay_binding=unavailable";
     set_probe(verified);
     check(registration->load(registration->instance, context), "load verified profile");
     check(!registration->load(registration->instance, context), "reject duplicate load");

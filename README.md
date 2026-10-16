@@ -1,6 +1,16 @@
 # HybridMCPE
 
-Native-first Minecraft Bedrock Android mod runtime. Target: Samsung M51, Android 12, ARM64; Minecraft **1.26.52.3**.
+Native-first Minecraft Bedrock Android mod runtime. Device: Samsung M51, Android 12, ARM64. Current real-host target: **Minecraft 1.26.50.4**; all **1.26.52.3** profiles and research are preserved.
+
+## Imported-engine host: verified on M51
+
+The existing launcher now imports installed Minecraft APK/splits or user-selected APK files without requiring a Google Play installation source. Imports verify cryptographic signatures, identify signers, detect version/versionCode, extract ARM64 libraries and select exact engine profiles. Unknown publishers remain explicitly untrusted; a valid signature is not proof of official publication or licensing.
+
+The host loads the original imported MainActivity, Java SDKs, assets and native engine in `dev.hybridmcpe.launcher:game`, with version-specific private storage paths. It does not replace license, authentication or integrity responses. No proprietary Minecraft code or engine is packaged in HybridMCPE. Versions without a known exact runtime profile remain unavailable for execution.
+
+**Real M51 result, 2026-10-16:** the exact 1.26.50.4 engine reached the menu and a local world. PID **10830** loaded the existing runtime and the bundled **Mod ABI 1 diagnostic** module, matched the engine hash, and logged successful native start/stop/resume through recents switching. The diagnostic run remained alive for more than five minutes. The installed original Minecraft APK hash remained unchanged. See [device evidence](validation/embedded-host-m51-2026-10-16.md).
+
+Build with `tools/build.ps1 -PreloaderAdapter`, install only `dist/HybridMCPE-debug.apk`, then select **Dùng Minecraft đang cài** or import base plus required split APKs. The engine-only button is the first startup test. After confirming its menu, the diagnostic button loads the bundled native diagnostic module. No personal account or existing world is required. General third-party module discovery and gameplay bindings remain unfinished; Iron Chest does not work in-game yet.
 
 ## Modified-game bootstrap status: NO-GO
 
@@ -31,13 +41,13 @@ The original installed APK was backed up to `build/backups/installed-minecraft-b
 
 Modified engine SHA-256: `a8942061e3743fce10952627c76615c9e5c0cb07b897efc33f8dabaec96bf4d6`. Source and modified profiles are kept separately. Python patch/profile checks, signed APK/alignment checks and M51 native runtime guards pass. Installation and native lifecycle do not establish game/world stability.
 
-## Preserved original-profile build
+## Runtime build and compatibility
 
 `tools/build.ps1` builds the C++ runtime, native mod library, native tests and signed `dist/HybridMCPE-debug.apk` using the installed Android SDK/NDK. Tool locations are parameters. No Gradle download is required.
 
-The launcher checks the installed engine SHA-256 and packages the native payload. **It does not inject into Minecraft.** Its button explicitly opens Minecraft with mods inactive.
+The launcher copies source APKs into its private version repository and creates an imported-engine process through Android's AppComponentFactory and ResourcesLoader APIs. It does not inject into or overwrite the separately installed Minecraft application. The [apksig dependency](android/APKSIG.md) and import-only tests document signature validation and distribution boundaries.
 
-The native runtime runs inside an existing engine process. It selects only an exact full-SHA-256, size and AArch64 match from `targets/bedrock-1.26.52.3-engine-profiles.json`, then checks five RTTI/vtable layouts before allowing plugin loading. There are no wildcard or fallback profiles. The modified engine's five layouts were validated on M51; the original engine's profile is grounded in the exact Ghidra-target ELF, but still requires runtime layout validation before use. `sdk/hybrid_mod.h` defines the unchanged C ABI; plugin loading uses `dlopen`, validates ABI/capabilities and handles lifecycle shutdown. This is not a gameplay SDK yet.
+The native runtime selects an exact full-SHA-256, size and AArch64 match from `native/engine_profiles.h`. The two preserved 1.26.52.3 profiles require all five recorded layout checks. The exact 1.26.50.4 profile is fingerprint-only, validates zero gameplay layouts and exposes zero capabilities. There are no wildcard fingerprints or fallback layouts. Importing an unknown fingerprint does not enroll it in this trusted runtime table. `sdk/hybrid_mod.h` defines the unchanged C ABI; plugin loading uses `dlopen`, validates ABI/capabilities and handles lifecycle shutdown. This is not a gameplay SDK yet.
 
 `mods/iron_chest.cpp` is a blocked native mod descriptor, not a working chest. Container, GUI and persistence capabilities are all unavailable. Even if those flags were mistakenly enabled, its start function fails until real registration code exists. No entity-inventory substitute or simulated game backend is included.
 
@@ -65,7 +75,7 @@ The earlier Frida tooling remains preserved but is not the selected bootstrap ro
 
 `tools/build.ps1 -PreloaderAdapter` compiles `bootstrap/preloader/adapter.cpp` into the existing runtime and emits `dist/hybridmcpe-bootstrap.levipack`. Its `PLGetModRegistration` table is pinned to the Preloader submodule commit used by LeviLaunchroid v1.5.24 (`7ca94daedfa30d6d4c265fc9b591768e8dc1f5af`). The adapter keeps `ModContext` opaque, maps the four host callbacks to HybridMCPE probe, mod suspend/resume and shutdown operations, and leaves Hybrid Mod ABI 1 unchanged. No Preloader source or SDK header is vendored; no gameplay functions are invoked.
 
-Load requires the real engine already mapped, the original SHA-256 and all five existing layout checks. Missing engine causes failure, not a successful bootstrap. Diagnostic logs include PID, process name and runtime status. The isolated ARM64 ABI harness validates registration, lifecycle dispatch, rejection paths and cleanup; this is a test host, **not** live Minecraft. Mod start/stop inside the engine remains untested.
+Load requires a mapped engine matching an exact supported profile and its required layout checks. Missing or unsupported engines fail closed. Diagnostic logs include PID, process name and runtime status. The isolated ARM64 ABI harness validates registration, lifecycle dispatch, rejection paths and cleanup; it is not a live Preloader test. The separate imported-engine JNI bootstrap has now demonstrated native mod start/stop/resume in real Minecraft; live Preloader deployment remains untested.
 
 Evaluated ABI target: LeviLaunchroid v1.5.24, whose Preloader submodule is pinned to `7ca94daedfa30d6d4c265fc9b591768e8dc1f5af`. This verifies the adapter contract, not game-host compatibility. The release notes mention Minecraft 1.26.50, not the 1.26.52.3 target. The release was not installed or launched; no license-preserving and integrity-safe host configuration has been established. The pinned Preloader tree has no LICENSE file, and no upstream implementation or header is copied. Source links and deployment status are in `bootstrap/preloader/compatibility.json`.
 

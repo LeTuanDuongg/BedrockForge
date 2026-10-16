@@ -43,9 +43,14 @@ EngineVerification verify_loaded_engine(){
     const auto digest=hash.finish();
     const auto* profile=select_engine_profile(digest.c_str(),total,elf.e_machine);
     if(!profile){result.status="engine_profile_unknown";return result;}
-    for(const auto& layout:layouts){
+    constexpr size_t layout_count=sizeof(layouts)/sizeof(layouts[0]);
+    if(profile->validated_layout_count>layout_count){
+        result.status="engine_profile_layout_contract_invalid";return result;
+    }
+    for(size_t i=0;i<profile->validated_layout_count;++i){
+        const auto& layout=layouts[i];
         if(!validate_layout(engine.image,layout)){
-            result.status=std::string("engine_profile_matched:1.26.52.3;profile=")+profile->id+
+            result.status=std::string("engine_profile_matched:")+profile->minecraft_version+";profile="+profile->id+
                 ";layout_failed="+layout.name+
                 ";capabilities=0;gameplay_binding=unavailable";
             return result;
@@ -55,8 +60,10 @@ EngineVerification verify_loaded_engine(){
     // RTTI and vtable layout checks verify identity only; no gameplay contract is certified.
     result.capabilities=0;
     result.status=std::string("engine_verified:")+profile->minecraft_version+
-        ";layout_validated=5;profile="+profile->id+";sha256="+profile->sha256+
-        ";arch=AArch64;introspection=rtti_vtables_read_only;capabilities=0;gameplay_binding=unavailable";
+        ";layout_validated="+std::to_string(profile->validated_layout_count)+
+        ";profile="+profile->id+";sha256="+profile->sha256+
+        ";arch=AArch64;introspection="+(profile->validated_layout_count?"rtti_vtables_read_only":"fingerprint_only")+
+        ";capabilities=0;gameplay_binding=unavailable";
     return result;
 }
 }

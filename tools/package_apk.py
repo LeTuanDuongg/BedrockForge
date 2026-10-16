@@ -2,9 +2,22 @@
 from pathlib import Path
 import sys
 import zipfile
+import hashlib
 
 root = Path(__file__).resolve().parents[1]
 build = root / "build"
+if len(sys.argv) == 3 and sys.argv[1] == "dependencies":
+    sdk_tools = Path(sys.argv[2])
+    jar = sdk_tools / "lib/apksigner.jar"
+    expected = "3716d9311e55d2b0918a2fd9d54ba9e406c5f6abeea700b287f11259bc163dec"
+    if hashlib.sha256(jar.read_bytes()).hexdigest() != expected:
+        raise SystemExit("Unsupported apksig build: verify API and update pin explicitly")
+    with zipfile.ZipFile(jar) as source, zipfile.ZipFile(build / "apksig.jar", "w", zipfile.ZIP_DEFLATED) as out:
+        for entry in source.infolist():
+            if entry.filename.startswith("com/android/apksig/") and entry.filename.endswith(".class"):
+                out.writestr(entry.filename, source.read(entry))
+    (build / "apksig-NOTICE.txt").write_bytes((sdk_tools / "NOTICE.txt").read_bytes())
+    sys.exit(0)
 if sys.argv[1:] == ["preloader"]:
     with zipfile.ZipFile(root / "dist/hybridmcpe-bootstrap.levipack", "w", zipfile.ZIP_DEFLATED) as out:
         out.write(root / "bootstrap/preloader/manifest.json", "manifest.json")
@@ -15,11 +28,14 @@ if sys.argv[1:] == ["preloader"]:
 if sys.argv[1:] == ["classes"]:
     with zipfile.ZipFile(build / "launcher-classes.jar", "w", zipfile.ZIP_DEFLATED) as out:
         for path in sorted((build / "java").rglob("*.class")):
+            if path.relative_to(build / "java").as_posix().startswith("com/mojang/"):
+                raise SystemExit("Compile-only game API must never ship")
             out.write(path, path.relative_to(build / "java").as_posix())
     sys.exit(0)
 apk = build / "launcher-unsigned.apk"
 with zipfile.ZipFile(apk, "a", compression=zipfile.ZIP_DEFLATED) as out:
     out.write(build / "dex/classes.dex", "classes.dex")
-    for name in ("libhybridmcpe.so", "libiron_chest.so"):
+    out.write(build / "apksig-NOTICE.txt", "assets/third-party/apksig-NOTICE.txt")
+    for name in ("libhybridmcpe.so", "libiron_chest.so", "libhybrid_diagnostic.so"):
         out.write(build / "native-arm64" / name, "lib/arm64-v8a/" + name)
 print(apk)

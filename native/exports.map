@@ -6,6 +6,10 @@
     hybrid_disable_mods;
     hybrid_shutdown;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe;
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeProfile;
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnostic;
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnosticLifecycle;
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnosticShutdown;
     PLGetModRegistration;
   local: *;
 };

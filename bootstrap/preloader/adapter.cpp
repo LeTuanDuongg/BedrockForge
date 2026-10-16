@@ -26,15 +26,19 @@ void record(const char* phase, const char* status) noexcept {
 }
 
 bool engine_ready() {
-    constexpr char expected[] =
-        "engine_verified:1.26.52.3;layout_validated=5;";
     const char* status = hybrid_probe();
     if (!status) {
         record("engine_check", "probe_returned_null");
         return false;
     }
     record("engine_check", status);
-    return std::strncmp(status, expected, sizeof(expected) - 1) == 0;
+    constexpr char verified_52[] = "engine_verified:1.26.52.3;layout_validated=5;";
+    constexpr char verified_50[] = "engine_verified:1.26.50.4;layout_validated=0;";
+    constexpr char diagnostic_only[] = ";capabilities=0;gameplay_binding=unavailable";
+    const bool known_profile =
+        std::strncmp(status, verified_52, sizeof(verified_52) - 1) == 0 ||
+        std::strncmp(status, verified_50, sizeof(verified_50) - 1) == 0;
+    return known_profile && std::strstr(status, diagnostic_only) != nullptr;
 }
 
 bool on_load(void* instance, pl::mod::ModContext&) noexcept {

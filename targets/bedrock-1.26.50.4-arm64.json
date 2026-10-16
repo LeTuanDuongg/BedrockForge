@@ -1,0 +1,209 @@
+{
+  "sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "architecture": "AArch64",
+  "rtti": {
+    "21ChestScreenController": {
+      "found": true,
+      "name_va": "0x29c775d",
+      "vtables": [
+        {
+          "typeinfo": "0x12ab6498",
+          "vtable_address_point": "0x12ab4a28",
+          "slots": [
+            "0x86231b4",
+            "0x862afa4",
+            "0x9b15e4c",
+            "0x9a24850",
+            "0x9b14f04",
+            "0x9b15dc8",
+            "0x9b15dd4",
+            "0x9a2535c"
+          ]
+        }
+      ]
+    },
+    "25ContainerScreenController": {
+      "found": true,
+      "name_va": "0x2c0da8f",
+      "vtables": [
+        {
+          "typeinfo": "0x12bedf88",
+          "vtable_address_point": "0x12be10a0",
+          "slots": [
+            "0x9a244e0",
+            "0x9a24848",
+            "0x9b15e4c",
+            "0x9a24850",
+            "0x9b14f04",
+            "0x9b15dc8",
+            "0x9b15dd4",
+            "0x9a2535c"
+          ]
+        }
+      ]
+    },
+    "15ChestBlockActor": {
+      "found": true,
+      "name_va": "0x33bf7e1",
+      "vtables": [
+        {
+          "typeinfo": "0x1312e718",
+          "vtable_address_point": "0x1312a428",
+          "slots": [
+            "0x106ed538",
+            "0x106ed620",
+            "0x106edfa8",
+            "0x106ee444",
+            "0x106ee7a4",
+            "0x106df5c4",
+            "0x106df5c8",
+            "0x106df5cc"
+          ]
+        }
+      ]
+    },
+    "21ContainerManagerModel": {
+      "found": true,
+      "name_va": "0x32e61da",
+      "vtables": [
+        {
+          "typeinfo": "0x13029130",
+          "vtable_address_point": "0x130280e8",
+          "slots": [
+            "0xf957dbc",
+            "0xf958028",
+            "0xf958ccc",
+            "0xf958cd4",
+            "0xf958cdc",
+            "0xf958ce4",
+            "0xf958d9c",
+            "0xf959310"
+          ]
+        }
+      ]
+    },
+    "9Inventory": {
+      "found": true,
+      "name_va": "0x331218b",
+      "vtables": [
+        {
+          "typeinfo": "0x13034950",
+          "vtable_address_point": "0x13033ee8",
+          "slots": [
+            "0xf9d9e4c",
+            "0xf9d9e50",
+            "0xf9d9e74",
+            "0xf883b00",
+            "0xf6e23ec",
+            "0xf6e2440",
+            "0xf6e2584",
+            "0xf6e258c"
+          ]
+        }
+      ]
+    },
+    "16ScreenController": {
+      "found": true,
+      "name_va": "0x2c27175",
+      "vtables": [
+        {
+          "typeinfo": "0x12bfcc90",
+          "vtable_address_point": "0x12bf81c0",
+          "slots": [
+            "0x9b13cb4",
+            "0x9b14510",
+            "0x9b15e4c",
+            "0x9b15e50",
+            "0x9b14f04",
+            "0x9b15dc8",
+            "0x9b15dd4",
+            "0x9b14534"
+          ]
+        }
+      ]
+    },
+    "27ComplexInventoryTransaction": {
+      "found": true,
+      "name_va": "0x3356c5b",
+      "vtables": [
+        {
+          "typeinfo": "0x1309cc88",
+          "vtable_address_point": "0x1309dc48",
+          "slots": [
+            "0x100275c4",
+            "0x100275d4",
+            "0x10027604",
+            "0x10027620",
+            "0x10020634",
+            "0x1001b8e4",
+            "0x1001b8d0"
+          ]
+        }
+      ]
+    },
+    "27ItemUseInventoryTransaction": {
+      "found": true,
+      "name_va": "0x3356c9b",
+      "vtables": [
+        {
+          "typeinfo": "0x1309ccb0",
+          "vtable_address_point": "0x1309dc00",
+          "slots": [
+            "0xb8455f4",
+            "0x100277e0",
+            "0x10021c70",
+            "0x10024858",
+            "0x10024a30",
+            "0x10020f68",
+            "0x10020f24"
+          ]
+        }
+      ]
+    },
+    "26InventoryTransactionPacket": {
+      "found": true,
+      "name_va": "0x2f5b145",
+      "vtables": [
+        {
+          "typeinfo": "0x12e071b8",
+          "vtable_address_point": "0x12e0cdb0",
+          "slots": [
+            "0xc14ead8",
+            "0xc14eae8",
+            "0xc149768",
+            "0xc149770",
+            "0xc14a24c",
+            "0xc64b698",
+            "0xc149790",
+            "0xc149988"
+          ]
+        }
+      ]
+    },
+    "9ItemStack": {
+      "found": true,
+      "name_va": "0x3354f79",
+      "vtables": [
+        {
+          "typeinfo": "0x1308a6c0",
+          "vtable_address_point": "0x1308b7e0",
+          "slots": [
+            "0x85adf18",
+            "0xffa8e20",
+            "0xff9d6a0",
+            "0xff9d52c",
+            "0xff9d814",
+            "0xff9f4d0",
+            "0xff9f728",
+            "0xff9faf0"
+          ]
+        }
+      ]
+    }
+  },
+  "limitations": [
+    "RTTI names and vtables were found from relocation-backed metadata in this exact ELF hash. Vtable entries are static candidates; method roles, call signatures, object layouts, ownership, and thread requirements remain unverified.",
+    "APK source and publisher authenticity remain unresolved; APK signature verifies cryptographically but its signer differs from the preserved 1.26.52.3 baseline. Do not execute on a device containing personal accounts or worlds.",
+    "No 1.26.50.4 gameplay capability is enabled."
+  ]
+}

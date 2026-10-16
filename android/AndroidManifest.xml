@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="dev.hybridmcpe.launcher">
     <uses-sdk android:minSdkVersion="31" android:targetSdkVersion="36" />
-    <queries><package android:name="com.mojang.minecraftpe" /></queries>
-    <application android:label="HybridMCPE" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:extractNativeLibs="true">
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="com.android.vending.CHECK_LICENSE" />
+    <queries><package android:name="com.mojang.minecraftpe" /><package android:name="com.android.vending" /></queries>
+    <application android:name=".HostApplication" android:label="HybridMCPE" android:theme="@android:style/Theme.Material.Light.NoActionBar" android:allowBackup="false" android:extractNativeLibs="true" android:appComponentFactory=".HostFactory">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".HostedMinecraftActivity" android:exported="false" android:process=":game"
+            android:screenOrientation="sensorLandscape" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|screenLayout|uiMode|density|navigation|touchscreen|fontScale|locale|layoutDirection"
+            android:launchMode="singleTask" android:hardwareAccelerated="true">
+            <meta-data android:name="android.app.lib_name" android:value="minecraftpe" />
+        </activity>
+        <service android:name="com.mojang.minecraftpe.NotificationListenerService" android:exported="false" android:process=":game">
+            <intent-filter><action android:name="com.google.firebase.MESSAGING_EVENT" /></intent-filter>
+        </service>
+        <service android:name="com.google.firebase.components.ComponentDiscoveryService" android:exported="false" android:process=":game">
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data android:name="com.google.firebase.components:com.google.android.datatransport.TransportRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+            <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar" android:value="com.google.firebase.components.ComponentRegistrar" />
+        </service>
     </application>
 </manifest>

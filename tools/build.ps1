@@ -16,15 +16,18 @@ function Run([string]$program, [string[]]$arguments) {
     & $program @arguments
     if ($LASTEXITCODE -ne 0) { throw "$program failed with exit code $LASTEXITCODE" }
 }
-New-Item -ItemType Directory -Force -Path "$build/java", "$build/dex", "$build/tmp", "$root/dist" | Out-Null
+New-Item -ItemType Directory -Force -Path "$build/java", "$build/game-api", "$build/dex", "$build/tmp", "$root/dist" | Out-Null
 $env:JAVA_HOME = $Jdk
 $env:JDK_JAVA_OPTIONS = "-Djava.io.tmpdir=$build/tmp"
 $adapter = if ($PreloaderAdapter) { 'ON' } else { 'OFF' }
 Run $cmake @('-S', $root, '-B', "$build/native-arm64", '-G', 'Ninja', "-DCMAKE_MAKE_PROGRAM=$ninja", "-DCMAKE_TOOLCHAIN_FILE=$ndk", '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-31', '-DANDROID_STL=c++_static', '-DCMAKE_BUILD_TYPE=RelWithDebInfo', "-DHYBRID_BOOTSTRAP_PRELOADER=$adapter")
 Run $cmake @('--build', "$build/native-arm64")
-Run "$Jdk/bin/javac.exe" @('--release', '17', '-classpath', $android, '-d', "$build/java", "$root/android/src/dev/hybridmcpe/launcher/MainActivity.java")
+Run $Python @("$root/tools/package_apk.py", 'dependencies', $tools)
+Run "$Jdk/bin/javac.exe" @('--release', '17', '-classpath', $android, '-d', "$build/game-api", "$root/android/compileOnly/com/mojang/minecraftpe/MainActivity.java")
+$sources = @(Get-ChildItem -LiteralPath "$root/android/src" -Filter '*.java' -Recurse | ForEach-Object { $_.FullName })
+Run "$Jdk/bin/javac.exe" (@('--release', '17', '-classpath', "$android;$build/apksig.jar;$build/game-api", '-d', "$build/java") + $sources)
 Run $Python @("$root/tools/package_apk.py", 'classes')
-Run "$tools/d8.bat" @('--min-api', '31', '--lib', $android, '--output', "$build/dex", "$build/launcher-classes.jar")
+Run "$tools/d8.bat" @('--min-api', '31', '--lib', $android, '--classpath', "$build/game-api", '--output', "$build/dex", "$build/launcher-classes.jar", "$build/apksig.jar")
 Run "$tools/aapt2.exe" @('link', '-I', $android, '--manifest', "$root/android/AndroidManifest.xml", '-o', "$build/launcher-unsigned.apk")
 Run $Python @("$root/tools/package_apk.py")
 Run "$tools/zipalign.exe" @('-f', '-P', '16', '4', "$build/launcher-unsigned.apk", "$build/launcher-aligned.apk")

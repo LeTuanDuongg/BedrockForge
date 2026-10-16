@@ -3,7 +3,7 @@
 #include <cstdio>
 
 namespace {
-char probe_status[160] = "engine_absent";
+char probe_status[320] = "engine_absent";
 bool throw_from_probe = false;
 int shutdowns = 0;
 int enables = 0;

@@ -14,10 +14,18 @@ int main(){
     const auto* modified=hybrid::select_engine_profile(
         "a8942061e3743fce10952627c76615c9e5c0cb07b897efc33f8dabaec96bf4d6",engine_size,aarch64);
     check(modified&&std::strcmp(modified->id,"bedrock-1.26.52.3-arm64-modified")==0);
+    const auto* target_50=hybrid::select_engine_profile(
+        "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",engine_size,aarch64);
+    check(target_50&&std::strcmp(target_50->id,"bedrock-1.26.50.4-arm64")==0);
+    check(std::strcmp(target_50->minecraft_version,"1.26.50.4")==0&&target_50->validated_layout_count==0);
     check(!hybrid::select_engine_profile(
         "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",engine_size-1,aarch64));
     check(!hybrid::select_engine_profile(
         "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",engine_size,x86_64));
+    check(!hybrid::select_engine_profile(
+        "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",engine_size-1,aarch64));
+    check(!hybrid::select_engine_profile(
+        "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",engine_size,x86_64));
     check(!hybrid::select_engine_profile("53c4a86a",engine_size,aarch64));
     check(!hybrid::select_engine_profile(
         "0000000000000000000000000000000000000000000000000000000000000000",engine_size,aarch64));
