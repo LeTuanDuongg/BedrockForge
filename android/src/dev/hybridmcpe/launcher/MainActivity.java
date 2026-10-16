@@ -16,12 +16,20 @@ public final class MainActivity extends Activity {
     private static native String nativeDiagnostic(String path);
     private static native int nativeDiagnosticLifecycle(boolean active);
     private static native String nativeDiagnosticShutdown();
+    private static native boolean nativeExperimentalEnabled();
+    private static native String nativeExperimentalRegistryProbe(String path);
+    private static native int nativeExperimentalRegistryTrigger();
+    private static native String nativeExperimentalCandidateTraceStart();
     public static String startDiagnostic(String path) { return nativeDiagnostic(path); }
     public static int diagnosticLifecycle(boolean active) { return nativeDiagnosticLifecycle(active); }
     public static String stopDiagnostic() { return nativeDiagnosticShutdown(); }
+    public static String startExperimentalRegistryProbe(String path) { return nativeExperimentalRegistryProbe(path); }
+    public static boolean experimentalEnabled() { return nativeExperimentalEnabled(); }
+    public static int triggerExperimentalRegistryProbe() { return nativeExperimentalRegistryTrigger(); }
+    public static String startExperimentalCandidateTrace() { return nativeExperimentalCandidateTraceStart(); }
     private TextView status;
     private Spinner versions;
-    private Button imported, installed, launch, diagnostic;
+    private Button imported, installed, launch, diagnostic, experimental;
     private ApkRepository repository;
     private List<ApkRepository.Version> entries = new ArrayList<>();
     private boolean busy;
@@ -48,6 +56,8 @@ public final class MainActivity extends Activity {
         });
         launch = button(layout, "Thử chạy engine trong HybridMCPE", () -> confirm(false));
         diagnostic = button(layout, "Thử host + diagnostic native mod", () -> confirm(true));
+        experimental = button(layout, "Probe native thụ động 1.26.50.4", this::confirmExperimental);
+        experimental.setEnabled(nativeExperimentalEnabled());
         status = new TextView(this); status.setTextIsSelectable(true); layout.addView(status);
         ScrollView scroll = new ScrollView(this); scroll.addView(layout); setContentView(scroll);
         try {
@@ -70,6 +80,7 @@ public final class MainActivity extends Activity {
     private void setBusy(boolean value) {
         imported.setEnabled(!value); installed.setEnabled(!value); versions.setEnabled(!value);
         launch.setEnabled(!value && !entries.isEmpty()); diagnostic.setEnabled(!value && !entries.isEmpty());
+        experimental.setEnabled(!value && !entries.isEmpty() && nativeExperimentalEnabled());
         if (value) status.setText("Đang sao chép và xác minh APK, chữ ký, engine…");
     }
     private void refresh(String selected) throws Exception {
@@ -103,7 +114,16 @@ public final class MainActivity extends Activity {
                 "Gói có nguồn chưa xác minh sẽ chạy mã trong sandbox HybridMCPE. Không đăng nhập tài khoản cá nhân hoặc mở world hiện có. Kiểm tra giấy phép gốc có thể từ chối host này.")
             .setNegativeButton("Hủy", null).setPositiveButton("Chạy thử", (d,w) -> startHost(v, diagnostics)).show();
     }
+    private void confirmExperimental() {
+        ApkRepository.Version v = selected(); if (v == null) return;
+        new AlertDialog.Builder(this).setTitle("Native experimental probe")
+            .setMessage("Chạy profile thử nghiệm cô lập. Probe registry chỉ đọc chờ kích hoạt thủ công sau khi vào world; không tự chạy theo timer, không sửa mã engine. Không mở world cá nhân.")
+            .setNegativeButton("Hủy", null).setPositiveButton("Chạy probe", (d,w) -> startHost(v, true, true)).show();
+    }
     private void startHost(ApkRepository.Version v, boolean diagnostics) {
+        startHost(v, diagnostics, false);
+    }
+    private void startHost(ApkRepository.Version v, boolean diagnostics, boolean experimentalRun) {
         work(() -> {
             if (!"true".equals(v.info.getProperty("engine.runtimeSupported"))) throw new IOException("Engine chỉ có fingerprint; chưa có profile runtime được hỗ trợ");
             ActivityManager am = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
@@ -116,7 +136,8 @@ public final class MainActivity extends Activity {
             File tmp = new File(getFilesDir(), "host-selection.tmp");
             try (DataOutputStream out = new DataOutputStream(new FileOutputStream(tmp))) { out.writeUTF(v.id()); }
             Files.move(tmp.toPath(), new File(getFilesDir(), "host-selection").toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            runOnUiThread(() -> startActivity(new Intent().setClassName(this, "dev.hybridmcpe.launcher.HostedMinecraftActivity").putExtra("diagnostics", diagnostics)));
+            runOnUiThread(() -> startActivity(new Intent().setClassName(this, "dev.hybridmcpe.launcher.HostedMinecraftActivity")
+                .putExtra("diagnostics", diagnostics).putExtra("experimental", experimentalRun)));
         });
     }
     @Override protected void onActivityResult(int request, int result, Intent data) {

@@ -70,6 +70,135 @@ EngineVerification verify_loaded_engine(){
     return result;
 }
 
+std::string experimental_registry_getter_probe(){
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+    return "experimental_registry_getter=disabled";
+#else
+    const auto verified=verify_loaded_engine();
+    if(!verified.verified||!verified.profile)return "experimental_registry_getter=blocked;reason=engine_not_verified";
+    if(std::strcmp(verified.profile->id,"bedrock-1.26.50.4-arm64"))
+        return "experimental_registry_getter=blocked;reason=unsupported_profile";
+    Engine engine;dl_iterate_phdr(find_engine,&engine);
+    uintptr_t owner,registry,getter;
+    if(!engine.image.address(0x134d7da0,owner)||!engine.image.address(0x134d7db8,registry)||
+       !engine.image.address(0x103e2d54,getter)||!engine.image.contains(owner,0x158,PF_R|PF_W)||
+       !engine.image.contains(getter,12,PF_R|PF_X))
+        return "experimental_registry_getter=blocked;reason=mapping_mismatch";
+    SelfMemory memory;
+    constexpr uint32_t expected_shape_masked[]={0x90000000,0x91000000,0xd65f03c0};
+    constexpr uint32_t shape_mask[]={0x9f00001f,0xffc003ff,0xffffffff};
+    uint32_t code[3]{};
+    if(!memory.available()||!memory.read(getter,code,sizeof code))
+        return "experimental_registry_getter=blocked;reason=code_unreadable";
+    for(size_t i=0;i<3;++i)if((code[i]&shape_mask[i])!=expected_shape_masked[i])
+        return "experimental_registry_getter=blocked;reason=instruction_mismatch";
+    using Getter=uintptr_t (*)();
+    const auto actual=reinterpret_cast<Getter>(getter)();
+    if(actual!=registry||!engine.image.contains(actual,0x158,PF_R|PF_W))
+        return "experimental_registry_getter=failed;reason=return_mismatch";
+    char result[192];
+    std::snprintf(result,sizeof result,
+        "experimental_registry_getter=ok;pid=%d;tid=%d;profile=%s;registry=0x%llx;abi=arm64_no_arguments_return_pointer;mutation=none",
+        getpid(),gettid(),verified.profile->id,static_cast<unsigned long long>(actual));
+    return result;
+#endif
+}
+
+std::string experimental_vanilla_block_lookup_probe(){
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+    return "vanilla_block_lookup=disabled";
+#else
+    const auto verified=verify_loaded_engine();
+    if(!verified.verified||!verified.profile)return "vanilla_block_lookup=blocked;reason=engine_not_verified";
+    if(std::strcmp(verified.profile->id,"bedrock-1.26.50.4-arm64"))
+        return "vanilla_block_lookup=blocked;reason=unsupported_profile";
+    Engine engine;dl_iterate_phdr(find_engine,&engine);
+    uintptr_t owner,registry,vtable,typeinfo,name,getter,lookup;
+    constexpr char expected_name[]="N7Bedrock5OwnerI17BlockTypeRegistryEE";
+    if(!engine.image.address(0x134d7da0,owner)||!engine.image.address(0x134d7db8,registry)||
+       !engine.image.address(0x13104308,vtable)||!engine.image.address(0x13104318,typeinfo)||
+       !engine.image.address(0x339eb9c,name)||!engine.image.address(0x103e2d54,getter)||
+       !engine.image.address(0x103e5648,lookup)||!engine.image.contains(owner,0x158,PF_R|PF_W)||
+       !engine.image.contains(vtable-8,32,PF_R)||!engine.image.contains(typeinfo,16,PF_R)||
+       !engine.image.contains(name,sizeof expected_name,PF_R)||!engine.image.contains(getter,12,PF_R|PF_X)||
+       !engine.image.contains(lookup,16,PF_R|PF_X))
+        return "vanilla_block_lookup=blocked;reason=mapping_mismatch";
+    SelfMemory memory;
+    if(!memory.available())return "vanilla_block_lookup=blocked;reason=self_memory_denied";
+    constexpr uint32_t expected_getter[]={0xb00187a0,0x9136e000,0xd65f03c0};
+    constexpr uint32_t expected_lookup[]={0x2a1f03e2,0x2a1f03e3,0x2a1f03e4,0x14000196};
+    uintptr_t owner_vptr=0,owner_typeinfo=0,owner_name=0;
+    char owner_text[sizeof expected_name]{};uint32_t getter_code[3]{},lookup_code[4]{};
+    if(!memory.read(owner,&owner_vptr,sizeof owner_vptr)||owner_vptr!=vtable||
+       !memory.read(vtable-8,&owner_typeinfo,sizeof owner_typeinfo)||owner_typeinfo!=typeinfo||
+       !memory.read(typeinfo+8,&owner_name,sizeof owner_name)||owner_name!=name||
+       !memory.read(name,owner_text,sizeof owner_text)||std::memcmp(owner_text,expected_name,sizeof expected_name)||
+       !memory.read(getter,getter_code,sizeof getter_code)||std::memcmp(getter_code,expected_getter,sizeof getter_code)||
+       !memory.read(lookup,lookup_code,sizeof lookup_code)||std::memcmp(lookup_code,expected_lookup,sizeof lookup_code))
+        return "vanilla_block_lookup=blocked;reason=registry_or_abi_mismatch";
+    // The verified getter returns this static address. Worker threads call no engine code.
+    uintptr_t root=0;
+    if(!memory.read(registry+8,&root,sizeof root))
+        return "registry_sample=blocked;reason=root_unreadable";
+    const auto describe=[&](uintptr_t object,uintptr_t& object_vptr,char* out,size_t capacity)->bool{
+        if(!object||!out||capacity<2||!memory.read(object,&object_vptr,sizeof object_vptr)||object_vptr<8||
+           !engine.image.contains(object_vptr-8,16,PF_R))return false;
+        uintptr_t dynamic_type=0,dynamic_name=0;
+        if(!memory.read(object_vptr-8,&dynamic_type,sizeof dynamic_type)||
+           !engine.image.contains(dynamic_type,16,PF_R)||
+           !memory.read(dynamic_type+8,&dynamic_name,sizeof dynamic_name)||
+           !engine.image.contains(dynamic_name,1,PF_R))return false;
+        for(size_t i=0;i+1<capacity;++i){
+            if(dynamic_name>UINTPTR_MAX-i||!engine.image.contains(dynamic_name+i,1,PF_R)||
+               !memory.read(dynamic_name+i,&out[i],1))return false;
+            if(!out[i])return true;
+        }
+        return false;
+    };
+    char header[512];
+    std::snprintf(header,sizeof header,
+        "registry_sample=done;pid=%d;tid=%d;profile=%s;engine_sha256=%s;phase=explicit_manual_probe;registry=0x%llx;root=0x%llx;engine_calls=0;mutation=none;key_encoding=unverified_raw_hex;value_ownership=unverified",
+        getpid(),gettid(),verified.profile->id,verified.profile->sha256,
+        static_cast<unsigned long long>(registry),static_cast<unsigned long long>(root));
+    std::string result=header;
+    uintptr_t queue[9]{root},visited[4]{};
+    size_t pending=1,head=0,count=0;
+    while(head<pending&&count<4){
+        const uintptr_t node=queue[head++];
+        if(!node)continue;
+        bool seen=false;
+        for(size_t i=0;i<count;++i)if(visited[i]==node)seen=true;
+        if(seen)continue;
+        unsigned char bytes[0x50]{},again[0x50]{};
+        if(node%alignof(uintptr_t)||!memory.read(node,bytes,sizeof bytes)||
+           !memory.read(node,again,sizeof again)||std::memcmp(bytes,again,sizeof bytes)){
+            result+=";node_sample=unstable_or_unreadable";break;
+        }
+        uintptr_t left=0,right=0,value=0,value_vptr=0;
+        std::memcpy(&left,bytes,sizeof left);
+        std::memcpy(&right,bytes+8,sizeof right);
+        std::memcpy(&value,bytes+0x48,sizeof value);
+        char key_hex[81]{},type[128]{},entry[512];
+        constexpr char hex[]="0123456789abcdef";
+        for(size_t i=0;i<40;++i){key_hex[2*i]=hex[bytes[0x20+i]>>4];key_hex[2*i+1]=hex[bytes[0x20+i]&15];}
+        const bool typed=describe(value,value_vptr,type,sizeof type);
+        std::snprintf(entry,sizeof entry,
+            ";node%zu=0x%llx,key20_hex=%s,value48=0x%llx,value_rtti=%s",
+            count,static_cast<unsigned long long>(node),key_hex,
+            static_cast<unsigned long long>(value),typed?type:"unvalidated");
+        result+=entry;
+        visited[count++]=node;
+        queue[pending++]=left;queue[pending++]=right;
+    }
+    uintptr_t final_root=0,final_vptr=0;
+    if(!memory.read(registry+8,&final_root,sizeof final_root)||final_root!=root||
+       !memory.read(owner,&final_vptr,sizeof final_vptr)||final_vptr!=vtable)
+        return "registry_sample=discarded;reason=owner_or_root_changed;mutation=none";
+    result+=";sampled_nodes="+std::to_string(count)+";root_unchanged=1;snapshot=best_effort_not_locked;lookup=not_invoked_key_abi_unverified";
+    return result;
+#endif
+}
+
 std::string observe_block_registry(){
     const auto verified=verify_loaded_engine();
     if(!verified.verified||!verified.profile)return "registry_observation=unavailable;reason=engine_not_verified";
@@ -114,4 +243,16 @@ extern "C" const char* hybrid_diagnostic_registry_snapshot(){
     thread_local std::string result;
     try{result=hybrid::observe_block_registry();return result.c_str();}
     catch(...){return "registry_observation=unavailable;reason=diagnostic_exception";}
+}
+
+extern "C" const char* hybrid_experimental_registry_getter_probe(){
+    thread_local std::string result;
+    try{result=hybrid::experimental_registry_getter_probe();return result.c_str();}
+    catch(...){return "experimental_registry_getter=failed;reason=exception";}
+}
+
+extern "C" const char* hybrid_experimental_vanilla_block_lookup_probe(){
+    thread_local std::string result;
+    try{result=hybrid::experimental_vanilla_block_lookup_probe();return result.c_str();}
+    catch(...){return "vanilla_block_lookup=failed;reason=exception";}
 }

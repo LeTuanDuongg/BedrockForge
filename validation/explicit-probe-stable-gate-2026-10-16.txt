@@ -1,0 +1,12 @@
+
+build\native-arm64-stable-check\libhybridmcpe.so:	file format elf64-littleaarch64
+
+Disassembly of section .text:
+
+000000000001e40c <Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalEnabled>:
+   1e40c: 2a1f03e0     	mov	w0, wzr
+   1e410: d65f03c0     	ret
+
+000000000001e428 <Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger>:
+   1e428: 12800060     	mov	w0, #-0x4               // =-4
+   1e42c: d65f03c0     	ret

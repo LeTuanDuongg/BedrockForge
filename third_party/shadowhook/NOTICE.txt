@@ -1,0 +1,7 @@
+ShadowHook 2.0.1 is Copyright (c) 2021-2026 ByteDance Inc. and is licensed under MIT. Its full license is in `LICENSE`.
+
+xdl is Copyright (c) 2020-2024 HexHacking Team and is licensed under MIT. Its full license is in `third_party/xdl/LICENSE`.
+
+Linux syscall support is Copyright (c) 2005-2011 Google Inc. and is licensed under the 3-clause BSD license. Its full license is in `third_party/lss/LICENSE`.
+
+`third_party/bsd/queue.h` contains the Regents of the University of California 3-clause BSD notice. `third_party/bsd/tree.h` contains the Niels Provos 2-clause BSD notice. Their complete notices appear in the respective source headers.

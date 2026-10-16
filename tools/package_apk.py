@@ -36,6 +36,18 @@ apk = build / "launcher-unsigned.apk"
 with zipfile.ZipFile(apk, "a", compression=zipfile.ZIP_DEFLATED) as out:
     out.write(build / "dex/classes.dex", "classes.dex")
     out.write(build / "apksig-NOTICE.txt", "assets/third-party/apksig-NOTICE.txt")
-    for name in ("libhybridmcpe.so", "libiron_chest.so", "libhybrid_diagnostic.so"):
-        out.write(build / "native-arm64" / name, "lib/arm64-v8a/" + name)
+    cache = (build / "native-arm64/CMakeCache.txt").read_text(errors="replace")
+    if "HYBRID_EXPERIMENTAL_NATIVE:BOOL=ON" in cache:
+        out.write(root / "third_party/shadowhook/NOTICE.txt", "assets/third-party/shadowhook-NOTICE.txt")
+        out.write(root / "third_party/shadowhook/LICENSE", "assets/third-party/shadowhook-LICENSE.txt")
+        out.write(root / "third_party/shadowhook/third_party/xdl/LICENSE", "assets/third-party/shadowhook-xdl-LICENSE.txt")
+        out.write(root / "third_party/shadowhook/third_party/lss/LICENSE", "assets/third-party/shadowhook-lss-LICENSE.txt")
+    names = ["libhybridmcpe.so", "libiron_chest.so", "libhybrid_diagnostic.so"]
+    if "HYBRID_EXPERIMENTAL_NATIVE:BOOL=ON" in cache:
+        names.extend(["libhybrid_experimental_registry_probe.so", "libshadowhook.so", "libshadowhook_nothing.so"])
+    for name in names:
+        source = build / "native-arm64" / name
+        if not source.exists():
+            source = build / "native-arm64/shadowhook-build" / name
+        out.write(source, "lib/arm64-v8a/" + name)
 print(apk)

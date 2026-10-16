@@ -2,15 +2,17 @@ param(
     [string]$Sdk = 'C:/Users/letua/AppData/Local/Android/Sdk',
     [string]$Jdk = 'C:/Users/letua/Documents/ChatGPT/ReverseEngine/tools/jdk/jdk-21.0.12.1+1',
     [string]$Python = 'C:/Users/letua/AppData/Local/Programs/Python/Python314/python.exe',
-    [switch]$PreloaderAdapter
+    [switch]$PreloaderAdapter,
+    [switch]$ExperimentalNative,
+    [switch]$ExperimentalEngineHook
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $build = Join-Path $root 'build'
 $tools = Join-Path $Sdk 'build-tools/36.0.0'
 $android = Join-Path $Sdk 'platforms/android-36/android.jar'
-$cmake = Join-Path $Sdk 'cmake/3.22.1/bin/cmake.exe'
-$ninja = Join-Path $Sdk 'cmake/3.22.1/bin/ninja.exe'
+$cmake = Join-Path $Sdk 'cmake/4.1.2/bin/cmake.exe'
+$ninja = Join-Path $Sdk 'cmake/4.1.2/bin/ninja.exe'
 $ndk = Join-Path $Sdk 'ndk/28.2.13676358/build/cmake/android.toolchain.cmake'
 function Run([string]$program, [string[]]$arguments) {
     & $program @arguments
@@ -20,7 +22,11 @@ New-Item -ItemType Directory -Force -Path "$build/java", "$build/game-api", "$bu
 $env:JAVA_HOME = $Jdk
 $env:JDK_JAVA_OPTIONS = "-Djava.io.tmpdir=$build/tmp"
 $adapter = if ($PreloaderAdapter) { 'ON' } else { 'OFF' }
-Run $cmake @('-S', $root, '-B', "$build/native-arm64", '-G', 'Ninja', "-DCMAKE_MAKE_PROGRAM=$ninja", "-DCMAKE_TOOLCHAIN_FILE=$ndk", '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-31', '-DANDROID_STL=c++_static', '-DCMAKE_BUILD_TYPE=RelWithDebInfo', "-DHYBRID_BOOTSTRAP_PRELOADER=$adapter")
+$experimental = if ($ExperimentalNative) { 'ON' } else { 'OFF' }
+$engineHook = if ($ExperimentalEngineHook) { 'ON' } else { 'OFF' }
+$env:TEMP = "$build/tmp"
+$env:TMP = "$build/tmp"
+Run $cmake @('-S', $root, '-B', "$build/native-arm64", '-G', 'Ninja', "-DCMAKE_MAKE_PROGRAM=$ninja", "-DCMAKE_TOOLCHAIN_FILE=$ndk", '-DANDROID_ABI=arm64-v8a', '-DANDROID_PLATFORM=android-31', '-DANDROID_STL=c++_static', '-DCMAKE_BUILD_TYPE=RelWithDebInfo', "-DHYBRID_BOOTSTRAP_PRELOADER=$adapter", "-DHYBRID_EXPERIMENTAL_NATIVE=$experimental", "-DHYBRID_EXPERIMENTAL_ENGINE_HOOK=$engineHook")
 Run $cmake @('--build', "$build/native-arm64")
 Run $Python @("$root/tools/package_apk.py", 'dependencies', $tools)
 Run "$Jdk/bin/javac.exe" @('--release', '17', '-classpath', $android, '-d', "$build/game-api", "$root/android/compileOnly/com/mojang/minecraftpe/MainActivity.java")

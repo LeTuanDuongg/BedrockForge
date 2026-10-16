@@ -1,0 +1,44 @@
+10-16 23:23:59.815 15255 15255 I HybridMCPE: host_stage=notification_class_resolved loader=dev.hybridmcpe.launcher.HostFactory$1[DexPathList[[zip file "/data/app/~~52X-T5yrVfvlfk5-fsQ-NQ==/dev.hybridmcpe.launcher-mLIMtLIsyZWbptaBk1Xptg==/base.apk", zip file "/data/data/dev.hybridmcpe.launcher/files/versions/acc6e42eeae9e46d2bde9c43096f10509c7b537a1deb207e6624ca45347539f0/apks/0.apk"],nativeLibraryDirectories=[/data/data/dev.hybridmcpe.launcher/files/versions/acc6e42eeae9e46d2bde9c43096f10509c7b537a1deb207e6624ca45347539f0/native/arm64-v8a, /data/app/~~52X-T5yrVfvlfk5-fsQ-NQ==/dev.hybridmcpe.launcher-mLIMtLIsyZWbptaBk1Xptg==/lib/arm64, /system/lib64, /system/system_ext/lib64]]]
+10-16 23:23:59.815 15255 15255 I HybridMCPE: host_stage=verified_apk_set pid=15255 engine=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1
+10-16 23:23:59.875 15255 15255 I HybridMCPE: host_stage=original_sdk_initialization_completed pid=15255
+10-16 23:24:00.053 15255 15255 I HybridMCPE: host_stage=original_activity_onCreate_begin pid=15255
+10-16 23:24:00.228 15255 15255 I HybridMCPE: host_stage=original_activity_onCreate_returned; menu_not_yet_verified pid=15255
+10-16 23:24:00.228 15255 15255 I HybridMCPE: host_stage=candidate_trace_armed elapsed_ns=424299336768884 pid=15255 interception=disabled;engine_access=deferred_until_mod_start
+10-16 23:24:00.383 15255 15255 I HybridMCPE: host_stage=resume pid=15255
+10-16 23:24:00.401 15255 15255 I HybridMCPE: host_stage=diagnostic_begin pid=15255 tid=15255 elapsed_ns=424299508926279
+10-16 23:24:04.541 15255 15255 I HybridMCPE: diagnostic_mod=start abi=1 pid=15255 capabilities=0
+10-16 23:24:09.396 15255 15255 I HybridMCPE: diagnostic_registry registry_observation=ok;pid=15255;tid=15255;profile=bedrock-1.26.50.4-arm64;owner_rva=0x134d7da0;registry_rva=0x134d7db8;direct_access_pointer=0x0;direct_access_nonzero=0;callable=0;registration=unavailable
+10-16 23:24:09.396 15255 15255 I HybridMCPE: native_diagnostic engine_verified:1.26.50.4;layout_validated=0;profile=bedrock-1.26.50.4-arm64;sha256=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1;arch=AArch64;introspection=fingerprint_only;capabilities=0;gameplay_binding=unavailable;diagnostic_load=0
+10-16 23:24:09.397 15255 15255 I HybridMCPE: host_stage=diagnostic_attempt pid=15255 result=engine_verified:1.26.50.4;layout_validated=0;profile=bedrock-1.26.50.4-arm64;sha256=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1;arch=AArch64;introspection=fingerprint_only;capabilities=0;gameplay_binding=unavailable;diagnostic_load=0
+10-16 23:24:09.397 15255 15255 I HybridMCPE: experimental_module_load=begin;pid=15255;tid=15255
+10-16 23:24:09.398 15255 15255 I HybridMCPE: experimental_mod_abi_start=entered;pid=15255;tid=15255
+10-16 23:24:14.248 15255 15255 I HybridMCPE: experimental_registry_getter=ok;pid=15255;tid=15255;profile=bedrock-1.26.50.4-arm64;registry=0x762df29db8;abi=arm64_no_arguments_return_pointer;mutation=none pid=15255
+10-16 23:24:14.248 15255 15255 I HybridMCPE: candidate_trace_stage=mod_start_entered;elapsed_ns=263493211417921;pid=15255;tid=15255;interception=disabled
+10-16 23:24:14.248 15255 15255 I HybridMCPE: candidate_trace_stage=engine_verification_begin;elapsed_ns=263493211437348;pid=15255;tid=15255;
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace_stage=engine_verification_complete;elapsed_ns=263498061674221;pid=15255;tid=15255;bedrock-1.26.50.4-arm64
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace_stage=target_resolution_begin;elapsed_ns=263498061847971;pid=15255;tid=15255;
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace_stage=target_resolution_complete;elapsed_ns=263498061965367;pid=15255;tid=15255;base=0x761aa52000;callsite=0x762a58e1ac;target=0x762aed9d40
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace_stage=candidate_validation_begin;elapsed_ns=263498061981669;pid=15255;tid=15255;
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace_stage=candidate_validation_complete;elapsed_ns=263498062032815;pid=15255;tid=15255;callsite_rva=0xfb3c1ac;target_rva=0x10487d40;instruction=0x94252ee5
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace_stage=hook_install_skipped;elapsed_ns=263498062051044;pid=15255;tid=15255;reason=interception_disabled;code_mutation=none
+10-16 23:24:19.098 15255 15255 I HybridMCPE: candidate_trace=validated;interception=disabled;code_mutation=none pid=15255
+10-16 23:24:19.098 15255 15255 I HybridMCPE: self_hook_stage=shadowhook_init_begin
+10-16 23:24:19.112 15255 15255 I HybridMCPE: self_hook_stage=shadowhook_init_complete;version=shadowhook version 2.0.1
+10-16 23:24:19.112 15255 15255 I HybridMCPE: self_hook_stage=install_begin;target=0x76905c0bb0
+10-16 23:24:19.114 15255 15255 I HybridMCPE: self_hook_stage=install_complete;stub=0xb4000077567b9fb0;original=0x7960a5d080
+10-16 23:24:19.114 15255 15255 I HybridMCPE: self_hook_stage=invoked;return=42;proxy_hits=1;original_calls=1
+10-16 23:24:19.114 15255 15255 I HybridMCPE: self_hook_stage=unhook_begin;stub=0xb4000077567b9fb0
+10-16 23:24:19.114 15255 15255 I HybridMCPE: self_hook_stage=cleanup_complete;return=42;proxy_hits=1;original_calls=1;clean=1
+10-16 23:24:19.114 15255 15255 I HybridMCPE: self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified pid=15255
+10-16 23:24:19.114 15255 15255 I HybridMCPE: engine_candidate_hook=disabled;reason=waiting_for_self_hook_test pid=15255
+10-16 23:24:19.114 15255 15255 I HybridMCPE: registry_trigger=armed;automatic=0;used=0;pid=15255;tid=15255
+10-16 23:24:19.114 15255 15255 I HybridMCPE: experimental_module_load=0
+10-16 23:24:19.114 15255 15255 I HybridMCPE: host_stage=experimental_registry_probe pid=15255 result=experimental_module_load=0
+10-16 23:24:19.116 15255 15255 I HybridMCPE: registry_trigger=registered;sender_permission=android.permission.DUMP;automatic=0
+10-16 23:29:23.598 15255 15255 I HybridMCPE: registry_trigger=request;elapsed_ns=424622706106260;pid=15255;tid=15255
+10-16 23:29:23.599 15255 15255 I HybridMCPE: registry_trigger=received;result=0;elapsed_ns=424622706920062;pid=15255;tid=15255;thread=android_main;world_state=externally_confirmed_only
+10-16 23:29:23.601 15255 16854 I HybridMCPE: registry_trigger=execute;phase=explicit_manual_probe;elapsed_ns=424622708810219;pid=15255;tid=16854;engine_thread=0
+10-16 23:29:28.391 15255 16854 I HybridMCPE: registry_sample=done;pid=15255;tid=16854;profile=bedrock-1.26.50.4-arm64;engine_sha256=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1;phase=explicit_manual_probe;registry=0x762df29db8;root=0xb4000077068d7d70;engine_calls=0;mutation=none;key_encoding=unverified_raw_hex;value_ownership=unverified;node_sample=unstable_or_unreadable;sampled_nodes=0;root_unchanged=1;snapshot=best_effort_not_locked;lookup=not_invoked_key_abi_unverified
+10-16 23:29:28.391 15255 16854 I HybridMCPE: registry_trigger=complete;elapsed_ns=424627499479956;pid=15255;tid=16854
+10-16 23:31:06.530 15255 15255 I HybridMCPE: registry_trigger=request;elapsed_ns=424725638489242;pid=15255;tid=15255
+10-16 23:31:06.531 15255 15255 I HybridMCPE: registry_trigger=received;result=-2;elapsed_ns=424725639769034;pid=15255;tid=15255;thread=android_main;world_state=externally_confirmed_only

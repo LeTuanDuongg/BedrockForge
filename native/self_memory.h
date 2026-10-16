@@ -18,6 +18,10 @@ public:
         return read(reinterpret_cast<uintptr_t>(&marker),&copy,sizeof copy)&&copy==marker;
     }
     bool read(uintptr_t address,void* out,size_t size) const {
+#if defined(__ANDROID__) && defined(__aarch64__)
+        // Android heap pointers carry top-byte tags; kernel remote addresses need the address bits.
+        address&=0x00ffffffffffffffULL;
+#endif
         if(!out||!size||address>static_cast<uintptr_t>(std::numeric_limits<ssize_t>::max())||
            size>static_cast<uintptr_t>(std::numeric_limits<ssize_t>::max())-address)return false;
         iovec local{out,size},remote{reinterpret_cast<void*>(address),size};
