@@ -14,8 +14,12 @@ struct Runtime {
     std::vector<Loaded> loaded;
     std::string status="engine_absent";
     bool verified=false;
+    bool lifecycle_blocked=false;
+    bool shutdown_pending=false;
     HybridHost host{HYBRID_ABI,sizeof(HybridHost),0};
 };
+constexpr const char* cleanup_failed="runtime_cleanup_incomplete:mod_stop_failed;handles_retained";
+constexpr const char* shutdown_failed="runtime_shutdown_incomplete:mod_stop_failed;handles_retained";
 // Dependency constructors can arrive before other translation units initialize.
 Runtime& runtime(){static Runtime state;return state;}
 bool check_engine(Runtime& state){
@@ -33,7 +37,7 @@ bool stop_mod(Loaded& loaded){
 extern "C" const char* hybrid_probe(){
     auto& state=runtime();
     std::lock_guard<std::mutex> guard(state.lock);
-    if(!state.verified)state.verified=check_engine(state);
+    if(!state.lifecycle_blocked&&!state.verified)state.verified=check_engine(state);
     // Thread-local storage keeps returned diagnostics valid across other callers.
     thread_local std::string result;result=state.status;return result.c_str();
 }
@@ -42,6 +46,7 @@ extern "C" int hybrid_load_mod(const char* path){
     std::lock_guard<std::mutex> guard(state.lock);
     auto& status=state.status;
     auto& loaded=state.loaded;
+    if(state.lifecycle_blocked){status=state.shutdown_pending?shutdown_failed:cleanup_failed;return -8;}
     if(!path||path[0]!='/'){status="mod_path_must_be_absolute";return -1;}
     if(!state.verified)state.verified=check_engine(state);
     if(!state.verified)return -2;
@@ -64,6 +69,7 @@ extern "C" int hybrid_load_mod(const char* path){
 extern "C" int hybrid_enable_mods(){
     auto& state=runtime();
     std::lock_guard<std::mutex> guard(state.lock);
+    if(state.lifecycle_blocked){state.status=state.shutdown_pending?shutdown_failed:cleanup_failed;return -4;}
     if(!state.verified&&!check_engine(state))return -1;
     std::vector<Loaded*> started;
     try{started.reserve(state.loaded.size());}catch(...){state.status="mod_resume_allocation_failed";return -2;}
@@ -72,10 +78,14 @@ extern "C" int hybrid_enable_mods(){
         if(!start_mod(state,entry)){
             bool rollback_ok=true;
             for(auto it=started.rbegin();it!=started.rend();++it){
-                rollback_ok=stop_mod(**it)&&rollback_ok;
-                (*it)->active=false;
+                if(stop_mod(**it))(*it)->active=false;
+                else rollback_ok=false;
             }
-            state.status=rollback_ok?"mod_resume_failed":"mod_resume_rollback_failed";
+            if(rollback_ok)state.status="mod_resume_failed";
+            else{
+                state.lifecycle_blocked=true;
+                state.status="runtime_cleanup_incomplete:resume_rollback_failed;handles_retained";
+            }
             return -3;
         }
         entry.active=true;started.push_back(&entry);
@@ -88,20 +98,37 @@ extern "C" int hybrid_disable_mods(){
     bool stopped=true;
     for(auto it=state.loaded.rbegin();it!=state.loaded.rend();++it){
         if(!it->active)continue;
-        stopped=stop_mod(*it)&&stopped;
-        it->active=false;
+        if(stop_mod(*it))it->active=false;
+        else stopped=false;
     }
-    state.status=stopped?"mods_disabled":"mod_stop_failed";
+    if(!stopped){
+        state.lifecycle_blocked=true;
+        state.status=state.shutdown_pending?shutdown_failed:cleanup_failed;
+    }else if(state.shutdown_pending){
+        state.lifecycle_blocked=true;
+        state.status=shutdown_failed;
+    }else{
+        state.lifecycle_blocked=false;
+        state.status="mods_disabled";
+    }
     return stopped?0:-1;
 }
 extern "C" void hybrid_shutdown(){
     auto& state=runtime();
     std::lock_guard<std::mutex> guard(state.lock);
     auto& loaded=state.loaded;
+    state.shutdown_pending=true;
+    bool stopped=true;
     for(auto it=loaded.rbegin();it!=loaded.rend();++it){
-        if(it->active)stop_mod(*it);
+        if(it->active&&!stop_mod(*it)){stopped=false;continue;}
         it->active=false;
-        dlclose(it->handle);
     }
-    loaded.clear();state.verified=false;state.host.capabilities=0;state.status="runtime_stopped";
+    state.verified=false;state.host.capabilities=0;
+    if(!stopped){
+        state.lifecycle_blocked=true;
+        state.status=shutdown_failed;
+        return;
+    }
+    for(auto& entry:loaded)dlclose(entry.handle);
+    loaded.clear();state.lifecycle_blocked=false;state.shutdown_pending=false;state.status="runtime_stopped";
 }

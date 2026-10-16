@@ -28,9 +28,13 @@ int hybrid_load_mod(const char* absolute_path);
 int hybrid_enable_mods(void);
 int hybrid_disable_mods(void);
 void hybrid_shutdown(void);
-/* Return codes: 0 loaded; -1 invalid path; -2 engine not verified;
+/* Load codes: 0 loaded; -1 invalid path; -2 engine not verified;
    -3 dlopen failed; -4 missing/invalid ABI; -5 missing capabilities;
-   -6 duplicate ID; -7 start failed. Lifecycle returns 0 on success. */
+   -6 duplicate ID; -7 start failed; -8 cleanup/shutdown incomplete.
+   Enable codes: 0 success; -1 engine not verified; -2 allocation failure;
+   -3 mod resume failed; -4 cleanup/shutdown incomplete. Disable returns 0
+   when all active mods stop, -1 if any stop callback fails. A failed stop
+   blocks load/enable; shutdown retains module handles until cleanup succeeds. */
 #ifdef __cplusplus
 }
 #endif

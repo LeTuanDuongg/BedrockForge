@@ -61,4 +61,18 @@ if(BUILD_TESTING)
   target_include_directories(hybrid_native_tests PRIVATE sdk native)
   target_link_libraries(hybrid_native_tests PRIVATE hybridmcpe)
   add_test(NAME hybrid_native_tests COMMAND hybrid_native_tests)
+  if(ANDROID)
+    add_library(hybrid_runtime_test_mod SHARED tests/runtime_lifecycle_mod.cpp)
+    target_include_directories(hybrid_runtime_test_mod PRIVATE sdk)
+    target_compile_options(hybrid_runtime_test_mod PRIVATE -Wall -Wextra -Werror -fexceptions)
+    add_executable(hybrid_runtime_lifecycle_tests
+      native/runtime.cpp
+      tests/runtime_engine_stub.cpp
+      tests/runtime_lifecycle_tests.cpp)
+    target_include_directories(hybrid_runtime_lifecycle_tests PRIVATE sdk native)
+    target_link_libraries(hybrid_runtime_lifecycle_tests PRIVATE ${CMAKE_DL_LIBS})
+    target_compile_options(hybrid_runtime_lifecycle_tests PRIVATE -Wall -Wextra -Werror -fexceptions)
+    add_test(NAME hybrid_runtime_lifecycle_tests COMMAND hybrid_runtime_lifecycle_tests
+      $<TARGET_FILE:hybrid_runtime_test_mod>)
+  endif()
 endif()

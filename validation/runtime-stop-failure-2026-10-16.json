@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-16",
+  "target": "Minecraft Bedrock 1.26.52.3 ARM64; Samsung Galaxy M51 (SM-M515F), Android 12",
+  "change": "Keep a mod active and its shared library mapped when stop() fails; block further loads/enables until shutdown retry succeeds.",
+  "verification": {
+    "toolchain": "Android NDK r28.2, arm64-v8a",
+    "build": "PASS: hybridmcpe, hybrid_native_tests, runtime lifecycle harness and test mod",
+    "device": "PASS: ADB authorized device RF8R31WEK5A; no Minecraft app or world accessed",
+    "isolated_runtime_lifecycle_test": "PASS: failed stop preserves active state; failed shutdown retains handles; load/enable blocked; retry succeeds",
+    "existing_native_tests": "PASS: profile selection, SHA-256, absent-engine gating, lifecycle gating, path validation and shutdown",
+    "python_tests": "PASS: python -m unittest tests.test_engine_profile tests.test_engine_contracts (3 tests)"
+  },
+  "test_scope": "Runtime test uses an isolated engine-verification stub. This validates host lifecycle safety only; it does not call Minecraft engine functions or establish in-game integration.",
+  "not_tested": [
+    "Minecraft gameplay or live Preloader host",
+    "Preloader adapter lifecycle regression suite (not repeated)",
+    "Container, ItemStack or UI engine calls"
+  ],
+  "deployment_status": "modified-APK route remains NO-GO; no game installation or world data changed"
+}
