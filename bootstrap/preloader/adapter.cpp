@@ -60,8 +60,8 @@ bool on_enable(void* instance, pl::mod::ModContext&) noexcept {
     auto& bridge = *static_cast<RuntimeBridge*>(instance);
     try {
         std::lock_guard<std::mutex> guard(bridge.lock);
-        if (!bridge.loaded || bridge.enabled || !engine_ready()) {
-            record("enable_rejected", "invalid_state_or_engine_not_ready");
+        if (!bridge.loaded || bridge.enabled) {
+            record("enable_rejected", "invalid_state");
             return false;
         }
         if (hybrid_enable_mods() != 0) {

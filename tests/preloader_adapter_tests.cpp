@@ -73,20 +73,20 @@ int main(int argc, char** argv) {
     check(!registration->enable(registration->instance, context), "reject duplicate enable");
     check(enable_count() == 2, "duplicate enable does not dispatch");
 
-    set_probe("engine_absent");
+    set_probe("mods_enabled");
     set_disable_result(-1);
     check(!registration->disable(registration->instance, context), "propagate mod suspend failure");
     set_disable_result(0);
     check(registration->disable(registration->instance, context), "disable active runtime");
     check(disable_count() == 2, "disable dispatch and retry counts");
     check(shutdown_count() == 0, "disable suspends without unloading");
-    check(!registration->enable(registration->instance, context), "reject enable after profile loss");
-    set_probe(verified);
-    check(registration->enable(registration->instance, context), "enable after verified recovery");
+    set_probe("mods_disabled");
+    check(registration->enable(registration->instance, context), "reenable after lifecycle status change");
     check(registration->unload(registration->instance, context), "unload active runtime");
     check(shutdown_count() == 1, "unload active runtime calls shutdown once");
     check(!registration->unload(registration->instance, context), "reject duplicate unload");
 
+    set_probe(verified);
     set_throw(true);
     check(!registration->load(registration->instance, context), "contain probe exception");
     set_throw(false);
