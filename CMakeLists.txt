@@ -4,7 +4,7 @@ option(HYBRID_BOOTSTRAP_PRELOADER "Include the private Preloader C lifecycle ada
 set(HYBRID_MODIFIED_PROFILE_DIR "" CACHE PATH "Generated modified-game fingerprint header directory")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_library(hybridmcpe SHARED native/runtime.cpp)
+add_library(hybridmcpe SHARED native/runtime.cpp native/engine_bridge.cpp)
 target_include_directories(hybridmcpe PUBLIC sdk PRIVATE native)
 target_link_libraries(hybridmcpe PRIVATE ${CMAKE_DL_LIBS})
 target_compile_options(hybridmcpe PRIVATE -Wall -Wextra -Werror)

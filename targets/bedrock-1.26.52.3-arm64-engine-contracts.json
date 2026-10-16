@@ -1,0 +1,145 @@
+{
+  "engine": "Minecraft Bedrock Android 1.26.52.3 ARM64",
+  "sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
+  "ghidra_project": "Minecraft_Analysis copied to build/ghidra-research",
+  "analysis_mode": "existing database, no Auto Analysis; vtable slots decompiled from existing function boundaries",
+  "address_note": "ELF virtual addresses are recorded below. Ghidra's database adds its artificial 0x100000 image base. These are not runtime pointers.",
+  "global_limit": "Ghidra database has no recovered prototypes or calling conventions for these candidates. Decompiled C types are inferred. No candidate is approved for invocation or hooking.",
+  "candidates": [
+    {
+      "class": "21ContainerManagerModel",
+      "slot": 2,
+      "elf_va": "0x0f9591d0",
+      "assembly": ["ldrb w0,[x0,#0x50]", "ret"],
+      "observation": "Reads one byte at object offset 0x50.",
+      "purpose": "Unknown field accessor.",
+      "confidence": "high for instruction behavior; low for semantic meaning",
+      "references": 0,
+      "ownership_lifetime": "Object layout, field meaning and construction are unknown.",
+      "status": "research_only"
+    },
+    {
+      "class": "21ContainerManagerModel",
+      "slot": 3,
+      "elf_va": "0x0f9591d8",
+      "assembly": ["strb w1,[x0,#0x50]", "ret"],
+      "observation": "Writes one byte at object offset 0x50.",
+      "purpose": "Unknown field mutator.",
+      "confidence": "high for instruction behavior; low for semantic meaning",
+      "references": 0,
+      "ownership_lifetime": "No evidence establishes whether the field describes slots, UI state, or another property.",
+      "status": "research_only"
+    },
+    {
+      "class": "9Inventory",
+      "slot": 2,
+      "elf_va": "0x0f9da378",
+      "assembly": ["ldr x8,[x0]", "mov w1,#0x24", "ldr x2,[x8,#0x188]", "br x2"],
+      "observation": "Tail-dispatches through a vtable entry at byte offset 0x188 with constant 0x24.",
+      "purpose": "Unknown forwarding operation.",
+      "confidence": "medium for dispatch pattern; low for semantic meaning",
+      "references": 0,
+      "ownership_lifetime": "Target implementation and argument contract are unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "9Inventory",
+      "slot": 3,
+      "elf_va": "0x0f884004",
+      "observation": "Existing database function is large and branch-heavy; Ghidra decompilation has PIC and control-flow uncertainty.",
+      "purpose": "Unknown inventory operation.",
+      "confidence": "low",
+      "references": 3,
+      "ownership_lifetime": "Inputs, effects, ownership and error behavior unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "15ChestBlockActor",
+      "slot": 2,
+      "elf_va": "0x106ee5fc",
+      "observation": "Large decompilation with PIC construction and unreachable-block warnings; one xref in the existing database.",
+      "purpose": "Unknown virtual operation; no persistence or inventory contract established.",
+      "confidence": "low",
+      "references": 1,
+      "ownership_lifetime": "Actor creation, destruction, world ownership and serialization unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "15ChestBlockActor",
+      "slot": 3,
+      "elf_va": "0x106eea98",
+      "observation": "Large decompilation with PIC construction and unreachable-block warnings; one xref in the existing database.",
+      "purpose": "Unknown virtual operation; no persistence or inventory contract established.",
+      "confidence": "low",
+      "references": 1,
+      "ownership_lifetime": "Actor creation, destruction, world ownership and serialization unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "16ScreenController",
+      "slot": 2,
+      "elf_va": "0x09b15f34",
+      "assembly": ["ret"],
+      "observation": "No-op body shared by ChestScreenController and ContainerScreenController at this slot.",
+      "purpose": "Unknown base virtual default.",
+      "confidence": "high for observed body; low for role",
+      "references": 0,
+      "ownership_lifetime": "No screen lifecycle contract inferred.",
+      "status": "research_only"
+    },
+    {
+      "class": "16ScreenController",
+      "slot": 3,
+      "elf_va": "0x09b15f38",
+      "assembly": ["ldr x20,[x0,#0x750]", "ldr x21,[x0,#0x758]", "cmp x20,x21"],
+      "observation": "Reads object fields at offsets 0x750 and 0x758 and iterates a pointer range; two database code references.",
+      "purpose": "Possibly range cleanup/iteration; exact operation unresolved.",
+      "confidence": "medium for range behavior; low for semantic meaning",
+      "references": 2,
+      "ownership_lifetime": "Element type, allocator and controller lifecycle unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "21ChestScreenController",
+      "slot": 3,
+      "elf_va": "0x09a24938",
+      "observation": "Large function with seven database call references and PIC/unreachable-block warnings.",
+      "purpose": "Unknown screen-controller virtual operation.",
+      "confidence": "low",
+      "references": 7,
+      "ownership_lifetime": "Screen creation, navigation and container binding unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "26InventoryTransactionPacket",
+      "slot": 2,
+      "elf_va": "0x0c149810",
+      "assembly": ["mov w0,#0x1e", "ret"],
+      "observation": "Returns constant 0x1e.",
+      "purpose": "Unknown packet/type discriminator candidate; not transaction processing evidence.",
+      "confidence": "high for constant return; low for meaning",
+      "references": 0,
+      "ownership_lifetime": "No transaction validation or item transfer behavior established.",
+      "status": "research_only"
+    },
+    {
+      "class": "26InventoryTransactionPacket",
+      "slot": 3,
+      "elf_va": "0x0c149818",
+      "observation": "Returns a 16-byte inferred value containing address-like constant data and 0x1a.",
+      "purpose": "Unknown metadata/type descriptor candidate.",
+      "confidence": "low",
+      "references": 0,
+      "ownership_lifetime": "ABI and returned object representation unresolved.",
+      "status": "research_only"
+    }
+  ],
+  "unavailable_capabilities": ["container", "chest_ui", "persistence"],
+  "next_evidence_needed": [
+    "constructor and destructor call paths for inventory/container ownership",
+    "slot mutation and transaction validation call chains with concrete callers",
+    "block and block-actor registry factories for a custom placeable block",
+    "screen registration/navigation lifecycle and input routing",
+    "world save/load serialization contract and owner lifetime"
+  ]
+}
