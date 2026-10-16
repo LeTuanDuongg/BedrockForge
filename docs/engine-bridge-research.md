@@ -43,4 +43,6 @@ Once a permitted host exists, the first runtime experiment should only verify li
 
 ## Authorized deployment status
 
+The [first custom-block integration audit](engine-integration-test-block.md) records the current source-based process boundary, M51 package identity, corrected Preloader unload behavior and unwind-bounded block-registry observations. It does not establish block registration or gameplay. The original target, zero gameplay capabilities and modified-APK NO-GO result remain unchanged.
+
 Microsoft's current Bedrock creator documentation describes Android delivery through Add-On/world-pack import and the JavaScript Script API. I found no documented, supported native C++ in-process mod-loading interface for Bedrock Android in those official references ([Add-On install guidance](https://learn.microsoft.com/en-us/minecraft/creator/documents/gettingstarted?view=minecraft-bedrock-stable), [Script API](https://learn.microsoft.com/en-us/minecraft/creator/scriptapi)). This does not prove no private partner interface exists; it means HybridMCPE has no verified authorized native host to target today. The existing native runtime and Mod ABI remain usable if such a host or a permitted local test build becomes available.

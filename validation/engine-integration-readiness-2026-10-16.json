@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-16",
+  "branch": "codex/native-engine-bridge-research",
+  "preserved_baseline": ["1e251cd", "fa8fc05"],
+  "device": {"serial": "RF8R31WEK5A", "model": "SM-M515F", "android": "12"},
+  "installed_package": {
+    "package": "com.mojang.minecraftpe",
+    "version_name": "1.26.52.3",
+    "version_code": 982605203,
+    "primary_cpu_abi": "arm64-v8a",
+    "apk_sha256": "b618ac8afda57ec19e5614afbabdc85765d10224dbdc1ec47315a94243e2fdb9",
+    "engine_sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
+    "engine_bytes": 328419680,
+    "verification": "Read-only dumpsys/pm inspection and on-device APK SHA-256 matched the existing local backup APK; hash of that matching backup's ARM64 engine entry matched the research ELF. No package installation or launch."
+  },
+  "validation_stages": {
+    "1_native_build": "PASS: existing Android NDK r28.2 ARM64 project build, including corrected adapter and existing Iron Chest core",
+    "2_in_game_integration_initialization": "NOT RUN: no stable authorized live-game host established. Prior transient modified-process execution remains historical evidence only.",
+    "3_test_block_registration": "BLOCKED: no verified registry mutation contract or live registry object/lifecycle access",
+    "4_world_instantiation": "NOT RUN: hybridmcpe:test_block is not implemented or registered",
+    "5_world_lifecycle": "NOT RUN: no placement, destruction, shutdown or reload evidence"
+  },
+  "independent_tests": "All five ARM64 native suites passed on M51; three existing Python profile/contract tests passed. See preloader-unload-safety-2026-10-16.json for exact binaries and scope.",
+  "engine_research": "Ghidra script ran on the copied project with -noanalysis/-readOnly; unwind-bounded getter decompiled in a transaction that was rolled back. No candidate was invoked or hooked.",
+  "tool_limitations": [
+    "REA offline ELF inspection rejected ARM64 because its configured artifact provider admits Linux x64 only; existing Ghidra 12.1.4 and NDK LLVM were used instead.",
+    "REA ADB provider had no configured adb path; existing SDK platform-tools read-only inspection and authorized test execution succeeded."
+  ],
+  "gameplay_capabilities": 0,
+  "modified_apk_route": "NO-GO unchanged; no clone experiments repeated",
+  "installed_game_and_worlds": "Unchanged; not launched, reinstalled, reset or opened by this work"
+}

@@ -1,0 +1,66 @@
+{
+  "engine": "Minecraft Bedrock Android 1.26.52.3 ARM64",
+  "sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
+  "ghidra_version": "12.1.4",
+  "ghidra_image_base": "0x100000",
+  "address_convention": "elf_va fields are linked ELF virtual addresses. Ghidra analysis addresses add 0x100000 in this database. Neither is a live runtime pointer.",
+  "analysis_script": "tools/ghidra/InspectBlockRegistration.java",
+  "evidence": "validation/block-registration-evidence-2026-10-16.txt",
+  "callable_contracts": [],
+  "registration_enabled": false,
+  "findings": [
+    {
+      "id": "registry_direct_access_getter",
+      "classification": "PARTIALLY VERIFIED",
+      "machine_behavior_classification": "VERIFIED",
+      "elf_va": "0x103e7800",
+      "end_exclusive_elf_va": "0x103e7874",
+      "fde_elf_va": "0x056912a0",
+      "cie_elf_va": "0x0452c1d0",
+      "fde_range_bytes": 116,
+      "diagnostic_function_name": "const BlockTypeRegistry::DirectAccessBlocks &BlockTypeRegistry::getDirectAccessBlocks() const",
+      "name_provenance": "ADRP/ADD references inside the unwind-bounded function to the diagnostic function string, BlockTypeRegistry.cpp and mDirectAccessBlocks expression string. Not an exported symbol or recovered C++ declaration.",
+      "assembly": [
+        "0x103e780c: ldr x8,[x0,#0x130]",
+        "0x103e7814: cbz x8,0x103e7828",
+        "0x103e7818: ldr x0,[x19,#0x130]",
+        "0x103e7824: ret",
+        "0x103e784c: bl 0x1290a19c",
+        "0x103e7860: str w9,[x8] with x8=0, w9=0xdeadc0de on one diagnostic branch"
+      ],
+      "observed_arguments": "Input memory is read relative to x0; normal return places the pointer-sized value from +0x130 in x0. This does not verify a C++ function-pointer type.",
+      "database_signature": "unknown calling convention; zero declared parameters. Temporary decompilation infers one pointer-like argument and an undefined8 return.",
+      "inferred_purpose": "Read the registry's already initialized direct-access-blocks member; not block registration.",
+      "ownership_threading_timing": "Registry instance source, object size, member owner, locking, initialization callback, thread affinity and lifetime remain unknown.",
+      "status": "research_only",
+      "invocation_allowed": false
+    },
+    {
+      "id": "post_level_block_definitions_dependency",
+      "classification": "PARTIALLY VERIFIED",
+      "string_reference_elf_va": "0x0ec39f6c",
+      "function_name_reference_elf_va": "0x0ec39f84",
+      "diagnostic_function_name": "Bedrock::Threading::Async<bool> ServerInstance::_postLevelInitialization(PostLevelArgs &&)",
+      "expression": "level->getBlockDefinitions()",
+      "observation": "An indirect call through vtable byte offset 0xe0 is followed by a non-null check and a diagnostic saying a BlockDefinitionGroup is required to run the server. Byte-verified diagnostic address materializations are recorded; the virtual target and C++ contract are not recovered.",
+      "unknowns": "No verified world callback, registration window, scheduler, Level object acquisition, block creation or mutation interface.",
+      "status": "research_only",
+      "invocation_allowed": false
+    }
+  ],
+  "unsupported_contracts": [
+    "Stable authorized in-game native execution host for this exact engine",
+    "Acquisition and ownership of the actual BlockTypeRegistry instance",
+    "Custom block definition construction and registry insertion/duplicate handling",
+    "Registry initialization timing and game-thread dispatch",
+    "World/Level access, lookup, placement and block lifecycle callbacks",
+    "Block actor factory, destruction and persistence callbacks"
+  ],
+  "limits": [
+    "Static evidence only; neither candidate was invoked or hooked.",
+    "Adjacent ADRP/ADD scan is deliberately incomplete for other reference encodings.",
+    "Unwind bounds identify a code range, not argument types or safe execution timing.",
+    "llvm-objdump nearest-export labels are not function identities for these stripped ranges.",
+    "The absence of readable matching dynamic symbols does not establish the absence of internal registration functions."
+  ]
+}

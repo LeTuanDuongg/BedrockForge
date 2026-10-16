@@ -1,0 +1,65 @@
+Static evidence excerpt, 2026-10-16. No engine execution.
+Engine SHA-256: 53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a
+Ghidra 12.1.4, AARCH64:LE:64:v8A, existing copied Minecraft_Analysis project.
+Image base 0x100000. Addresses below are linked ELF virtual addresses.
+Script: tools/ghidra/InspectBlockRegistration.java
+Full local report: build/ghidra-research/block-registration-2026-10-16.txt
+Options: -process libminecraftpe.so -noanalysis -readOnly
+Temporary getter instructions/function were rolled back. Original research files were not modified.
+
+BYTE-VERIFIED STRINGS
+0x02588624: handheld/src/common/world/level/block/registry/BlockTypeRegistry.cpp (full source-path string in binary)
+0x025f6e45: const BlockTypeRegistry::DirectAccessBlocks &BlockTypeRegistry::getDirectAccessBlocks() const
+0x025f6e04: Tried to use the direct access blocks without initializing them.
+0x0237c9ef: mDirectAccessBlocks
+0x025aac68: We need a BlockDefinitionGroup in order to run the server. Otherwise blocks are broken.
+0x0255d6b3: level->getBlockDefinitions()
+0x0271a22b: Bedrock::Threading::Async<bool> ServerInstance::_postLevelInitialization(PostLevelArgs &&)
+
+ADJACENT ADRP/ADD REFERENCES
+0x103e7828 -> 0x025f6e04: f0f91060 91381000
+0x103e7830 -> 0x0237c9ef: b0f8fca1 9127bc21
+0x103e7838 -> 0x02588624: b0f90d03 91189063
+0x103e7840 -> 0x025f6e45: f0f91064 91391484
+0x0ec39f6c -> 0x025aac68: b0f9cb80 9131a000
+0x0ec39f74 -> 0x0255d6b3: 90f9c921 911acc21
+0x0ec39f84 -> 0x0271a22b: b0f9d704 9108ac84
+One adjacent-pair reference per selected string in the scanned .text bytes.
+This excludes other instruction/reference encodings and does not prove a unique runtime caller.
+
+UNWIND-BOUNDED GETTER
+.eh_frame_hdr: version=1, encodings=1b/03/3b, 754234 FDE table entries.
+FDE 0x056912a0; CIE 0x0452c1d0, augmentation zR, pointer encoding pcrel_sdata4.
+FDE range: [0x103e7800, 0x103e7874), 116 bytes.
+0x103e780c: ldr x8,[x0,#0x130]
+0x103e7810: mov x19,x0
+0x103e7814: cbz x8,0x103e7828
+0x103e7818: ldr x0,[x19,#0x130]
+0x103e7824: ret
+0x103e7848: mov w2,#0x2fd
+0x103e784c: bl 0x1290a19c
+0x103e7850: tbz w0,#0,0x103e7818
+0x103e7854: mov w9,#0xc0de
+0x103e7858: mov x8,xzr
+0x103e785c: movk w9,#0xdead,lsl #16
+0x103e7860: str w9,[x8]
+0x103e7864: ldr x0,[x19,#0x130]
+0x103e7870: ret
+Database convention=unknown; declared parameters=0.
+Temporary pseudocode inferred a pointer-like argument and undefined8 return, with a conditional null write.
+That inferred signature is not approved for use as a function pointer.
+
+POST-LEVEL DIAGNOSTIC WINDOW (LLVM 19.0.1 disassembly corroboration)
+0x0ec39f58: ldr x0,[sp,#0xc0]
+0x0ec39f5c: ldr x8,[x0]
+0x0ec39f60: ldr x8,[x8,#0xe0]
+0x0ec39f64: blr x8
+0x0ec39f68: cbnz x0,0x0ec39fa8
+0x0ec39f6c: adrp x0,0x025aa000
+0x0ec39f70: add x0,x0,#0xc68
+0x0ec39f8c: mov w2,#0x424
+0x0ec39f90: bl 0x1290a19c
+The virtual target, ownership, threading and registration timing remain unverified.
+
+No function above is a verified registration entrypoint.
+No block was registered, placed or tested in Minecraft.
