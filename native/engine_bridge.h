@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
+#include "engine_profiles.h"
 
 namespace hybrid {
 struct EngineVerification {
@@ -11,5 +12,5 @@ struct EngineVerification {
 };
 
 // Verifies the loaded engine image and known layouts. No engine methods are called.
-EngineVerification verify_loaded_engine(const char* target_sha256,size_t target_size);
+EngineVerification verify_loaded_engine();
 }

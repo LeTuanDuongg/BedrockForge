@@ -6,18 +6,8 @@
 #include <string>
 #include <utility>
 #include <vector>
-#ifdef HYBRID_MODIFIED_GAME
-#include "engine_profile.h"
-#endif
 
 namespace {
-#ifdef HYBRID_MODIFIED_GAME
-constexpr auto target=HYBRID_MODIFIED_ENGINE_SHA256;
-constexpr size_t target_size=HYBRID_MODIFIED_ENGINE_SIZE;
-#else
-constexpr auto target="53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a";
-constexpr size_t target_size=328419680;
-#endif
 struct Loaded {void* handle;const HybridMod* mod;std::string id;bool active;};
 struct Runtime {
     std::mutex lock;
@@ -29,7 +19,7 @@ struct Runtime {
 // Dependency constructors can arrive before other translation units initialize.
 Runtime& runtime(){static Runtime state;return state;}
 bool check_engine(Runtime& state){
-    const auto result=hybrid::verify_loaded_engine(target,target_size);
+    const auto result=hybrid::verify_loaded_engine();
     state.status=result.status;state.host.capabilities=result.capabilities;
     return result.verified;
 }

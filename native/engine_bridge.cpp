@@ -25,7 +25,7 @@ int find_engine(dl_phdr_info* info,size_t,void* out){
 }
 }
 
-EngineVerification verify_loaded_engine(const char* target_sha256,size_t target_size){
+EngineVerification verify_loaded_engine(){
     EngineVerification result;
     Engine engine;dl_iterate_phdr(find_engine,&engine);
     if(engine.path.empty()){result.status="engine_absent";return result;}
@@ -40,10 +40,13 @@ EngineVerification verify_loaded_engine(const char* target_sha256,size_t target_
     while((n=std::fread(buffer,1,sizeof buffer,f))){hash.update(buffer,n);total+=n;}
     bool error=std::ferror(f);std::fclose(f);
     if(error){result.status="engine_read_failed";return result;}
-    if(total!=target_size||hash.finish()!=target_sha256){result.status="engine_identity_mismatch";return result;}
+    const auto digest=hash.finish();
+    const auto* profile=select_engine_profile(digest.c_str(),total,elf.e_machine);
+    if(!profile){result.status="engine_profile_unknown";return result;}
     for(const auto& layout:layouts){
         if(!validate_layout(engine.image,layout)){
-            result.status=std::string("engine_verified:1.26.52.3;layout_failed:")+layout.name+
+            result.status=std::string("engine_profile_matched:1.26.52.3;profile=")+profile->id+
+                ";layout_failed="+layout.name+
                 ";capabilities=0;gameplay_binding=unavailable";
             return result;
         }
@@ -51,7 +54,9 @@ EngineVerification verify_loaded_engine(const char* target_sha256,size_t target_
     result.verified=true;
     // RTTI and vtable layout checks verify identity only; no gameplay contract is certified.
     result.capabilities=0;
-    result.status="engine_verified:1.26.52.3;layout_validated=5;introspection=rtti_vtables_read_only;capabilities=0;gameplay_binding=unavailable";
+    result.status=std::string("engine_verified:")+profile->minecraft_version+
+        ";layout_validated=5;profile="+profile->id+";sha256="+profile->sha256+
+        ";arch=AArch64;introspection=rtti_vtables_read_only;capabilities=0;gameplay_binding=unavailable";
     return result;
 }
 }

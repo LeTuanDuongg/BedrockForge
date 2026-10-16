@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-16",
+  "target": {
+    "minecraft_version": "1.26.52.3",
+    "architecture": "AArch64",
+    "elf_class": 64,
+    "elf_machine": 183,
+    "selection_policy": "Exact full SHA-256 + file size + ELF machine; no wildcard or fallback. All five layouts must validate before the runtime enables mod loading.",
+    "profiles": [
+      {
+        "id": "bedrock-1.26.52.3-arm64-original",
+        "artifact": "C:\\MCPE_Research\\libminecraftpe.so",
+        "sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
+        "bytes": 328419680,
+        "identity_check": "REA open_binary reported ELF/arm64; SHA-256 and byte count match target profile.",
+        "layout_source": "targets/bedrock-1.26.52.3-arm64.json; existing Ghidra RTTI/vtable observations.",
+        "runtime_layout_result": "Not yet tested on an unmodified engine. The runtime will still perform all five checks and reject on any mismatch."
+      },
+      {
+        "id": "bedrock-1.26.52.3-arm64-modified",
+        "artifact": "build/modified/libminecraftpe.so",
+        "sha256": "a8942061e3743fce10952627c76615c9e5c0cb07b897efc33f8dabaec96bf4d6",
+        "bytes": 328419680,
+        "identity_check": "REA open_binary reported ELF/arm64; SHA-256 and byte count match target profile.",
+        "layout_source": "targets/bedrock-1.26.52.3-arm64-modified.json; previous M51 game-process observation validated five layouts.",
+        "runtime_layout_result": "Five layouts previously validated on Samsung M51 PID 7312; this turn did not launch Minecraft."
+      }
+    ]
+  },
+  "build": {
+    "ndk": "28.2.13676358",
+    "abi": "arm64-v8a",
+    "runtime_language_standard": "C++17",
+    "preloader_adapter_language_standard": "C++20",
+    "library": {
+      "path": "build/native-arm64/libhybridmcpe.so",
+      "bytes": 3152456,
+      "sha256": "ce091f666b9dd6f5d312573bfede7be6591dc11a90062bea44f035339fc3f41d"
+    }
+  },
+  "tests": {
+    "native_m51": {
+      "device": "Samsung SM-M515F",
+      "android": "12",
+      "abi": "arm64-v8a",
+      "serial": "RF8R31WEK5A",
+      "engine_profile_selection": "PASS: exact original and modified profiles; rejects wrong size, wrong ELF machine, short hash and unknown hash.",
+      "hybrid_native_tests": "PASS",
+      "preloader_adapter_lifecycle_harness": "PASS; fixture/mock runtime only.",
+      "sha_and_layout_self_tests": "PASS",
+      "temporary_device_test_files": "Removed; Minecraft and world data untouched."
+    },
+    "host_python": {
+      "test_engine_profile.py": "PASS (2 tests)",
+      "test_modified_patch.py": "PASS (4 tests); in-memory/parser checks only, no APK written or installed."
+    },
+    "live_minecraft_or_gameplay": "NOT TESTED; no Minecraft start or unverified engine function calls."
+  },
+  "abi": {
+    "mod_abi": 1,
+    "preloader_pin": "7ca94daedfa30d6d4c265fc9b591768e8dc1f5af",
+    "export_set_unchanged": true,
+    "engine_profile_selector_exported": false
+  },
+  "rea_limitations": [
+    "REA open_binary confirmed file identity and ARM64 format for both ELF files.",
+    "REA inspect_binary_layout was unavailable on this Windows host because its verified pwntools profile supports Linux x64 only; original layout evidence remains the existing Ghidra profile and prior M51 modified-engine observation."
+  ]
+}

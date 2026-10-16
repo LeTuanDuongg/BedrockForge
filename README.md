@@ -6,7 +6,7 @@ Native-first Minecraft Bedrock Android mod runtime. Target: Samsung M51, Android
 
 Run `tools/build-modified.ps1` to produce local-only `dist/HybridMCPE-local-game.apk` for package `dev.hybridmcpe.research`. Do not distribute the APK or copied game libraries. No root, Frida or Levi host is used by this route.
 
-The version-pinned patcher adds `DT_NEEDED=libhybridmcpe.so` in existing ELF metadata/padding and signs a separate application. `.text`, `.rodata`, relocations, addresses and file length remain unchanged for this particular patch. Future HybridMCPE engines need not remain unmodified: the existing runtime receives a generated exact hash/size profile for the modified engine.
+The version-pinned patcher adds `DT_NEEDED=libhybridmcpe.so` in existing ELF metadata/padding and signs a separate application. `.text`, `.rodata`, relocations, addresses and file length remain unchanged for this particular patch. Runtime profile selection now accepts only the exact original or exact metadata-patched engine hashes; the patched engine is not a general runtime requirement.
 
 An ELF constructor initializes the existing runtime synchronously. A linker export map prevents static C++ symbols from interposing on the game. All original DEX/native payloads except the deliberately patched engine are retained, including Pairip and MCPELIFE, all original permissions, licensing, purchases and authentication code. Only package identity, package-owned permissions and provider authorities are renamed in the manifest.
 
@@ -37,7 +37,7 @@ Modified engine SHA-256: `a8942061e3743fce10952627c76615c9e5c0cb07b897efc33f8dab
 
 The launcher checks the installed engine SHA-256 and packages the native payload. **It does not inject into Minecraft.** Its button explicitly opens Minecraft with mods inactive.
 
-The native runtime runs inside an existing engine process. It checks ELF identity, the full engine file SHA-256, and five RTTI/vtable layouts before allowing plugin loading. `sdk/hybrid_mod.h` defines the C ABI; plugin loading uses `dlopen`, validates ABI/capabilities and handles lifecycle shutdown. This is not a gameplay SDK yet.
+The native runtime runs inside an existing engine process. It selects only an exact full-SHA-256, size and AArch64 match from `targets/bedrock-1.26.52.3-engine-profiles.json`, then checks five RTTI/vtable layouts before allowing plugin loading. There are no wildcard or fallback profiles. The modified engine's five layouts were validated on M51; the original engine's profile is grounded in the exact Ghidra-target ELF, but still requires runtime layout validation before use. `sdk/hybrid_mod.h` defines the unchanged C ABI; plugin loading uses `dlopen`, validates ABI/capabilities and handles lifecycle shutdown. This is not a gameplay SDK yet.
 
 `mods/iron_chest.cpp` is a blocked native mod descriptor, not a working chest. Container, GUI and persistence capabilities are all unavailable. Even if those flags were mistakenly enabled, its start function fails until real registration code exists. No entity-inventory substitute or simulated game backend is included.
 
