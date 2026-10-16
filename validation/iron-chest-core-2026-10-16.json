@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-16",
+  "target": "Android 12 ARM64, Samsung Galaxy M51 (SM-M515F)",
+  "toolchain": "Android NDK r28.2, arm64-v8a, C++17",
+  "build": "PASS: hybrid_container_core static library and iron_chest_core_tests",
+  "device_tests": {
+    "iron_chest_core_tests": "PASS: exact 54 slots; configurable stack limits; insertion/extraction/split/merge/swap conservation; atomic rollback; duplicate and stale transaction rejection; capacity and index bounds; deterministic round trip; version, truncation and checksum rejection; close lifecycle; maximum-count bounds",
+    "hybrid_self_tests": "PASS",
+    "hybrid_native_tests": "PASS",
+    "runtime_lifecycle_tests": "PASS: failed stops retain handles and retries recover"
+  },
+  "test_scope": "Native isolated tests on M51. No Minecraft engine functions, game installation or world data accessed.",
+  "gameplay_status": "NOT IMPLEMENTED: block/entity registration, native ItemStack conversion, engine transactions, chest UI and world-save hooks remain unavailable."
+}
