@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-16",
+  "tested_change_commit": "7e28b33",
+  "target": {
+    "device": "Samsung SM-M515F",
+    "android": "12",
+    "abi": "arm64-v8a",
+    "serial": "RF8R31WEK5A"
+  },
+  "build": {
+    "ndk": "28.2.13676358",
+    "cmake": "3.22.1",
+    "abi": "arm64-v8a",
+    "artifacts": [
+      {
+        "path": "build/native-arm64/libhybridmcpe.so",
+        "bytes": 3152056,
+        "sha256": "76746520dcba60dc6e880be1f7b8027ad40eea184064606365a5594bbb955e23"
+      },
+      {
+        "path": "build/native-arm64/hybrid_native_tests",
+        "bytes": 1735608,
+        "sha256": "d8bdb659d122fb0787074d5597cbb3ccf96088ee8eab975cf42e2447c97ba006"
+      },
+      {
+        "path": "build/native-arm64/hybrid_self_tests",
+        "bytes": 1764992,
+        "sha256": "ce7545bfeefa6f5a4906bff52b12985180dec27cfb2846aed65ecd00e400bef4"
+      },
+      {
+        "path": "build/native-arm64/hybrid_preloader_tests",
+        "bytes": 29992,
+        "sha256": "d2f07c3f86fb9cf9a66276cf0debb4e8b40ca9a741af86a723a71e4beb76c872"
+      },
+      {
+        "path": "build/native-arm64/libhybridmcpe_preloader_test.so",
+        "bytes": 2997656,
+        "sha256": "8f7aacdbf4409855df25c4c58cd8380e98717f5be419ed9e3421e7eddb0bdea0"
+      }
+    ]
+  },
+  "device_tests": {
+    "hybrid_native_tests": "PASS",
+    "hybrid_self_tests": "PASS",
+    "hybrid_preloader_tests": "PASS; isolated Preloader ABI fixture with mock runtime; callback re-enable succeeds after probe status becomes mods_disabled",
+    "temporary_test_directory": "Removed: /data/local/tmp/hybridmcpe-adapter-check-20261016"
+  },
+  "scope": {
+    "live_minecraft": "NOT TESTED",
+    "real_preloader_host": "NOT TESTED",
+    "gameplay_integration": "NOT TESTED",
+    "minecraft_or_world_data_modified": false
+  }
+}
