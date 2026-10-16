@@ -5,6 +5,7 @@
     hybrid_enable_mods;
     hybrid_disable_mods;
     hybrid_shutdown;
+    hybrid_diagnostic_registry_snapshot;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeProfile;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnostic;

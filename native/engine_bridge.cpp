@@ -1,6 +1,8 @@
 #include "engine_bridge.h"
 #include "engine_layout.h"
 #include "sha256.h"
+#include "self_memory.h"
+#include "registry_diagnostic.h"
 #include <dlfcn.h>
 #include <link.h>
 #include <elf.h>
@@ -57,6 +59,7 @@ EngineVerification verify_loaded_engine(){
         }
     }
     result.verified=true;
+    result.profile=profile;
     // RTTI and vtable layout checks verify identity only; no gameplay contract is certified.
     result.capabilities=0;
     result.status=std::string("engine_verified:")+profile->minecraft_version+
@@ -66,4 +69,49 @@ EngineVerification verify_loaded_engine(){
         ";capabilities=0;gameplay_binding=unavailable";
     return result;
 }
+
+std::string observe_block_registry(){
+    const auto verified=verify_loaded_engine();
+    if(!verified.verified||!verified.profile)return "registry_observation=unavailable;reason=engine_not_verified";
+    if(std::strcmp(verified.profile->id,"bedrock-1.26.50.4-arm64"))
+        return "registry_observation=unavailable;reason=profile_unsupported";
+    Engine engine;dl_iterate_phdr(find_engine,&engine);
+    uintptr_t owner,registry,vtable,typeinfo,name,getter;
+    if(!engine.image.address(0x134d7da0,owner)||!engine.image.address(0x134d7db8,registry)||
+       !engine.image.address(0x13104308,vtable)||!engine.image.address(0x13104318,typeinfo)||
+       !engine.image.address(0x339eb9c,name)||!engine.image.address(0x103e2d54,getter)||
+       !engine.image.contains(owner,0x170,PF_R|PF_W)||!engine.image.contains(vtable-8,32,PF_R)||
+       !engine.image.contains(typeinfo,16,PF_R)||
+       !engine.image.contains(getter,12,PF_R|PF_X))
+        return "registry_observation=unavailable;reason=mapping_mismatch";
+    SelfMemory memory;
+    if(!memory.available())return "registry_observation=unavailable;reason=self_memory_denied";
+    constexpr char expected_name[]="N7Bedrock5OwnerI17BlockTypeRegistryEE";
+    constexpr uint32_t expected_getter[]={0xb00187a0,0x9136e000,0xd65f03c0};
+    uintptr_t actual_vptr=0,actual_typeinfo=0,actual_name=0,first=0,last=0,final_vptr=0;
+    char actual_text[sizeof expected_name]{};uint32_t actual_code[3]{};
+    if(!engine.image.contains(name,sizeof expected_name,PF_R)||
+       !memory.read(owner,&actual_vptr,sizeof actual_vptr)||actual_vptr!=vtable||
+       !memory.read(vtable-8,&actual_typeinfo,sizeof actual_typeinfo)||actual_typeinfo!=typeinfo||
+       !memory.read(typeinfo+8,&actual_name,sizeof actual_name)||actual_name!=name||
+       !memory.read(name,actual_text,sizeof actual_text)||std::memcmp(actual_text,expected_name,sizeof expected_name)||
+       !memory.read(getter,actual_code,sizeof actual_code)||std::memcmp(actual_code,expected_getter,sizeof actual_code))
+        return "registry_observation=unavailable;reason=owner_contract_mismatch";
+    // This field is only sampled. Its pointee is never dereferenced and nonzero does not imply readiness.
+    if(!memory.read(registry+0x130,&first,sizeof first)||
+       !memory.read(registry+0x130,&last,sizeof last)||
+       !memory.read(owner,&final_vptr,sizeof final_vptr)||first!=last||final_vptr!=vtable)
+        return "registry_observation=unavailable;reason=snapshot_unstable_or_unreadable";
+    char sample[512];
+    std::snprintf(sample,sizeof sample,
+        "registry_observation=ok;pid=%d;tid=%d;profile=%s;owner_rva=0x134d7da0;registry_rva=0x134d7db8;direct_access_pointer=0x%llx;direct_access_nonzero=%d;callable=0;registration=unavailable",
+        getpid(),gettid(),verified.profile->id,static_cast<unsigned long long>(first),first!=0);
+    return sample;
+}
+}
+
+extern "C" const char* hybrid_diagnostic_registry_snapshot(){
+    thread_local std::string result;
+    try{result=hybrid::observe_block_registry();return result.c_str();}
+    catch(...){return "registry_observation=unavailable;reason=diagnostic_exception";}
 }

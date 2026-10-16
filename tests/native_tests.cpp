@@ -1,5 +1,6 @@
 #include "hybrid_mod.h"
 #include "engine_bridge.h"
+#include "registry_diagnostic.h"
 #include "sha256.h"
 #include <cstdio>
 #include <cstring>
@@ -33,6 +34,8 @@ int main(){
     hybrid::Sha256 abc;abc.update("abc",3);check(abc.finish()=="ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
     hybrid::Sha256 million;for(int i=0;i<1000000;++i)million.update("a",1);check(million.finish()=="cdc76e5c9914fb9281a1c7e284d73e67f1809a48a497200e046d39ccc7112cd0");
     check(std::strcmp(hybrid_probe(),"engine_absent")==0);
+    check(std::strcmp(hybrid_diagnostic_registry_snapshot(),
+        "registry_observation=unavailable;reason=engine_not_verified")==0);
     check(hybrid_enable_mods()==-1);
     check(hybrid_disable_mods()==0);
     check(hybrid_load_mod(nullptr)==-1);check(hybrid_load_mod("relative.so")==-1);
