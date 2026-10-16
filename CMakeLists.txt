@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 project(HybridMCPE LANGUAGES CXX)
-option(HYBRID_BOOTSTRAP_PRELOADER "Include the private Preloader C lifecycle adapter" OFF)
+option(HYBRID_BOOTSTRAP_PRELOADER "Include the Levi v1.5.24 Preloader registration adapter" OFF)
 set(HYBRID_MODIFIED_PROFILE_DIR "" CACHE PATH "Generated modified-game fingerprint header directory")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,20 +25,35 @@ if(ANDROID)
     target_link_libraries(hybrid_bootstrap_check PRIVATE log)
   endif()
   if(HYBRID_BOOTSTRAP_PRELOADER)
+    set_property(TARGET hybridmcpe PROPERTY CXX_STANDARD 20)
     target_sources(hybridmcpe PRIVATE bootstrap/preloader/adapter.cpp)
     target_link_libraries(hybridmcpe PRIVATE log)
+
+    add_library(hybrid_preloader_test_module SHARED
+      bootstrap/preloader/adapter.cpp
+      tests/preloader_runtime_stub.cpp)
+    target_include_directories(hybrid_preloader_test_module PRIVATE
+      sdk bootstrap/preloader tests)
+    target_link_libraries(hybrid_preloader_test_module PRIVATE log)
+    target_compile_options(hybrid_preloader_test_module PRIVATE -Wall -Wextra -Werror)
+    set_target_properties(hybrid_preloader_test_module PROPERTIES
+      CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON
+      OUTPUT_NAME hybridmcpe_preloader_test)
+
+    add_executable(hybrid_preloader_tests tests/preloader_adapter_tests.cpp)
+    target_include_directories(hybrid_preloader_tests PRIVATE
+      bootstrap/preloader tests)
+    target_link_libraries(hybrid_preloader_tests PRIVATE ${CMAKE_DL_LIBS})
+    target_compile_options(hybrid_preloader_tests PRIVATE -Wall -Wextra -Werror)
+    set_target_properties(hybrid_preloader_tests PROPERTIES
+      CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+    add_dependencies(hybrid_preloader_tests hybrid_preloader_test_module)
   endif()
 endif()
 add_library(iron_chest SHARED mods/iron_chest.cpp)
 target_include_directories(iron_chest PRIVATE sdk)
 include(CTest)
 if(BUILD_TESTING)
-  if(ANDROID AND HYBRID_BOOTSTRAP_PRELOADER)
-    add_executable(hybrid_preloader_tests tests/preloader_adapter_tests.cpp)
-    target_include_directories(hybrid_preloader_tests PRIVATE bootstrap/preloader)
-    target_link_libraries(hybrid_preloader_tests PRIVATE hybridmcpe)
-    add_test(NAME hybrid_preloader_tests COMMAND hybrid_preloader_tests)
-  endif()
   add_executable(hybrid_self_tests tests/sha_tests.cpp)
   target_include_directories(hybrid_self_tests PRIVATE native)
   add_test(NAME hybrid_self_tests COMMAND hybrid_self_tests)

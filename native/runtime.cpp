@@ -4,6 +4,7 @@
 #include <cstring>
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 #ifdef HYBRID_MODIFIED_GAME
 #include "engine_profile.h"
@@ -17,7 +18,7 @@ constexpr size_t target_size=HYBRID_MODIFIED_ENGINE_SIZE;
 constexpr auto target="53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a";
 constexpr size_t target_size=328419680;
 #endif
-struct Loaded {void* handle;const HybridMod* mod;std::string id;};
+struct Loaded {void* handle;const HybridMod* mod;std::string id;bool active;};
 struct Runtime {
     std::mutex lock;
     std::vector<Loaded> loaded;
@@ -31,6 +32,12 @@ bool check_engine(Runtime& state){
     const auto result=hybrid::verify_loaded_engine(target,target_size);
     state.status=result.status;state.host.capabilities=result.capabilities;
     return result.verified;
+}
+bool start_mod(Runtime& state, Loaded& loaded){
+    try{return loaded.mod->start(&state.host)==0;}catch(...){return false;}
+}
+bool stop_mod(Loaded& loaded){
+    try{loaded.mod->stop();return true;}catch(...){return false;}
 }
 }
 extern "C" const char* hybrid_probe(){
@@ -57,13 +64,54 @@ extern "C" int hybrid_load_mod(const char* path){
     if(!mod||mod->abi!=HYBRID_ABI||mod->size<sizeof(HybridMod)||!mod->id||!mod->id[0]||!mod->start||!mod->stop)return fail(-4,"mod_abi_invalid");
     if(mod->required_capabilities&~state.host.capabilities)return fail(-5,"mod_blocked:required_engine_capabilities_unavailable");
     for(const auto& prior:loaded)if(prior.id==mod->id)return fail(-6,"mod_duplicate_id");
-    if(mod->start(&state.host)!=0)return fail(-7,"mod_start_failed");
-    loaded.push_back({handle,mod,mod->id});status="mod_loaded:"+loaded.back().id;return 0;
+    Loaded loaded_mod{handle,mod,mod->id,false};
+    if(!start_mod(state,loaded_mod))return fail(-7,"mod_start_failed");
+    loaded_mod.active=true;
+    try{loaded.push_back(std::move(loaded_mod));}
+    catch(...){stop_mod(loaded_mod);return fail(-7,"mod_registry_allocation_failed");}
+    status="mod_loaded:"+loaded.back().id;return 0;
+}
+extern "C" int hybrid_enable_mods(){
+    auto& state=runtime();
+    std::lock_guard<std::mutex> guard(state.lock);
+    if(!state.verified&&!check_engine(state))return -1;
+    std::vector<Loaded*> started;
+    try{started.reserve(state.loaded.size());}catch(...){state.status="mod_resume_allocation_failed";return -2;}
+    for(auto& entry:state.loaded){
+        if(entry.active)continue;
+        if(!start_mod(state,entry)){
+            bool rollback_ok=true;
+            for(auto it=started.rbegin();it!=started.rend();++it){
+                rollback_ok=stop_mod(**it)&&rollback_ok;
+                (*it)->active=false;
+            }
+            state.status=rollback_ok?"mod_resume_failed":"mod_resume_rollback_failed";
+            return -3;
+        }
+        entry.active=true;started.push_back(&entry);
+    }
+    state.status="mods_enabled";return 0;
+}
+extern "C" int hybrid_disable_mods(){
+    auto& state=runtime();
+    std::lock_guard<std::mutex> guard(state.lock);
+    bool stopped=true;
+    for(auto it=state.loaded.rbegin();it!=state.loaded.rend();++it){
+        if(!it->active)continue;
+        stopped=stop_mod(*it)&&stopped;
+        it->active=false;
+    }
+    state.status=stopped?"mods_disabled":"mod_stop_failed";
+    return stopped?0:-1;
 }
 extern "C" void hybrid_shutdown(){
     auto& state=runtime();
     std::lock_guard<std::mutex> guard(state.lock);
     auto& loaded=state.loaded;
-    for(auto it=loaded.rbegin();it!=loaded.rend();++it){it->mod->stop();dlclose(it->handle);}
+    for(auto it=loaded.rbegin();it!=loaded.rend();++it){
+        if(it->active)stop_mod(*it);
+        it->active=false;
+        dlclose(it->handle);
+    }
     loaded.clear();state.verified=false;state.host.capabilities=0;state.status="runtime_stopped";
 }

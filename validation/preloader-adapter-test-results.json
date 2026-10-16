@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-16",
+  "target_host": {
+    "device": "Samsung SM-M515F",
+    "android": "12",
+    "abi": "arm64-v8a",
+    "serial": "RF8R31WEK5A"
+  },
+  "preloader_contract": {
+    "levi_release": "v1.5.24",
+    "preloader_commit": "7ca94daedfa30d6d4c265fc9b591768e8dc1f5af",
+    "symbol": "PLGetModRegistration",
+    "registration_size_arm64": 40,
+    "lifecycle_callback_type": "bool (*)(void*, pl::mod::ModContext&)",
+    "source": "https://github.com/LiteLDev/preloader-android/blob/7ca94daedfa30d6d4c265fc9b591768e8dc1f5af/include/pl/Mod.hpp"
+  },
+  "build": {
+    "ndk": "28.2.13676358",
+    "android_platform": 31,
+    "android_stl": "c++_static",
+    "adapter_language_standard": "C++20",
+    "elf_class": "ELF64",
+    "elf_machine": "AArch64"
+  },
+  "results": {
+    "arm64_registration_and_lifecycle_harness": "PASS",
+    "covered": [
+      "registration symbol and stable table",
+      "registration layout and non-null callbacks",
+      "engine fingerprint gate and failed-load retry",
+      "duplicate load/enable/unload rejection",
+      "ABI 1 mod enable/disable dispatch and retry after failure",
+      "probe exception containment",
+      "shutdown once on unload, including after disable"
+    ],
+    "existing_hybrid_native_tests": "PASS",
+    "existing_hybrid_self_tests": "PASS",
+    "live_preloader_or_minecraft": "NOT TESTED; harness uses a mock runtime and dummy ModContext"
+  },
+  "artifacts": {
+    "build/native-arm64/libhybridmcpe.so": {
+      "sha256": "6612fb9c89337b36ceff755d3207a198d8b50d97080cd4f5def2ac1a53724703",
+      "bytes": 3134144
+    },
+    "build/native-arm64/libhybridmcpe_preloader_test.so": {
+      "sha256": "0cdd0d6be3f24eba9bb824987caa26be9d679ede7d1ee4595f5e5077b18b4057",
+      "bytes": 2998048
+    },
+    "build/native-arm64/hybrid_preloader_tests": {
+      "sha256": "aaa74c39ee022047b1d7a8701373e62e7a32654f1e6e2ed01dca963390784e37",
+      "bytes": 30136
+    },
+    "build/native-arm64/hybrid_native_tests": {
+      "sha256": "b58c0a4b63d9910ff49d482dfa246664494f765889054002c44d3b18a81ea4c8",
+      "bytes": 1728432
+    }
+  },
+  "device_cleanup": "Only /data/local/tmp/hybridmcpe-preloader-abi test files were removed; Minecraft and world data were untouched."
+}

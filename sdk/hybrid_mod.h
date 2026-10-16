@@ -24,10 +24,13 @@ typedef struct HybridMod {
 typedef const HybridMod* (*HybridModEntry)(void);
 const char* hybrid_probe(void);
 int hybrid_load_mod(const char* absolute_path);
+/* Suspend or resume loaded ABI 1 mods without unloading their libraries. */
+int hybrid_enable_mods(void);
+int hybrid_disable_mods(void);
 void hybrid_shutdown(void);
 /* Return codes: 0 loaded; -1 invalid path; -2 engine not verified;
    -3 dlopen failed; -4 missing/invalid ABI; -5 missing capabilities;
-   -6 duplicate ID; -7 start failed. Probe returns diagnostics. */
+   -6 duplicate ID; -7 start failed. Lifecycle returns 0 on success. */
 #ifdef __cplusplus
 }
 #endif

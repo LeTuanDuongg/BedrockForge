@@ -2,8 +2,10 @@
   global:
     hybrid_probe;
     hybrid_load_mod;
+    hybrid_enable_mods;
+    hybrid_disable_mods;
     hybrid_shutdown;
     Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe;
-    PLMod_*;
+    PLGetModRegistration;
   local: *;
 };

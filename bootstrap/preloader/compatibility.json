@@ -1,21 +1,35 @@
 {
-  "adapter": "preloader-c-lifecycle",
-  "contract_commit": "5d108da350ce3e7f13f51415f81e65344ecd5d14",
+  "adapter": "preloader-cpp-registration",
+  "preloader_revision": "7ca94daedfa30d6d4c265fc9b591768e8dc1f5af",
+  "levi_release": "v1.5.24",
+  "abi": {
+    "registration_symbol": "PLGetModRegistration",
+    "registration_size_arm64": 40,
+    "lifecycle_signature": "bool (*)(void*, pl::mod::ModContext&)",
+    "callbacks": ["load", "enable", "disable", "unload"],
+    "mod_context_access": "opaque; adapter does not inspect C++/STL members",
+    "preloader_language_standard": "C++20",
+    "boundary": "AArch64 ELF; no STL objects cross the registration/callback boundary",
+    "native_mod_lifecycle_source": "src/pl/internal/NativeModLifecycle.cpp"
+  },
   "contract_sources": [
-    "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/src/pl/legacy/LegacyMod.h",
-    "https://github.com/LiteLDev/preloader-android/blob/5d108da350ce3e7f13f51415f81e65344ecd5d14/src/pl/internal/NativeModLifecycle.cpp"
+    "https://github.com/LiteLDev/preloader-android/blob/7ca94daedfa30d6d4c265fc9b591768e8dc1f5af/include/pl/Mod.hpp",
+    "https://github.com/LiteLDev/preloader-android/blob/7ca94daedfa30d6d4c265fc9b591768e8dc1f5af/include/pl/Export.hpp",
+    "https://github.com/LiteLDev/preloader-android/blob/7ca94daedfa30d6d4c265fc9b591768e8dc1f5af/src/pl/internal/NativeModLifecycle.cpp"
   ],
   "third_party_implementation_vendored": false,
-  "evaluated_host": "LeviLaunchroid v1.5.27",
+  "abi_harness": "ARM64 test module and dlopen host pass on Samsung M51; mock runtime only",
   "host_deployment_allowed": false,
   "host_evidence": [
-    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.27/minecraft/src/main/java/com/mojang/minecraftpe/store/StoreFactory.java#L13",
-    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.27/minecraft/src/main/java/com/mojang/minecraftpe/store/StubStore.java#L59",
-    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.27/app/src/main/java/org/levimc/launcher/util/NativeImageGuard.java#L41"
+    "https://github.com/LiteLDev/LeviLaunchroid/releases/tag/v1.5.24",
+    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.24/minecraft/src/main/java/com/mojang/minecraftpe/store/StoreFactory.java",
+    "https://github.com/LiteLDev/LeviLaunchroid/blob/v1.5.24/minecraft/src/main/java/com/mojang/minecraftpe/store/StubStore.java"
   ],
   "blockers": [
-    "The hosted game replaces the Google Play store with StubStore, whose license checks unconditionally return true.",
-    "NativeImageGuard may rewrite cached engine libraries through bundled gxcore; byte preservation and integrity behavior are unverified.",
-    "No LICENSE file was found in the pinned standalone Preloader source tree; no implementation or headers are copied or redistributed."
+    "Levi v1.5.24 release notes mention Minecraft 1.26.50; target 1.26.52.3 is not verified.",
+    "StoreFactory routes Google Play store creation to StubStore, whose hasVerifiedLicense() returns true; this host configuration must not be used under the no-bypass requirement.",
+    "NativeImageGuard cache rewrite behavior and byte preservation remain unverified.",
+    "The pinned Preloader source tree has no LICENSE file; no upstream implementation or headers are copied or redistributed.",
+    "The ABI adapter test host is isolated and is not a live LeviLauncher or Minecraft integration test."
   ]
 }
