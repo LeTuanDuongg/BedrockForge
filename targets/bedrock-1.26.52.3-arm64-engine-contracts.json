@@ -2,7 +2,7 @@
   "engine": "Minecraft Bedrock Android 1.26.52.3 ARM64",
   "sha256": "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a",
   "ghidra_project": "Minecraft_Analysis copied to build/ghidra-research",
-  "analysis_mode": "existing database, no Auto Analysis; vtable slots decompiled from existing function boundaries",
+  "analysis_mode": "existing database plus targeted disassembly/function boundaries on copied project; no Auto Analysis",
   "address_note": "ELF virtual addresses are recorded below. Ghidra's database adds its artificial 0x100000 image base. These are not runtime pointers.",
   "global_limit": "Ghidra database has no recovered prototypes or calling conventions for these candidates. Decompiled C types are inferred. No candidate is approved for invocation or hooking.",
   "candidates": [
@@ -11,11 +11,35 @@
       "slot": 2,
       "elf_va": "0x0f9591d0",
       "assembly": ["ldrb w0,[x0,#0x50]", "ret"],
-      "observation": "Reads one byte at object offset 0x50.",
+      "observation": "Reads one byte at object offset 0x50. Adjacent slot 4 reads one byte at 0x51.",
       "purpose": "Unknown field accessor.",
       "confidence": "high for instruction behavior; low for semantic meaning",
       "references": 0,
       "ownership_lifetime": "Object layout, field meaning and construction are unknown.",
+      "status": "research_only"
+    },
+    {
+      "class": "21ContainerManagerModel",
+      "slot": 0,
+      "elf_va": "0x0f9582c0",
+      "assembly": ["adrp/add materialize a vtable-related address", "str x8,[x22],#0x70", "iterates member pointers and dispatches indirect cleanup"],
+      "observation": "44 direct call/jump references in the existing database; body traverses members and invokes an indirect function. Function is a destructor candidate by vtable slot convention and observed cleanup shape.",
+      "purpose": "Likely object teardown; member types and exact destruction order unknown.",
+      "confidence": "medium",
+      "references": 44,
+      "ownership_lifetime": "This candidate suggests owned or referenced subobjects, but allocator, ownership and reentrancy contract are unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "21ContainerManagerModel",
+      "slot": 4,
+      "elf_va": "0x0f9591e0",
+      "assembly": ["ldrb w0,[x0,#0x51]", "ret"],
+      "observation": "Reads a second adjacent byte at object offset 0x51.",
+      "purpose": "Unknown field accessor; adjacency supports separate byte-sized state, not a slot-count interpretation for offset 0x50.",
+      "confidence": "high for instruction behavior; low for semantic meaning",
+      "references": 0,
+      "ownership_lifetime": "Class construction and field meanings are unknown.",
       "status": "research_only"
     },
     {
@@ -51,6 +75,30 @@
       "confidence": "low",
       "references": 3,
       "ownership_lifetime": "Inputs, effects, ownership and error behavior unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "15ChestBlockActor",
+      "slot": 0,
+      "elf_va": "0x106edb8c",
+      "assembly": ["str x8,[x0]", "stp x9,x10,[x0,#0x30]", "str x9,[x0,#0x40]", "str x8,[x0,#0xf8]"],
+      "observation": "Rewrites the object's primary and several subobject vtable pointers and walks member state; 14 database code references. Slot 1 directly calls this candidate.",
+      "purpose": "Destructor candidate; exact inheritance/subobject cleanup semantics are not recovered.",
+      "confidence": "medium-high for cleanup behavior; medium for destructor classification",
+      "references": 14,
+      "ownership_lifetime": "Some member teardown is visible, but block-actor owner, inventory ownership and serialization remain unknown. Ghidra's recovered body spans 155840 bytes and decompilation is skipped.",
+      "status": "research_only"
+    },
+    {
+      "class": "15ChestBlockActor",
+      "slot": 1,
+      "elf_va": "0x106edc74",
+      "assembly": ["mov x19,x0", "bl 0x106edb8c", "mov x0,x19", "b 0x12a118d0"],
+      "observation": "Calls slot 0 with the same object pointer, then tail-branches to 0x12a118d0. This resembles a deleting-destructor path; target helper is unresolved.",
+      "purpose": "Destructor/deallocation candidate, not a safe callable contract.",
+      "confidence": "medium",
+      "references": 0,
+      "ownership_lifetime": "Whether the tail target frees memory and which allocator owns the actor are unverified.",
       "status": "research_only"
     },
     {
@@ -131,6 +179,30 @@
       "confidence": "low",
       "references": 0,
       "ownership_lifetime": "ABI and returned object representation unresolved.",
+      "status": "research_only"
+    },
+    {
+      "class": "9ItemStack",
+      "slot": 0,
+      "elf_va": "0x085ae038",
+      "assembly": ["str x9,[x0]", "ldr w8,[x0,#0x90]", "add x1,x19,#0x80", "blr x8"],
+      "observation": "RTTI/vtable found through RELA. 868 code references target this slot; sampled callsites assign a local/object address to x0 before the direct call. Entry writes a vtable pointer and processes fields at +0x80 and +0x90.",
+      "purpose": "Strong destructor/cleanup candidate based on Itanium-style vtable slot position, object-state updates and callsite evidence.",
+      "confidence": "high for observed assembly and call references; medium-high for destructor classification",
+      "references": 868,
+      "ownership_lifetime": "Shows destruction of stack/local values in sampled callers. Does not establish inventory ownership, copy/move rules, allocator or ABI types. Ghidra body boundary is invalidly broad, so no decompilation is trusted.",
+      "status": "research_only"
+    },
+    {
+      "class": "9ItemStack",
+      "slot": 1,
+      "elf_va": "0x0ffa9474",
+      "assembly": ["str x9,[x0]", "ldr w8,[x0,#0x90]", "add x1,x19,#0x80", "blr x8"],
+      "observation": "212-byte recovered function follows a similar vptr/state cleanup shape; no direct references were found in the existing database.",
+      "purpose": "Possible alternate destructor variant under the C++ ABI; exact role unresolved.",
+      "confidence": "medium for cleanup shape; low-medium for variant classification",
+      "references": 0,
+      "ownership_lifetime": "No allocator or ownership contract established; decompiler reports PIC/control-flow warnings.",
       "status": "research_only"
     }
   ],

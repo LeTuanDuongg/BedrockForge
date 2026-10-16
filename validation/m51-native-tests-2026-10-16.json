@@ -1,0 +1,51 @@
+{
+  "date_local": "2026-10-16",
+  "scope": "Isolated native tests only; Minecraft was not launched, installed, modified or queried for app data.",
+  "adb": {
+    "version": "1.0.41 / 37.0.1-15733141",
+    "initial_failure": "Sandboxed ADB could not connect to 127.0.0.1:5037: Windows socket error 10013 (access forbidden by permissions). No server process or listener was present before the retry.",
+    "resolution": "Started the installed Android SDK ADB server outside the sandbox; subsequent device queries succeeded.",
+    "device_state": "authorized",
+    "model": "Samsung SM-M515F (M51)",
+    "android": "12 / API 31",
+    "abi": "arm64-v8a"
+  },
+  "toolchain": {
+    "android_sdk": "C:/Users/letua/AppData/Local/Android/Sdk",
+    "platform_tools_adb": "C:/Users/letua/AppData/Local/Android/Sdk/platform-tools/adb.exe",
+    "ndk": "28.2.13676358",
+    "clang": "19.0.1",
+    "cmake": "3.22.1",
+    "build_directory": "build/native-arm64",
+    "build_command": "cmake --build build/native-arm64 --target hybridmcpe hybrid_self_tests hybrid_native_tests"
+  },
+  "test_artifacts": [
+    {
+      "path": "build/native-arm64/hybrid_self_tests",
+      "sha256": "CE7545BFEEFA6F5A4906BFF52B12985180DEC27CFB2846AED65ECD00E400BEF4",
+      "device_path": "/data/local/tmp/hybrid_self_tests",
+      "result": "PASS",
+      "covers": "SHA-256 vectors, RTTI/vtable pointer validation, readable/executable bounds, overflow guards",
+      "exit_code": 0
+    },
+    {
+      "path": "build/native-arm64/hybrid_native_tests",
+      "sha256": "BC7FA061BC14A13F3F97E1D89C7A8FE6CDDF463927C8C2B52BD23C79B160CE31",
+      "device_path": "/data/local/tmp/hybrid_native_tests",
+      "result": "PASS",
+      "covers": "engine_absent gating, invalid path rejection, shutdown",
+      "exit_code": 0,
+      "runtime_library": {
+        "path": "build/native-arm64/libhybridmcpe.so",
+        "sha256": "20079E87DDB3073A4A30FF9A92DCEE8C0864B7DBE1CC059C51E2E1C7F80826FA",
+        "device_path": "/data/local/tmp/libhybridmcpe.so"
+      }
+    }
+  ],
+  "host_tests": {
+    "result": "not_run",
+    "reason": "No native Windows C++ compiler was found on PATH. The first host CMake configure also lacked a host Ninja program. Android ARM64 builds were produced and executed on the real M51 instead."
+  },
+  "minecraft_or_world_changes": false,
+  "test_limit": "Real-device ARM64 process tests, not execution inside Minecraft and not gameplay integration."
+}

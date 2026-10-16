@@ -8,7 +8,8 @@ import struct
 TARGET_SHA256 = "53c4a86a8f3dbd7f0d48e440f8607d63c55100aeb364c80d19afefa8097e233a"
 NAMES = ("21ChestScreenController", "25ContainerScreenController", "15ChestBlockActor",
          "21ContainerManagerModel", "9Inventory", "16ScreenController",
-         "27ComplexInventoryTransaction", "27ItemUseInventoryTransaction", "26InventoryTransactionPacket")
+         "27ComplexInventoryTransaction", "27ItemUseInventoryTransaction", "26InventoryTransactionPacket",
+         "9ItemStack")
 
 
 def inspect(data):
@@ -83,6 +84,17 @@ def main():
             for slot, address in enumerate(table["slots"][2:4], start=2):
                 seeds.append(f"{name}.slot{slot} {address}")
     args.output.with_suffix(".seeds").write_text("\n".join(seeds) + "\n", encoding="utf8")
+    contract_seeds = []
+    vtable_seeds = []
+    for name, item in result["rtti"].items():
+        for table_index, table in enumerate(item.get("vtables", [])):
+            vtable_seeds.append(
+                f"{name}.vtable{table_index} {table['vtable_address_point']} {table['typeinfo']}"
+            )
+            for slot, address in enumerate(table["slots"]):
+                contract_seeds.append(f"{name}.vtable{table_index}.slot{slot} {address}")
+    args.output.with_suffix(".contracts.seeds").write_text("\n".join(contract_seeds) + "\n", encoding="utf8")
+    args.output.with_suffix(".contracts.vtables").write_text("\n".join(vtable_seeds) + "\n", encoding="utf8")
     print(f"Verified engine; {sum(bool(v.get('vtables')) for v in result['rtti'].values())} classes with relocation-backed vtables. {args.output}")
 
 

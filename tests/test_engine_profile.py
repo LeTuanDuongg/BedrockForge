@@ -18,7 +18,8 @@ class EngineProfileTests(unittest.TestCase):
         profile = engine.inspect(Path("C:/MCPE_Research/libminecraftpe.so").read_bytes())
         self.assertEqual(profile["sha256"], engine.TARGET_SHA256)
         classes = profile["rtti"]
-        self.assertEqual(len(classes), 9)
+        self.assertEqual(len(classes), len(engine.NAMES))
+        self.assertTrue(classes["9ItemStack"]["vtables"])
         chest = classes["21ChestScreenController"]["vtables"][0]
         self.assertEqual(chest["vtable_address_point"], "0x12ab50a8")
         self.assertEqual(chest["slots"][0], "0x86232d4")
