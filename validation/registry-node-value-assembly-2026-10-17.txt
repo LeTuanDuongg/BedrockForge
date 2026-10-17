@@ -1,0 +1,54 @@
+Minecraft 1.26.50.4 AArch64
+SHA-256 fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1
+All addresses below are ELF virtual addresses, not file offsets or runtime PCs.
+Source: matching LLVM disassembly and targeted saved Ghidra analysis.
+Ghidra database addresses have image base 0x100000 added; converted below.
+
+Constructor sequence (selected instructions, not a complete function):
+103e7300  mov w0, #0x3a8
+103e7304  bl _Znwm@plt
+103e7308  sub x1, x29, #0x40
+103e730c  mov w2, wzr
+103e7310  mov x3, x21
+103e7314  mov x20, x0
+103e7318  bl 0x10209164
+
+Constructor at 0x10209164 calls base 0x101076dc at 0x10209174 and
+stores vtable 0x130f20e0 at 0x10209188. Live RTTI: 8AirBlock.
+
+Registry handoff:
+103e7458  adrp x0, 0x134d7000
+103e745c  add x0, x0, #0xdb8
+103e7460  adrp x2, 0x29c0000
+103e7464  add x2, x2, #0xb17
+103e7468  add x1, sp, #0x30
+103e746c  sub x3, x29, #0x70
+103e7470  add x4, sp, #0x80
+103e7474  bl 0x94f6850
+103e7478  mov x8, x0
+103e747c  ldr x0, [x0, #0x48]
+103e7480  str x20, [x8, #0x48]
+103e7484  cbz x0, 0x103e7494
+103e7488  ldr x8, [x0]
+103e748c  ldr x8, [x8, #0x8]
+103e7490  blr x8
+
+0x94f6850's store at 0x94f691c linked the observed first node through
+registry+8. The subsequent store at 0x103e7480 assigned its AirBlock value.
+The CPU stopped on the next instruction in both hardware watchpoint captures.
+
+Selected parent call sequence:
+092e795c  mov x0, x23
+092e7960  str x20, [sp, #0x28]
+092e7964  bl 0x103e7220
+092e7968  mov x0, x23
+092e796c  mov x1, x24
+092e7970  bl 0x93c32b4
+... optional virtual call at 092e7994; semantic type not established ...
+092e7998  bl 0x94f21f4
+092e799c  mov x0, x23
+092e79a0  mov x1, x24
+092e79a4  bl 0x8ccfc78
+
+Observed relationships are not callable public APIs. Full ownership, context,
+thread scheduling, finalization and state/runtime-ID contracts remain unknown.

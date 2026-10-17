@@ -1,0 +1,196 @@
+{
+  "engine_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "pid": 4552,
+  "load_bias": "0x7618025000",
+  "events": [
+    {
+      "stage": "root_watch_armed",
+      "host_monotonic_ns": 31764609000000,
+      "registry": "0x762b4fcdb8",
+      "root_field": "0x762b4fcdc0",
+      "root_before": "0x0"
+    },
+    {
+      "stage": "root_write",
+      "host_monotonic_ns": 31833718000000,
+      "tid": 4614,
+      "thread": "Thread-11",
+      "pc": "0x762151b920",
+      "elf_va": "0x94f6920",
+      "stop_reason": "watchpoint 1",
+      "stack": [
+        {
+          "pc": "0x762151b920",
+          "elf_va": "0x94f6920",
+          "symbol": null
+        },
+        {
+          "pc": "0x762840c478",
+          "elf_va": "0x103e7478",
+          "symbol": null
+        },
+        {
+          "pc": "0x762130c968",
+          "elf_va": "0x92e7968",
+          "symbol": null
+        },
+        {
+          "pc": "0x762130b308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x7626c5aa7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7621807618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x76217c7c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x76217c62f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a85486c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a854514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a87bae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "root_after": "0x77068e9d70",
+      "x21": "0x77068e9d70",
+      "x23": "0x762b4fcdc0"
+    },
+    {
+      "stage": "node_value_watch_armed",
+      "host_monotonic_ns": 31833734000000,
+      "node": "0x77068e9d70",
+      "field": "0x77068e9db8",
+      "initial_value": "0x0",
+      "key_hex": "48340000af4b58bd1a6d696e6563726166743a616972000000000000000000000000000000000000",
+      "node_hex": "00000000000000000000000000000000c0cd4f2b76000000727665725f6c696248340000af4b58bd1a6d696e6563726166743a6169720000000000000000000000000000000000000000000000000000",
+      "value_already_assigned": false
+    },
+    {
+      "stage": "node_value_write",
+      "host_monotonic_ns": 31834218000000,
+      "tid": 4614,
+      "thread": "Thread-11",
+      "pc": "0x762840c484",
+      "elf_va": "0x103e7484",
+      "stop_reason": "watchpoint 2",
+      "stack": [
+        {
+          "pc": "0x762840c484",
+          "elf_va": "0x103e7484",
+          "symbol": null
+        },
+        {
+          "pc": "0x762130c968",
+          "elf_va": "0x92e7968",
+          "symbol": null
+        },
+        {
+          "pc": "0x762130b308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x7626c5aa7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7621807618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x76217c7c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x76217c62f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a85486c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a854514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a87bae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "node": "0x77068e9d70",
+      "value_before": "0x0",
+      "value_after": "0xb4000077b6d0ed30",
+      "key_unchanged": true,
+      "value": {
+        "raw_pointer": "0xb4000077b6d0ed30",
+        "canonical_pointer": "0x77b6d0ed30",
+        "vptr": "0x762b1170e0",
+        "vtable_elf_va": "0x130f20e0",
+        "typeinfo": "0x762b118c38",
+        "rtti": "8AirBlock",
+        "validation": "engine_itanium_rtti_chain",
+        "ownership": "unknown"
+      }
+    },
+    {
+      "stage": "detach",
+      "host_monotonic_ns": 31834234000000,
+      "success": true,
+      "detail": "success"
+    }
+  ],
+  "engine_memory_writes": 0,
+  "result": "observed_value_write"
+}
