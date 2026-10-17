@@ -44,7 +44,7 @@ with zipfile.ZipFile(apk, "a", compression=zipfile.ZIP_DEFLATED) as out:
         out.write(root / "third_party/shadowhook/third_party/lss/LICENSE", "assets/third-party/shadowhook-lss-LICENSE.txt")
     names = ["libhybridmcpe.so", "libiron_chest.so", "libhybrid_diagnostic.so"]
     if "HYBRID_EXPERIMENTAL_NATIVE:BOOL=ON" in cache:
-        names.extend(["libhybrid_experimental_registry_probe.so", "libshadowhook.so", "libshadowhook_nothing.so"])
+        names.extend(["libhybrid_experimental_registry_probe.so", "libhybrid_button_duration_mod.so", "libshadowhook.so", "libshadowhook_nothing.so"])
     for name in names:
         source = build / "native-arm64" / name
         if not source.exists():

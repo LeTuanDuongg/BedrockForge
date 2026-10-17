@@ -1,0 +1,33 @@
+10-17 10:30:35.576 9054 9054 I HybridMCPE: host_stage=verified_apk_set pid=9054 engine=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1
+10-17 10:30:54.930 9054 9054 I HybridMCPE: button_hook=install_complete;result=0;errno=0;pid=9054;modification=0
+10-17 10:30:54.930 9054 9054 I HybridMCPE: button_mod=lifecycle_start;enabled=0;pid=9054
+10-17 10:30:54.930 9054 9054 I HybridMCPE: button_mod_load=0;pid=9054
+10-17 10:32:56.891 9054 9799 I HybridMCPE: button_hook=hit;pid=9054;tid=9799;elapsed_ns=464435999724789;caller_rva=0x10114c44;state=0xb400007776b495b0;block=0xb4000077b6e1f0d0;vtable=0x762df7ff68;pos=0,94,24;before=30;after=30;flags=0,0;hit=1
+10-17 10:33:45.503 9054 9799 I HybridMCPE: button_hook=hit;pid=9054;tid=9799;elapsed_ns=464484610906854;caller_rva=0x10114c44;state=0xb400007776b495b0;block=0xb4000077b6e1f0d0;vtable=0x762df7ff68;pos=-1,94,25;before=30;after=30;flags=0,0;hit=4
+10-17 10:34:10.652 9054 9336 I HybridMCPE: button_hook=modification_enabled;pid=9054;ticks=200;elapsed_ns=464509760331219
+10-17 10:34:10.652 9054 9336 I HybridMCPE: button_mod=control;operation=1;result=0;enabled=1;pid=9054;tid=9336
+10-17 10:34:10.942 9054 9799 I HybridMCPE: button_hook=hit;pid=9054;tid=9799;elapsed_ns=464510050593823;caller_rva=0x10114c44;state=0xb400007776b495b0;block=0xb4000077b6e1f0d0;vtable=0x762df7ff68;pos=-1,94,25;before=30;after=200;flags=0,0;hit=5
+10-17 10:34:36.836 9054 9336 I HybridMCPE: button_hook=cleanup;result=0;pid=9054;hits=5;retained=0
+10-17 10:34:36.836 9054 9336 I HybridMCPE: button_mod=control;operation=2;result=0;enabled=0;pid=9054;tid=9336
+10-17 10:36:04.461 9054 9336 I HybridMCPE: button_hook=install_complete;result=0;errno=0;pid=9054;modification=0
+10-17 10:36:04.461 9054 9336 I HybridMCPE: button_hook=modification_enabled;pid=9054;ticks=200;elapsed_ns=464623569189978
+10-17 10:36:04.461 9054 9336 I HybridMCPE: button_mod=control;operation=1;result=0;enabled=1;pid=9054;tid=9336
+10-17 10:36:07.709 9054 9336 I HybridMCPE: button_hook=cleanup;result=0;pid=9054;hits=0;retained=0
+10-17 10:36:07.709 9054 9336 I HybridMCPE: button_mod=control;operation=2;result=0;enabled=0;pid=9054;tid=9336
+10-17 10:36:12.535 9054 9336 I HybridMCPE: button_hook=install_complete;result=0;errno=0;pid=9054;modification=0
+10-17 10:36:12.535 9054 9336 I HybridMCPE: button_hook=modification_enabled;pid=9054;ticks=200;elapsed_ns=464631643188464
+10-17 10:36:12.535 9054 9336 I HybridMCPE: button_mod=control;operation=1;result=0;enabled=1;pid=9054;tid=9336
+10-17 10:36:42.242 9054 9799 I HybridMCPE: button_hook=hit;pid=9054;tid=9799;elapsed_ns=464661349864338;caller_rva=0x10114c44;state=0xb400007776b495b0;block=0xb4000077b6e1f0d0;vtable=0x762df7ff68;pos=1,94,15;before=30;after=200;flags=0,0;hit=1
+10-17 10:41:44.143 9054 9054 I HybridMCPE: host_stage=pause pid=9054
+10-17 10:41:44.144 9054 9054 I HybridMCPE: button_hook=cleanup;result=0;pid=9054;hits=1;retained=0
+10-17 10:41:44.145 9054 9054 I HybridMCPE: button_mod=lifecycle_stop;enabled_state_preserved=1;pid=9054
+10-17 10:41:44.148 9054 9054 I HybridMCPE: diagnostic_suspend=0
+10-17 10:43:27.008 9054 9054 I HybridMCPE: button_hook=install_complete;result=0;errno=0;pid=9054;modification=0
+10-17 10:43:27.008 9054 9054 I HybridMCPE: button_hook=modification_enabled;pid=9054;ticks=200;elapsed_ns=465066115901111
+10-17 10:43:27.008 9054 9054 I HybridMCPE: button_mod=lifecycle_start;enabled=1;pid=9054
+10-17 10:43:27.008 9054 9054 I HybridMCPE: diagnostic_resume=0
+10-17 10:55:20.037 17144 17144 I HybridMCPE: button_hook=install_complete;result=0;errno=0;pid=17144;modification=0
+10-17 10:55:20.037 17144 17144 I HybridMCPE: button_mod=lifecycle_start;enabled=0;pid=17144
+10-17 10:56:16.923 17144 17198 W Bedrock: Breakpad dump created in app-private path; dump not accessed
+10-17 10:56:18.165 1179 2074 I ActivityManager: Process dev.hybridmcpe.launcher:game (pid 17144) has died
+10-17 10:56:18.166 847 847 I Zygote: Process 17144 exited due to signal 11 (Segmentation fault)

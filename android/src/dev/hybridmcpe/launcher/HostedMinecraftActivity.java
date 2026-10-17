@@ -121,7 +121,12 @@ public final class HostedMinecraftActivity extends com.mojang.minecraftpe.MainAc
                     String experiment = MainActivity.startExperimentalRegistryProbe(
                         getApplicationInfo().nativeLibraryDir + "/libhybrid_experimental_registry_probe.so");
                     Log.i("HybridMCPE", "host_stage=experimental_registry_probe pid=" + android.os.Process.myPid() + " result=" + experiment);
-                    if (experiment.equals("experimental_module_load=0")) registerExperimentalTrigger();
+                    if (experiment.equals("experimental_module_load=0")) {
+                        String buttonMod = MainActivity.startExperimentalButtonMod(
+                            getApplicationInfo().nativeLibraryDir + "/libhybrid_button_duration_mod.so");
+                        Log.i("HybridMCPE", "host_stage=button_duration_mod pid=" + android.os.Process.myPid() + " result=" + buttonMod);
+                        if (buttonMod.equals("button_mod_load=0")) registerExperimentalTrigger();
+                    }
                 }
             });
         }

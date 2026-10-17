@@ -20,6 +20,7 @@ public final class MainActivity extends Activity {
     private static native String nativeExperimentalRegistryProbe(String path);
     private static native int nativeExperimentalRegistryTrigger();
     private static native int nativeExperimentalButtonTrigger(int operation);
+    private static native String nativeExperimentalButtonModLoad(String path);
     private static native String nativeExperimentalCandidateTraceStart();
     public static String startDiagnostic(String path) { return nativeDiagnostic(path); }
     public static int diagnosticLifecycle(boolean active) { return nativeDiagnosticLifecycle(active); }
@@ -28,6 +29,7 @@ public final class MainActivity extends Activity {
     public static boolean experimentalEnabled() { return nativeExperimentalEnabled(); }
     public static int triggerExperimentalRegistryProbe() { return nativeExperimentalRegistryTrigger(); }
     public static int triggerExperimentalButton(int operation) { return nativeExperimentalButtonTrigger(operation); }
+    public static String startExperimentalButtonMod(String path) { return nativeExperimentalButtonModLoad(path); }
     public static String startExperimentalCandidateTrace() { return nativeExperimentalCandidateTraceStart(); }
     private TextView status;
     private Spinner versions;

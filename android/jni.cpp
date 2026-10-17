@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <string>
+#include <cstdio>
 #include <android/log.h>
 #include <unistd.h>
 #include <dlfcn.h>
@@ -11,6 +12,10 @@ extern "C" int hybrid_disable_mods();
 extern "C" void hybrid_shutdown();
 extern "C" int hybrid_load_mod(const char*);
 extern "C" const char* hybrid_experimental_candidate_trace_start();
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+extern "C" int hybrid_experimental_button_control(unsigned) { return -4; }
+extern "C" int hybrid_engine_button_schedule_126504_control(unsigned) { return -4; }
+#endif
 extern "C" JNIEXPORT jstring JNICALL
 Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe(JNIEnv* env, jclass) {
     return env->NewStringUTF(hybrid_probe());
@@ -56,7 +61,6 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalEnabled(JNIEnv*, jcl
 extern "C" JNIEXPORT jstring JNICALL
 Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe(JNIEnv* env, jclass, jstring path) {
 #ifndef HYBRID_EXPERIMENTAL_NATIVE
-extern "C" int hybrid_experimental_button_control(unsigned) { return -4; }
     (void)path;
     return env->NewStringUTF("experimental_module_load=disabled");
 #else
@@ -94,13 +98,32 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalCandidateTraceStart(
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s", result);
     return env->NewStringUTF(result);
 }
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonModLoad(JNIEnv* env, jclass, jstring path) {
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+    (void)path;
+    return env->NewStringUTF("button_mod_load=disabled");
+#else
+    if (!path) return env->NewStringUTF("button_mod_load=failed;reason=missing_path");
+    const char* text = env->GetStringUTFChars(path, nullptr);
+    if (!text) return nullptr;
+    const int result = hybrid_load_mod(text);
+    env->ReleaseStringUTFChars(path, text);
+    char message[96];
+    std::snprintf(message, sizeof message, "button_mod_load=%d", result);
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s;pid=%d", message, getpid());
+    return env->NewStringUTF(message);
+#endif
+}
+
 extern "C" JNIEXPORT jint JNICALL
 Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonTrigger(JNIEnv*, jclass, jint operation) {
 #ifdef HYBRID_EXPERIMENTAL_NATIVE
     if (operation < 0 || operation > 2) return -1;
-    void* module=dlopen("libhybrid_experimental_registry_probe.so",RTLD_NOW|RTLD_NOLOAD);
+    void* module=dlopen("libhybrid_button_duration_mod.so",RTLD_NOW|RTLD_NOLOAD);
     if (!module) return -4;
-    auto trigger=reinterpret_cast<int (*)(unsigned)>(dlsym(module,"hybrid_experimental_trigger_button"));
+    auto trigger=reinterpret_cast<int (*)(unsigned)>(dlsym(module,"hybrid_button_duration_mod_control"));
     const int result=trigger?trigger(static_cast<unsigned>(operation)):-4;
     dlclose(module);
     return result;

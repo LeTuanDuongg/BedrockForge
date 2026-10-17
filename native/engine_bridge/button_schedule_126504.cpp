@@ -1,5 +1,6 @@
 #include "engine_bridge.h"
 #include "engine_layout.h"
+#include "button_schedule_126504.h"
 #include "self_memory.h"
 #include <android/log.h>
 #include <shadowhook.h>
@@ -81,8 +82,8 @@ int locate(dl_phdr_info* info, size_t, void* output) {
 }
 }
 
-// Private experimental commands: observe, extend stone-button delay, disable/cleanup.
-extern "C" int hybrid_experimental_button_control(unsigned operation) {
+// Experimental 1.26.50.4 bridge: observe, enable the narrowly filtered change, disable and unhook.
+extern "C" int hybrid_engine_button_schedule_126504_control(unsigned operation) {
     std::lock_guard<std::mutex> lock(control_lock);
     if (operation > 2) return -1;
     if (operation == 2) {
@@ -95,14 +96,14 @@ extern "C" int hybrid_experimental_button_control(unsigned operation) {
         return result;
     }
     if (operation == 1) {
-        if (!stub || !observations.load(std::memory_order_acquire)) return -2;
+        if (!stub || !original) return -2;
         modify.store(true, std::memory_order_release);
         __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "button_hook=modification_enabled;pid=%d;ticks=200;elapsed_ns=%llu",
             getpid(), static_cast<unsigned long long>(now()));
         return 0;
     }
-    modify.store(false, std::memory_order_release);
     if (stub) return 0;
+    modify.store(false, std::memory_order_release);
     const auto verified = hybrid::verify_loaded_engine();
     if (!verified.verified || !verified.profile || std::strcmp(verified.profile->id, "bedrock-1.26.50.4-arm64")) return -3;
     hybrid::EngineImage image;
@@ -128,4 +129,9 @@ extern "C" int hybrid_experimental_button_control(unsigned operation) {
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "button_hook=install_complete;result=%d;errno=%d;pid=%d;modification=0",
         result, shadowhook_get_errno(), getpid());
     return result;
+}
+
+// Kept for existing experimental callers; Mod ABI 1 consumers use the versioned bridge symbol.
+extern "C" int hybrid_experimental_button_control(unsigned operation) {
+    return hybrid_engine_button_schedule_126504_control(operation);
 }
