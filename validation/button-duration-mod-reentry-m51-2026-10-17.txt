@@ -1,0 +1,28 @@
+HybridMCPE button-duration mod: enabled world re-entry evidence
+Date: 2026-10-17 (device local time)
+Device: Samsung Galaxy M51, SM_M515F, Android 12
+Target engine: Minecraft 1.26.50.4 ARM64
+Engine SHA-256: fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1
+Test APK: FAAF2288AC5557C87B923E3AF2EA56D8AF429A456873EA68DDB8992D0609C4E5
+Disposable world: HybridMCPE_check
+
+Earlier enabled-exit attempt, PID 11710:
+11:46:27.973 HybridMCPE: host_stage=pause; button_mod=lifecycle_stop;enabled_state_preserved=1
+11:46:59.826 HybridMCPE: button_mod=lifecycle_start;enabled=1; host_stage=resume
+11:46:59.896 HybridMCPE: host_stage=pause; button_mod=lifecycle_stop;enabled_state_preserved=1
+11:47:19.936 HybridMCPE: button_mod=lifecycle_start;enabled=1; host_stage=resume
+11:48:43.800 Android ApplicationExitInfo: pid=11710; reason=SIGNALED; status=11; subreason=ISOLATED NOT NEEDED
+No faulting PC/backtrace was available in the accessible crash logs. Cause remains unknown.
+
+Restart and successful re-entry, PID 18117:
+11:48:52.097 ActivityManager started dev.hybridmcpe.launcher:game PID 18117.
+11:48:53.116 HybridMCPE: host_stage=verified_apk_set; engine=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1
+11:49:12.303 HybridMCPE: button_mod=lifecycle_start;enabled=0; button_mod_load=0
+11:52:28.580 HybridMCPE: button_mod=control;operation=1;result=0;enabled=1;pid=18117;tid=18333
+User saved and quit the disposable world, re-entered, and confirmed the gameplay HUD. Captured screenshot: button-duration-mod-m51-enabled-reentry.png. The process stayed PID 18117.
+11:53:47.513 HybridMCPE: button_mod=control;operation=2;result=0;enabled=0;pid=18117;tid=18333
+11:53:52.783 HybridMCPE: button_mod=control;operation=1;result=0;enabled=1;pid=18117;tid=18333
+11:53:53.197 HybridMCPE: button_mod=control;operation=2;result=0;enabled=0;pid=18117;tid=18333
+After toggles: PID 18117 remained alive; final hook state disabled.
+
+This confirms successful same-process world re-entry while the experimental hook was enabled, plus post-re-entry hook removal/reinstallation. It does not explain the earlier signal-11 exit and is not proof that arbitrary hooks are safe.
