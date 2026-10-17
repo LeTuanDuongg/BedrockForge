@@ -50,6 +50,8 @@ int schedule_snapshot(unsigned phase) {
                 static_cast<unsigned long long>(monotonic_ns()), getpid(), gettid());
             __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s",
                 hybrid_experimental_registry_lifecycle_snapshot(phase));
+            if (phase != 0) __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s",
+                hybrid_experimental_block_registration_126504_probe());
             __android_log_print(ANDROID_LOG_INFO, "HybridMCPE",
                 "registry_trigger=complete;phase=%s;elapsed_ns=%llu;pid=%d;tid=%d",
                 phase_name(phase), static_cast<unsigned long long>(monotonic_ns()), getpid(), gettid());

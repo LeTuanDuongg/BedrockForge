@@ -22,5 +22,6 @@ std::string experimental_registry_lifecycle_snapshot(unsigned phase);
 extern "C" const char* hybrid_experimental_registry_getter_probe();
 extern "C" const char* hybrid_experimental_vanilla_block_lookup_probe();
 extern "C" const char* hybrid_experimental_registry_lifecycle_snapshot(unsigned phase);
+extern "C" const char* hybrid_experimental_block_registration_126504_probe();
 extern "C" const char* hybrid_experimental_candidate_trace_start();
 extern "C" const char* hybrid_experimental_candidate_trace_stop();
