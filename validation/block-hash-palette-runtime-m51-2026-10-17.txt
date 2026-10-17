@@ -1,0 +1,21 @@
+10-17 17:05:53.475 19952 19952 I HybridMCPE: registry_trigger=armed;phase=native_mod_abi_start;result=0;pid=19952;tid=19952
+10-17 17:05:53.476 19952 20098 I HybridMCPE: registry_trigger=execute;phase=native_mod_abi_start;requested_ns=488012581061837;elapsed_ns=488012583978295;pid=19952;tid=20098;engine_calls=0
+10-17 17:05:58.312 19952 20098 I HybridMCPE: registry_sample=done;pid=19952;tid=20098;profile=bedrock-1.26.50.4-arm64;engine_sha256=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1;phase=native_mod_abi_start;registry=0x762b32ddb8;root=0x0;engine_calls=0;mutation=none;key_encoding=observed_hash64_plus_inline_ascii;value_ownership=unverified;sampled_nodes=0;root_unchanged=1;snapshot=best_effort_not_locked;lookup=not_invoked_key_abi_unverified
+10-17 17:05:58.312 19952 20098 I HybridMCPE: registry_trigger=complete;phase=native_mod_abi_start;elapsed_ns=488017420837564;pid=19952;tid=20098
+10-17 17:06:03.161 19952 19952 I HybridMCPE: self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified pid=19952
+10-17 17:06:12.839 19952 19952 I HybridMCPE: cobblestone_constructor_hook=installed;elf_va=0x100fb840;runtime=0x7627f51840;load_bias=0x7617e56000;sha256=fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1;abi=gp4_forwarded;callsite_observed=4_gp_args;full_contract=provisional;reads=0;pid=19952;tid=19952
+10-17 17:06:12.839 19952 19952 I HybridMCPE: block_state_append_hook=installed;elf_va=0x1010d108;pid=19952;tid=19952;abi=observed_gp2;behavior=forward_only;errno=0
+10-17 17:06:12.839 19952 19952 I HybridMCPE: block_palette_append_hook=installed;elf_va=0xfb8ba5c;pid=19952;tid=19952;abi=observed_gp2;behavior=forward_only;errno=0
+10-17 17:06:12.840 19952 19952 I HybridMCPE: cobblestone_constructor_hook=installed;behavior=forward_only;object_dereferences=0 pid=19952
+10-17 17:06:12.840 19952 19952 I HybridMCPE: experimental_module_load=0
+10-17 17:06:12.840 19952 19952 I HybridMCPE: host_stage=experimental_registry_probe pid=19952 result=experimental_module_load=0
+10-17 17:06:12.845 19952 19952 I HybridMCPE: registry_trigger=registered;sender_permission=android.permission.DUMP;automatic=0
+10-17 17:07:14.091 19952 19998 I HybridMCPE: cobblestone_ctor=entry;hit=1;mono_ns=316624840870101;x0_this=0xb4000077b6d0fa20;x1=0x76399f2fa0;x2=0x4;x3=0xb4000076c74989b0;return_pc=0x7621219cc0;pid=19952;tid=19998;object_read=0
+10-17 17:07:14.091 19952 19998 I HybridMCPE: cobblestone_ctor=return;hit=1;mono_ns=316624840940049;this=0xb4000077b6d0fa20;pid=19952;tid=19998;object_read=0
+10-17 17:07:14.725 19952 19998 I HybridMCPE: block_palette_append=entry;pid=19952;tid=19998;selected=0;vtable=0x0;owner=0xb4000077b6e14450;caller=0x76279f6a2c
+10-17 17:07:14.725 19952 19998 I HybridMCPE: block_palette_append=entry;pid=19952;tid=19998;selected=0;vtable=0x0;owner=0xb4000077b6e038f0;caller=0x76279f6a2c
+10-17 17:07:14.744 19952 19998 I HybridMCPE: block_palette_append=observed;pid=19952;tid=19998;mono_ns=316625493899632;palette=0xb400007726b33f40;vtable=0x762aeb6690;state=0xb400007777153a10;type=0xb4000077b6d0fa20;caller=0x76279f6a2c;read=1;index_before=6777;palette_key11c=1741778478;assigned12a=1;last_matches=1;primary_matches=1;count_increased=1;hash_found=1;hash_index=6777;hash_index_matches=1;engine_mutation=original_only
+10-17 17:07:18.955 19952 19990 I HybridMCPE: block_palette_append=observed;pid=19952;tid=19990;mono_ns=316629705169943;palette=0xb40000772869e200;vtable=0x762aeb6690;state=0xb400007777153a10;type=0xb4000077b6d0fa20;caller=0x76279f6a2c;read=1;index_before=6777;palette_key11c=1741778478;assigned12a=1;last_matches=1;primary_matches=1;count_increased=1;hash_found=1;hash_index=6777;hash_index_matches=1;engine_mutation=original_only
+10-17 17:10:28.706 19952 19952 I HybridMCPE: registry_trigger=request;elapsed_ns=488287813867461;pid=19952;tid=19952;phase=world_loaded_manual
+10-17 17:10:28.708 19952 19952 I HybridMCPE: registry_trigger=received;result=0;elapsed_ns=488287815966784;pid=19952;tid=19952;thread=android_main;phase=world_loaded_manual;world_state=externally_confirmed_only
+10-17 17:10:28.708 19952 21875 I HybridMCPE: registry_trigger=execute;phase=world_loaded_manual;requested_ns=488287815227982;elapsed_ns=488287816508867;pid=19952;tid=21875;engine_calls=0

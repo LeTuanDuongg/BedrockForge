@@ -1,0 +1,62 @@
+{
+  "engine_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "architecture": "AArch64",
+  "status": "experimental-observation-only",
+  "registration_enabled": false,
+  "object_model": {
+    "CobblestoneBlock": {
+      "typeinfo_elf_va": "0x130d8918",
+      "vtable_elf_va": "0x130d6190",
+      "direct_base": "BlockType",
+      "base_typeinfo_elf_va": "0x130dfdb8",
+      "inheritance_evidence": "Relocation-backed Itanium __si_class_type_info; not BlockLegacy"
+    },
+    "Block": {
+      "typeinfo_elf_va": "0x130f03a8",
+      "vtable_elf_va": "0x130f01c0",
+      "role": "Observed state/permutation object, distinct from BlockType",
+      "owner_pointer_offset": "0x68",
+      "hash_palette_key_offset": "0x11c",
+      "assignment_flag_offset": "0x12a"
+    },
+    "BlockType": {
+      "state_vector_begin_offset": "0x1e8",
+      "state_vector_end_offset": "0x1f0",
+      "state_vector_capacity_offset": "0x1f8",
+      "primary_state_offset": "0x200",
+      "primary_getter_elf_va": "0x1010c57c",
+      "state_enumerator_elf_va": "0x1010da88",
+      "state_append_candidate_elf_va": "0x1010d108",
+      "state_append_candidate_status": "Assembly moves source pointer into vector and clears source; no matching Cobblestone runtime hit observed"
+    },
+    "BlockHashPalette": {
+      "direct_base": "BlockPalette",
+      "typeinfo_elf_va": "0x130609d8",
+      "vtable_elf_va": "0x13060690",
+      "append_elf_va": "0xfb8ba5c",
+      "base_vector_append_elf_va": "0xfb8bb48",
+      "key_assignment_elf_va": "0xfb8bf28",
+      "state_key_setter_elf_va": "0x101fc8c8",
+      "state_vector_begin_offset": "0x48",
+      "state_vector_end_offset": "0x50",
+      "hash_tree_root_offset": "0x70",
+      "hash_node_key_offset": "0x20",
+      "hash_node_vector_index_offset": "0x28"
+    }
+  },
+  "observed_chain": [
+    "CobblestoneBlock constructor -> recorded object identity",
+    "BlockType primary pointer -> Block; Block owner pointer -> same CobblestoneBlock",
+    "BlockType state enumeration 0x1010da88 -> callback 0xfba0a14",
+    "Callback virtual call at 0xfba0a28 -> BlockHashPalette append 0xfb8ba5c",
+    "Same Block pointer in palette vector; palette hash key maps to its actual vector index"
+  ],
+  "runtime_evidence": "validation/block-hash-palette-runtime-m51-2026-10-17.txt",
+  "limitations": [
+    "Observed in disposable world initialization, PID 19952; no arbitrary engine function was invoked.",
+    "Same state appeared in two distinct palette instances on two threads; their server/client roles and lifetime across world reloads are not established.",
+    "Hash palette key is distinct from vector index. Network protocol and world-save encoding are not established.",
+    "State construction/finalization producer and ownership transfer for a new BlockType remain unverified.",
+    "This is not a callable custom-block registration API and does not enable a stable gameplay capability."
+  ]
+}

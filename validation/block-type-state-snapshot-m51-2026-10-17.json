@@ -1,0 +1,33 @@
+{
+  "engine_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "pid": 16623,
+  "host_monotonic_ns": 40194609000000,
+  "result": "type_state_edge_validated",
+  "block_type": {
+    "pointer": "0xb4000077b6d0e8e0",
+    "vptr": "0x7631b85190",
+    "vtable_elf_va": "0x130d6190",
+    "typeinfo_elf_va": "0x130d8918",
+    "name": "16CobblestoneBlock"
+  },
+  "state_fields": {
+    "begin": "0xb4000076c6a94750",
+    "end": "0xb4000076c6a94758",
+    "capacity": "0xb4000076c6a94758",
+    "primary": "0xb400007777160590"
+  },
+  "state_count": 1,
+  "primary": {
+    "pointer": "0xb400007777160590",
+    "vptr": "0x7631b9f1c0",
+    "vtable_elf_va": "0x130f01c0",
+    "typeinfo_elf_va": "0x130f03a8",
+    "name": "5Block",
+    "owner": "0xb4000077b6d0e8e0",
+    "owner_matches": true,
+    "first_matches": true,
+    "ordinal11c": 1741778478,
+    "assigned12a": 1
+  },
+  "detached": true
+}

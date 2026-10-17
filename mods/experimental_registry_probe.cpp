@@ -86,6 +86,8 @@ int start(const HybridHost* host) {
         hybrid_experimental_hook_self_test(), getpid());
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s pid=%d",
         hybrid_experimental_engine_candidate_hook_start(), getpid());
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s pid=%d",
+        hybrid_experimental_cobblestone_constructor_hook_start(), getpid());
     return 0;
 }
 void stop() {
@@ -96,6 +98,8 @@ void stop() {
     }
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s pid=%d",
         hybrid_experimental_engine_candidate_hook_stop(), getpid());
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s pid=%d",
+        hybrid_experimental_cobblestone_constructor_hook_stop(), getpid());
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s pid=%d",
         hybrid_experimental_candidate_trace_stop(), getpid());
 }

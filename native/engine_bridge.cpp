@@ -3,6 +3,7 @@
 #include "sha256.h"
 #include "self_memory.h"
 #include "registry_diagnostic.h"
+#include "experimental_hooks.h"
 #include <dlfcn.h>
 #include <link.h>
 #include <elf.h>
@@ -200,10 +201,11 @@ std::string experimental_registry_lifecycle_snapshot(unsigned phase){
         }
         if(!id_len)id_valid=false;
         const bool typed=describe(value,value_vptr,type,sizeof type);
+        const int constructor_match=hybrid_experimental_cobblestone_constructor_match(value);
         std::snprintf(entry,sizeof entry,
-            ";node%zu=0x%llx,key20_hex=%s,id_candidate=%s,value48=0x%llx,value_rtti=%s",
+            ";node%zu=0x%llx,key20_hex=%s,id_candidate=%s,value48=0x%llx,value_rtti=%s;cobblestone_ctor_match=%d",
             count,static_cast<unsigned long long>(node),key_hex,id_valid?id_candidate:"unverified",
-            static_cast<unsigned long long>(value),typed?type:"unvalidated");
+            static_cast<unsigned long long>(value),typed?type:"unvalidated",constructor_match);
         result+=entry;
         visited[count++]=node;
         queue[pending++]=left;queue[pending++]=right;
