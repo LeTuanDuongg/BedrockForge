@@ -29,6 +29,22 @@
       "state_append_candidate_elf_va": "0x1010d108",
       "state_append_candidate_status": "Assembly moves source pointer into vector and clears source; no matching Cobblestone runtime hit observed"
     },
+    "StatePopulation": {
+      "function_elf_va": "0x101071e0",
+      "caller_elf_va": "0x103e3024",
+      "primary_assignment_elf_va": "0x10107424",
+      "primary_selection_vtable_offset": "0x410",
+      "allocation_size": "0x130",
+      "state_constructor_elf_va": "0x101f95a0",
+      "state_constructor_call_elf_va": "0x101073a0",
+      "post_constructor_initializer_elf_va": "0x101fc434",
+      "observed_assignment": "PID 3491 TID 3537: first value-changing watchpoint at PC 0x10107428, preceding STR x0,[x19,#0x200]; assigned 5Block owner equals watched CobblestoneBlock",
+      "population_arguments": "Assembly: x0=BlockType, w1=context copied to w20; context semantics unresolved",
+      "constructor_arguments": "Assembly at 0x10107394..0x101073a0: x0=engine operator-new allocation, w1=state-vector ordinal, x2=BlockType; constructor stores x2 at state+0x68",
+      "native_observation": "PID 6365 TID 6410: constructor ordinal=0, type=0xb4000077b6cb1d60, state=0xb4000077771367f0; population context=0x1153c21; same state became primary and entered both observed palettes",
+      "ownership_evidence": "Population replaces state-vector entries and invokes old non-null entries' deleting-destructor vtable slot +8; not a transfer contract for mods",
+      "callable_by_mods": false
+    },
     "BlockHashPalette": {
       "direct_base": "BlockPalette",
       "typeinfo_elf_va": "0x130609d8",
@@ -46,6 +62,7 @@
   },
   "observed_chain": [
     "CobblestoneBlock constructor -> recorded object identity",
+    "Registry iteration 0x103e3024 -> state population 0x101071e0 -> Block constructor 0x101f95a0 -> primary selection -> live assignment 0x10107424",
     "BlockType primary pointer -> Block; Block owner pointer -> same CobblestoneBlock",
     "BlockType state enumeration 0x1010da88 -> callback 0xfba0a14",
     "Callback virtual call at 0xfba0a28 -> BlockHashPalette append 0xfb8ba5c",
@@ -56,7 +73,7 @@
     "Observed in disposable world initialization, PID 19952; no arbitrary engine function was invoked.",
     "Same state appeared in two distinct palette instances on two threads; their server/client roles and lifetime across world reloads are not established.",
     "Hash palette key is distinct from vector index. Network protocol and world-save encoding are not established.",
-    "State construction/finalization producer and ownership transfer for a new BlockType remain unverified.",
+    "State population and primary assignment are identified; input context semantics, complete new-type initialization and ownership transfer for a new BlockType remain unverified.",
     "This is not a callable custom-block registration API and does not enable a stable gameplay capability."
   ]
 }

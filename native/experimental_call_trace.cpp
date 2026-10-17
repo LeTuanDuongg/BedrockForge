@@ -48,6 +48,12 @@ using StateAppend = uintptr_t (*)(uintptr_t, uintptr_t);
 StateAppend state_append_original = nullptr, palette_append_original = nullptr;
 void* state_append_stub = nullptr;
 void* palette_append_stub = nullptr;
+StateAppend state_factory_original = nullptr;
+void* state_factory_stub = nullptr;
+using StateConstructor = uintptr_t (*)(uintptr_t, uintptr_t, uintptr_t);
+StateConstructor state_constructor_original = nullptr;
+void* state_constructor_stub = nullptr;
+std::atomic<unsigned> state_factory_hits{0}, state_constructor_hits{0};
 std::atomic<uintptr_t> state_engine_base{0};
 std::atomic<unsigned> state_append_hits{0}, palette_append_hits{0};
 std::atomic<unsigned> state_append_calls{0}, palette_append_calls{0};
@@ -67,6 +73,45 @@ bool observed_state(const hybrid::SelfMemory& memory, uintptr_t state, uintptr_t
     return state && memory.read(state, &vptr, sizeof vptr) &&
         vptr == state_engine_base.load(std::memory_order_acquire) + 0x130f01c0 &&
         memory.read(state + 0x68, &owner, sizeof owner) && observed_cobblestone(owner);
+}
+
+// shortcut: GP arguments verified at the vanilla callsites only; no mod-facing callable factory ABI.
+uintptr_t state_constructor_proxy(uintptr_t state, uintptr_t ordinal, uintptr_t type) {
+    SHADOWHOOK_STACK_SCOPE();
+    const bool selected = observed_cobblestone(type);
+    const uintptr_t caller = reinterpret_cast<uintptr_t>(SHADOWHOOK_RETURN_ADDRESS());
+    const uintptr_t result = state_constructor_original(state, ordinal, type);
+    if (!selected || state_constructor_hits.fetch_add(1, std::memory_order_relaxed) >= 8) return result;
+    hybrid::SelfMemory memory;
+    uintptr_t owner = 0;
+    const bool valid = observed_state(memory, state, owner) && owner == type;
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "block_state_constructor=observed;pid=%d;tid=%d;mono_ns=%" PRIu64
+        ";state=0x%" PRIxPTR ";type=0x%" PRIxPTR ";ordinal=%" PRIuPTR
+        ";caller=0x%" PRIxPTR ";owner_matches=%d;engine_mutation=original_only",
+        getpid(), gettid(), monotonic_ns(), state, type, ordinal, caller, valid);
+    return result;
+}
+
+uintptr_t state_factory_proxy(uintptr_t type, uintptr_t context) {
+    SHADOWHOOK_STACK_SCOPE();
+    const bool selected = observed_cobblestone(type);
+    const uintptr_t caller = reinterpret_cast<uintptr_t>(SHADOWHOOK_RETURN_ADDRESS());
+    const uintptr_t result = state_factory_original(type, context);
+    if (!selected || state_factory_hits.fetch_add(1, std::memory_order_relaxed) >= 8) return result;
+    hybrid::SelfMemory memory;
+    uintptr_t primary = 0, owner = 0, bounds[2]{}, first = 0;
+    const bool valid = memory.read(type + 0x200, &primary, sizeof primary) &&
+        observed_state(memory, primary, owner) && owner == type &&
+        memory.read(type + 0x1e8, bounds, sizeof bounds) && bounds[0] &&
+        bounds[1] >= bounds[0] + 8 && (bounds[1] - bounds[0]) % 8 == 0 &&
+        (bounds[1] - bounds[0]) / 8 <= 4096 && memory.read(bounds[0], &first, sizeof first);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "block_state_factory=observed;pid=%d;tid=%d;mono_ns=%" PRIu64
+        ";type=0x%" PRIxPTR ";context_raw=0x%" PRIxPTR ";caller=0x%" PRIxPTR
+        ";state=0x%" PRIxPTR ";owner_matches=%d;primary_is_first=%d;engine_mutation=original_only",
+        getpid(), gettid(), monotonic_ns(), type, context, caller, primary, valid, valid && first == primary);
+    return result;
 }
 
 uintptr_t state_append_proxy(uintptr_t type, uintptr_t source) {
@@ -446,6 +491,12 @@ const char* start_cobblestone_constructor_hook() {
         uint32_t code[4];
     };
     ObservationHook hooks[]{
+        {"block_state_factory", 0x101071e0, reinterpret_cast<void*>(&state_factory_proxy),
+            reinterpret_cast<void**>(&state_factory_original), &state_factory_stub,
+            {0xd10203ff, 0xa9027bfd, 0xa9036ffc, 0xa90467fa}},
+        {"block_state_constructor", 0x101f95a0, reinterpret_cast<void*>(&state_constructor_proxy),
+            reinterpret_cast<void**>(&state_constructor_original), &state_constructor_stub,
+            {0xd10143ff, 0xa9027bfd, 0xa90357f6, 0xa9044ff4}},
         {"block_state_append", 0x1010d108, reinterpret_cast<void*>(&state_append_proxy),
             reinterpret_cast<void**>(&state_append_original), &state_append_stub,
             {0xa9bc7bfd, 0xf9000bf7, 0xa90257f6, 0xa9034ff4}},
@@ -455,6 +506,8 @@ const char* start_cobblestone_constructor_hook() {
     };
     state_engine_base.store(mapping.base, std::memory_order_release);
     state_append_hits.store(0, std::memory_order_relaxed);
+    state_factory_hits.store(0, std::memory_order_relaxed);
+    state_constructor_hits.store(0, std::memory_order_relaxed);
     palette_append_hits.store(0, std::memory_order_relaxed);
     state_append_calls.store(0, std::memory_order_relaxed);
     palette_append_calls.store(0, std::memory_order_relaxed);
@@ -468,9 +521,9 @@ const char* start_cobblestone_constructor_hook() {
         }
         *hook.stub = shadowhook_hook_func_addr(reinterpret_cast<void*>(address), hook.proxy, hook.original);
         __android_log_print(ANDROID_LOG_INFO, kTag,
-            "%s_hook=%s;elf_va=0x%" PRIxPTR ";pid=%d;tid=%d;abi=observed_gp2;behavior=forward_only;errno=%d",
+            "%s_hook=%s;elf_va=0x%" PRIxPTR ";pid=%d;tid=%d;abi=observed_gp%d;behavior=forward_only;errno=%d",
             hook.name, *hook.stub && *hook.original ? "installed" : "failed", hook.va,
-            getpid(), gettid(), shadowhook_get_errno());
+              getpid(), gettid(), hook.va == 0x101f95a0 ? 3 : 2, shadowhook_get_errno());
     }
     return "cobblestone_constructor_hook=installed;behavior=forward_only;object_dereferences=0";
 #endif
@@ -481,7 +534,7 @@ const char* stop_cobblestone_constructor_hook() {
     return "cobblestone_constructor_hook=not_installed;reason=build_gate";
 #else
     std::lock_guard<std::mutex> guard(cobblestone_hook_lock);
-    for (void** stub : {&palette_append_stub, &state_append_stub}) {
+    for (void** stub : {&palette_append_stub, &state_append_stub, &state_constructor_stub, &state_factory_stub}) {
         if (!*stub) continue;
         const int status = shadowhook_unhook(*stub);
         __android_log_print(ANDROID_LOG_INFO, kTag,

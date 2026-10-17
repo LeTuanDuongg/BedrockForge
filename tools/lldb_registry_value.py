@@ -73,7 +73,8 @@ def engine_layout(path):
     raise ValueError("writer outside executable file-backed PT_LOAD")
 
 
-def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="minecraft:air"):
+def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="minecraft:air",
+        observe_default_state=False):
     import lldb
 
     segments = []
@@ -82,7 +83,7 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="
     process = target.GetProcess()
     events = []
     report = {"engine_sha256": ENGINE_SHA256, "pid": process.GetProcessID(),
-              "load_bias": hex(load_bias), "identifier": identifier,
+              "load_bias": hex(load_bias), "identifier": "minecraft:cobblestone" if observe_default_state else identifier,
               "events": events, "engine_memory_writes": 0}
     watches = []
     breakpoints = []
@@ -112,9 +113,14 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="
                    address + size <= load_bias + va + length for va, length, flags, _, _ in segments)
 
     def stack(thread):
-        return [{"pc": hex(frame.GetPC()), "elf_va": hex(frame.GetPC() - load_bias)
-                 if in_engine(frame.GetPC(), 4) else None, "symbol": frame.GetFunctionName()}
-                for frame in list(thread)[:16]]
+        frames = []
+        for index in range(16):
+            frame = thread.GetFrameAtIndex(index)
+            if not frame.IsValid():
+                break
+            frames.append({"pc": hex(frame.GetPC()), "elf_va": hex(frame.GetPC() - load_bias)
+                           if in_engine(frame.GetPC(), 4) else None, "symbol": frame.GetFunctionName()})
+        return frames
 
     def context(thread):
         frame = thread.GetFrameAtIndex(0)
@@ -218,6 +224,57 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="
             raise ValueError("runtime writer bytes mismatch")
         if read(load_bias + GETTER_VA, 12) != struct.pack("<3I", 0xB00187A0, 0x9136E000, 0xD65F03C0):
             raise ValueError("runtime registry getter mismatch")
+        if observe_default_state:
+            # Stop before the base constructor: it may create the state itself.
+            call_va = 0x100FB850
+            expected = struct.pack("<I", 0x94000000 | ((0x101076DC - call_va) // 4))
+            if not any(flags & 1 and va <= call_va and call_va + 4 <= va + size
+                       for va, _, flags, _, size in segments):
+                raise ValueError("base-constructor call outside executable ELF segment")
+            if read(load_bias + call_va, 4) != expected:
+                raise ValueError("base-constructor BL mismatch")
+            entry = hardware_break(load_bias + call_va)
+            emit("pre_base_constructor_armed", call_elf_va=hex(call_va),
+                 phase="waiting_for_vanilla_cobblestone_construction")
+            thread = resume_until_stop(timeout, lldb.eStopReasonBreakpoint)
+            frame = thread.GetFrameAtIndex(0)
+            registers = {"x" + str(i): frame.FindRegister("x" + str(i)).GetValueAsUnsigned()
+                         for i in range(9)}
+            block_type = canonical_pointer(registers["x0"])
+            if frame.GetPC() != load_bias + call_va or not block_type or block_type % 8:
+                raise ValueError("unexpected pre-constructor stop or invalid this")
+            if canonical_pointer(frame.FindRegister("x19").GetValueAsUnsigned()) != block_type:
+                raise ValueError("constructor this/x19 mismatch")
+            field = block_type + 0x200
+            before = word(field)
+            state_watch = watch(field)
+            emit("default_state_watch_armed", **context(thread), block_type=hex(block_type),
+                 field=hex(field), initial_uninitialized_bits=hex(before),
+                 registers={key: hex(value) for key, value in registers.items()})
+            remove_break(entry)
+            for index in range(12):
+                thread = resume_until_stop(30)
+                pc = thread.GetFrameAtIndex(0).GetPC()
+                after = word(field)
+                details = describe_value(after) if after else {"raw_pointer": "0x0"}
+                emit("default_state_field_write", **context(thread), sequence=index,
+                     block_type=hex(block_type), before=hex(before), after=hex(after),
+                     registers={"x" + str(i): hex(thread.GetFrameAtIndex(0).FindRegister(
+                         "x" + str(i)).GetValueAsUnsigned()) for i in range(31)},
+                     instruction_at_pc=read(pc, 4).hex(), instruction_before_pc=read(pc - 4, 4).hex(),
+                     value=details)
+                before = after
+                if after:
+                    if details.get("rtti") != "5Block":
+                        raise ValueError("non-null assigned pointer is not validated Block RTTI")
+                    owner = word(canonical_pointer(after) + 0x68)
+                    emit("default_state_owner", block_type=hex(block_type), state=hex(after),
+                         owner=hex(owner), owner_matches=canonical_pointer(owner) == block_type,
+                         type_value=describe_value(block_type))
+                    report["result"] = ("observed_default_state_producer" if
+                                        canonical_pointer(owner) == block_type else "owner_mismatch")
+                    return
+            raise RuntimeError("bounded default-state write count exhausted")
         registry = load_bias + REGISTRY_VA
         root_field = registry + 8
         root_before = word(root_field)

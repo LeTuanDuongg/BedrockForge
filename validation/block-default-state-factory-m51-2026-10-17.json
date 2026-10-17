@@ -1,0 +1,227 @@
+{
+  "engine_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "pid": 3491,
+  "load_bias": "0x761e48d000",
+  "identifier": "minecraft:air",
+  "events": [
+    {
+      "stage": "pre_base_constructor_armed",
+      "host_monotonic_ns": 42735671000000,
+      "call_elf_va": "0x100fb850",
+      "phase": "waiting_for_vanilla_cobblestone_construction"
+    },
+    {
+      "stage": "default_state_watch_armed",
+      "host_monotonic_ns": 42848312000000,
+      "tid": 3537,
+      "thread": "Thread-16",
+      "pc": "0x762e588850",
+      "elf_va": "0x100fb850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x762e588850",
+          "elf_va": "0x100fb850",
+          "symbol": null
+        },
+        {
+          "pc": "0x763568e2b4",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x7627850cc0",
+          "elf_va": "0x93c3cc0",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627774974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627773308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762d0c2a7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627c6f618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627c2fc08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627c2e2f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x7630cbc86c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7630cbc514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x7630ce3ae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "block_type": "0x77b6d10fb0",
+      "field": "0x77b6d111b0",
+      "initial_uninitialized_bits": "0x0",
+      "registers": {
+        "x0": "0xb4000077b6d10fb0",
+        "x1": "0x761308cfa0",
+        "x2": "0x4",
+        "x3": "0xb4000076c74fc670",
+        "x4": "0x21",
+        "x5": "0x0",
+        "x6": "0x7967bd5000",
+        "x7": "0x37f8456",
+        "x8": "0x79609eb100"
+      }
+    },
+    {
+      "stage": "default_state_field_write",
+      "host_monotonic_ns": 42849265000000,
+      "tid": 3537,
+      "thread": "Thread-16",
+      "pc": "0x762e594428",
+      "elf_va": "0x10107428",
+      "stop_reason": "watchpoint 1",
+      "stack": [
+        {
+          "pc": "0x762e594428",
+          "elf_va": "0x10107428",
+          "symbol": null
+        },
+        {
+          "pc": "0x762e870028",
+          "elf_va": "0x103e3028",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627774d64",
+          "elf_va": "0x92e7d64",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627773308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762d0c2a7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627c6f618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627c2fc08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7627c2e2f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x7630cbc86c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7630cbc514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x7630ce3ae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "sequence": 0,
+      "block_type": "0x77b6d10fb0",
+      "before": "0x0",
+      "after": "0xb400007777163030",
+      "instruction_at_pc": "681740f9",
+      "instruction_before_pc": "600201f9",
+      "value": {
+        "raw_pointer": "0xb400007777163030",
+        "canonical_pointer": "0x7777163030",
+        "vptr": "0x763157d1c0",
+        "vtable_elf_va": "0x130f01c0",
+        "typeinfo": "0x763157d3a8",
+        "rtti": "5Block",
+        "validation": "engine_itanium_rtti_chain",
+        "ownership": "unknown"
+      }
+    },
+    {
+      "stage": "default_state_owner",
+      "host_monotonic_ns": 42849265000000,
+      "block_type": "0x77b6d10fb0",
+      "state": "0xb400007777163030",
+      "owner": "0xb4000077b6d10fb0",
+      "owner_matches": true,
+      "type_value": {
+        "raw_pointer": "0x77b6d10fb0",
+        "canonical_pointer": "0x77b6d10fb0",
+        "vptr": "0x7631563190",
+        "vtable_elf_va": "0x130d6190",
+        "typeinfo": "0x7631565918",
+        "rtti": "16CobblestoneBlock",
+        "validation": "engine_itanium_rtti_chain",
+        "ownership": "unknown"
+      }
+    },
+    {
+      "stage": "detach",
+      "host_monotonic_ns": 42849281000000,
+      "success": true,
+      "detail": "success"
+    }
+  ],
+  "engine_memory_writes": 0,
+  "result": "observed_default_state_producer"
+}
