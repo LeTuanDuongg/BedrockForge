@@ -11,9 +11,9 @@ bool started = false;
 bool requested_enabled = false;
 
 int prepare_and_set(bool enabled) {
+    if (!enabled) return hybrid_engine_button_schedule_126504_control(2);
     const int prepared = hybrid_engine_button_schedule_126504_control(0);
     if (prepared) return prepared;
-    if (!enabled) return 0;
     const int result = hybrid_engine_button_schedule_126504_control(1);
     if (!result) return 0;
     const int cleanup = hybrid_engine_button_schedule_126504_control(2);

@@ -4,7 +4,7 @@ Target engine: Minecraft 1.26.50.4 ARM64, SHA-256 `fac2be5b17ef79419ebd66fe4f9e3
 
 Test APK SHA-256: `8544AD67DA8F9D51464E0B7249217D06D8172886D8AE2E4CA803ADF163C9B835`.
 
-Post-validation reproducible build SHA-256: `7C682CDE9451396CD1851C5ACB1B270A3D7AABF4D31BDDF5F4FAE3AB979FD748` (built successfully; not installed after the device run).
+Post-validation rebuild after making the disabled state hook-free: `FAAF2288AC5557C87B923E3AF2EA56D8AF429A456873EA68DDB8992D0609C4E5` (ARM64 build passed; installed APK hash on M51 matches).
 
 Filtered device logs: [button-duration-mod-abi1-m51.log](button-duration-mod-abi1-m51.log).
 
@@ -21,3 +21,9 @@ Observed sequence in the disposable `My World`:
 The game saved and returned to its world list ([capture](button-duration-mod-m51-reentry.png)). A later re-entry attempt selected `My World` and reached the Minecraft loading screen, but the game process then exited. Android recorded PID `17144` exiting with signal 11 (SIGSEGV) at `10:56:18`; the screen returned to HybridMCPE ([capture](button-duration-mod-m51-reentry-state.png)). Bedrock Breakpad reported a dump under the app-private directory, which was not accessed. Available logs do not identify the faulting instruction or prove that the button hook caused the crash. World re-entry therefore failed and remains unsafe/unverified for this build. No personal world or original Minecraft installation was used or modified.
 
 The executable proof covers a real ButtonBlock callback, behavior change, visual result, unhook restoration, repeated toggles and Activity pause/resume. It does not establish safety for arbitrary engine hooks or world-specific object lifetimes.
+
+## Hook-free start follow-up
+
+The hook-free disabled-start change was built and installed on 2026-10-17. At 11:33:14, PID `11710` logged `button_mod=lifecycle_start;enabled=0` and `button_mod_load=0`; the engine profile hash matched. Minecraft reached its menu, then entered the newly created `HybridMCPE_check` test world with its HUD visible in the same PID. Android Back opened Pause; Save & Quit returned to the world list, which showed the new third world. The two earlier worlds were left unopened. A hook-free re-entry also reached the HUD in PID `11710`.
+
+In the same world, the explicit enable and disable commands each logged `result=0`; the second enable/disable cycle returned success from the diagnostic receiver. The hook was enabled before Save & Quit. Minecraft returned to the world list in PID `11710` with no observed crash ([post-exit capture](button-duration-mod-m51-current.png)). Re-entry after this enabled exit is pending because ADB touch did not activate the world card. These results cover one hook-free re-entry and one enabled world exit; they do not prove enabled-hook re-entry safety or visual behavior in this newly created world.
