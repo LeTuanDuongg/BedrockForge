@@ -32,7 +32,9 @@ This confirms runtime reachability during world loading only. It does not establ
 
 The follow-up build added bounded entry logging for raw `x0`–`x3`, Shadowhook's captured return PC, the expected return PC (`callsite + 4`), a comparison-only registry-address match mask, and monotonic time. It does not dereference arguments or change the original call. APK SHA-256: `67edc0b9c106ef6d39eec54d7644e72ae121a5dc6e6a3e09b07e21bcd2cdc29e`.
 
-On M51 PID `27298`, the engine fingerprint and mapping checks passed and the hook installed at runtime address `0x762c2d0d40`; the callsite was `0x762b9851ac`, expected return PC `0x762b9851b0`, and load bias `0x761be49000`. The registry global address logged was `0x762f320db8`, matching the prior verified getter result. The app was then paused/stopped when the device locked at `12:19:18.590`; module stop removed the hook before the candidate ran. This build produced no second hit, so its new return-PC and argument-match fields remain runtime-unverified.
+On M51 PID `27298`, the engine fingerprint and mapping checks passed and the hook installed at runtime address `0x762c2d0d40`; the callsite was `0x762b9851ac`, expected return PC `0x762b9851b0`, and load bias `0x761be49000`. The registry global address logged was `0x762f320db8`, matching the prior verified getter result. Initial runs were paused/stopped when Android's 60-second display timeout expired; module stop removed the hook cleanly (`result=0`, `retained=0`). The device timeout was temporarily set to ten minutes for the authorized isolated test.
+
+On the next entry to `HybridMCPE_check`, the hook recorded hit 1 at `12:28:36.747`, PID `27298`, TID `27340`. Raw args were `x0=0xb400007766a3a4f0`, `x1=0xb400007786bea790`, `x2=0xb4000077c68767e8`, `x3=0x763a5f61e0`. Captured return PC `0x762b9851b0` exactly matched expected `callsite + 4`; registry-address match mask was `0x0`. No argument was dereferenced. The original returned `0x2` at `12:28:36.788`; Minecraft logged player connected at `12:28:40.859`. A later screen capture showed the real gameplay HUD in the same PID: [candidate-hook-followup-screen.png](candidate-hook-followup-screen.png).
 
 The hit occurred during the world-loading transition, before the player-connection log. It must not be described as a confirmed gameplay-action callback.
 
@@ -42,7 +44,7 @@ Static evidence for this exact ELF shows the candidate performs block-identifier
 
 At caller ELF VA `0xfb3c19c`–`0xfb3c1ac`, the observed setup is `x3=sp`, `x0=x21`, `x1=x22`, `x2=x20`, then `bl 0x10487d40`. The call instruction is `0x94252ee5`. Caller control flow does not consume the returned `x0`; the value `2` therefore cannot be assigned meaning from this call alone. Candidate-side lookup/duplicate-diagnostic evidence supports a definition validation/loading role, but no instruction chain has yet been shown to mutate the verified registry's tree.
 
-The first build's intercepted call is a real engine invocation, but neither the function's full semantic contract nor its relationship to registry insertion is verified. The return value `2` is not interpreted. The follow-up's extra entry fields were compiled and its hook installed, but a lock-triggered lifecycle stop happened before another invocation. No new block was created, registered, obtained, placed, or saved.
+The intercepted call is a real engine invocation from the expected caller during world re-entry/loading. Return-PC matching validates that specific call edge. A zero registry-address match only means none of the four raw arguments equals the logged global address; it does not rule out indirect object relationships. Neither the function's full semantic contract nor its relationship to registry insertion is verified. The return value `2` is not interpreted. No new block was created, registered, obtained, placed, or saved.
 
 ## Next blocker
 
