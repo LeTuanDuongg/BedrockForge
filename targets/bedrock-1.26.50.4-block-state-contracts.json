@@ -45,6 +45,45 @@
       "ownership_evidence": "Population replaces state-vector entries and invokes old non-null entries' deleting-destructor vtable slot +8; not a transfer contract for mods",
       "callable_by_mods": false
     },
+    "BlockTypePreparation": {
+      "ordinary_allocation_size": "0x3a8",
+      "allocator_elf_va": "0xe49677c",
+      "allocator_evidence": "Tail branch to engine operator new at 0x12911390; vanilla allocation at 0x93c3ca0",
+      "identifier_input": "Engine libc++ string object in x1; live minecraft:cobblestone",
+      "short_string_constructor_elf_va": "0x85380f0",
+      "short_string_evidence": "x0=24-byte destination, x1=bytes, x2=length; <=22-byte branch stores length<<1 then copies length+1 bytes",
+      "identifier_parser_elf_va": "0x10107be8",
+      "unqualified_name_evidence": "No-colon branch 0x10107d68 uses literal minecraft: at ELF 0x269e8a8 to build full identifier",
+      "material_argument": "x3 -> type+0x20; same live pointer at constructor return and population entry",
+      "numeric_argument": "w2 -> 16-bit type+0x14e; observed 4, no policy for assigning a unique custom ID verified",
+      "property_bits_offset": "0x1a4",
+      "property_bits_observation": "Cobblestone raw value 0 at constructor return and population entry; creates one state",
+      "component_pair_offsets": ["0x388", "0x390"],
+      "component_origin": "Base constructor allocates 8-byte wrapper via 0x1063e794 pointing to type+0x368, then creates its reference-counted control object",
+      "attachment_pair_offsets": ["0x398", "0x3a0"],
+      "attachment_move_elf_va": "0x1010bb6c",
+      "attachment_call_elf_va": "0x93c3cf0",
+      "attachment_observation": "PID 10007: source pair cleared, destination matches; null at constructor return and non-null before state population",
+      "registration_enabled": false
+    },
+    "UnregisteredConstructionExperiment": {
+      "status": "m51-construction-and-primary-state-observed-not-registered",
+      "pid": 12566,
+      "tid": 12609,
+      "input_name": "hybridmcpe",
+      "engine_canonical_name": "minecraft:hybridmcpe",
+      "type_pointer": "0xb4000077b6d033c0",
+      "state_pointer": "0xb400007777157690",
+      "implementation": "Engine allocates 0x3a8 bytes; original CobblestoneBlock constructor initializes the new instance, including its vtable and owned components. No object bytes or vtable are cloned.",
+      "state_validation": "Engine population on the same creation thread produces primary with exact Block vtable and owner equal to the newly constructed type",
+      "context_raw": "0x1153c21",
+      "numeric_argument": "4 borrowed solely for the unregistered construction test; not admitted for registry insertion",
+      "cleanup": "Engine deleting destructor from verified type vtable slot +8 returned; no pending object retained",
+      "hook_lifecycle": "4 shutdown/re-enable cycles in real host, including one after world exit; final shutdown leaves hooks removed; 25 successful individual unhooks",
+      "registration_attempted": false,
+      "palette_inserted": false,
+      "evidence": "validation/native-block-construction-m51-2026-10-17.txt"
+    },
     "BlockHashPalette": {
       "direct_base": "BlockPalette",
       "typeinfo_elf_va": "0x130609d8",
@@ -73,7 +112,7 @@
     "Observed in disposable world initialization, PID 19952; no arbitrary engine function was invoked.",
     "Same state appeared in two distinct palette instances on two threads; their server/client roles and lifetime across world reloads are not established.",
     "Hash palette key is distinct from vector index. Network protocol and world-save encoding are not established.",
-    "State population and primary assignment are identified; input context semantics, complete new-type initialization and ownership transfer for a new BlockType remain unverified.",
+    "Private same-thread construction and primary-state production work for an unregistered instance; unique numeric identity, complete registry adoption/indexing and ownership transfer remain unverified. Population context semantics are not generalized.",
     "This is not a callable custom-block registration API and does not enable a stable gameplay capability."
   ]
 }

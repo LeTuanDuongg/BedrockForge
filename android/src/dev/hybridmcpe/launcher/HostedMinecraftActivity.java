@@ -72,9 +72,17 @@ public final class HostedMinecraftActivity extends com.mojang.minecraftpe.MainAc
                 }
                 if (!"dev.hybridmcpe.launcher.EXPERIMENTAL_REGISTRY_PROBE".equals(action)) return;
                 int phase = intent.getIntExtra("phase", -1);
-                if (phase != 1 && phase != 2) {
+                if (phase < 1 || phase > 5) {
                     Log.w("HybridMCPE", "registry_trigger=rejected;reason=invalid_phase;phase=" + phase);
                     setResultCode(-1);
+                    return;
+                }
+                // Private debug-only hook lifecycle controls; use at the menu, not during world loading.
+                if (phase >= 3) {
+                    int result = !destroyed && resumed && diagnosticActive ?
+                        MainActivity.triggerExperimentalRegistryProbe(phase) : -1;
+                    Log.i("HybridMCPE", "block_type_hook_request=" + phase + ";result=" + result);
+                    setResultCode(result);
                     return;
                 }
                 String phaseName = phase == 1 ? "main_menu_manual" : "world_loaded_manual";

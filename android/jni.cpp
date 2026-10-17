@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <dlfcn.h>
 #include "engine_profiles.h"
+#include "experimental_hooks.h"
 extern "C" const char* hybrid_probe();
 extern "C" int hybrid_load_mod(const char*);
 extern "C" int hybrid_enable_mods();
@@ -78,6 +79,15 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe(JNIEnv
 extern "C" JNIEXPORT jint JNICALL
 Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger(JNIEnv*, jclass, jint phase) {
 #ifdef HYBRID_EXPERIMENTAL_NATIVE
+    if (phase == 5) return hybrid_experimental_block_construction_arm();
+    if (phase == 3 || phase == 4) {
+        const char* status = phase == 3 ? hybrid_experimental_cobblestone_constructor_hook_stop() :
+                                        hybrid_experimental_cobblestone_constructor_hook_start();
+        __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "block_type_hook_control=%d;status=%s;pid=%d;tid=%d",
+                            phase, status, getpid(), gettid());
+        const std::string result(status);
+        return result.find(phase == 3 ? "cleanup=verified" : "=installed") != std::string::npos ? 0 : -5;
+    }
     if (phase != 1 && phase != 2) return -1;
     void* module=dlopen("libhybrid_experimental_registry_probe.so",RTLD_NOW|RTLD_NOLOAD);
     if(!module)return -4;

@@ -1,0 +1,34 @@
+Selected verbatim HybridMCPE logcat evidence, Samsung M51, Bedrock 1.26.50.4 ARM64.
+Engine SHA-256: fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1
+Final installed APK SHA-256 (pulled back and matched to dist): 7fc3e7af8dedefb6d282db206607ca6a1792c40639ee1a8465535533483cb177
+Final runtime SHA-256: b3aefd47493a339813d29fde0b5f422bbab70e85bfd98e49ac86b72ba712bd10
+
+10-17 18:15:17.275 12566 12566 I HybridMCPE: block_state_factory_hook=installed;elf_va=0x101071e0;pid=12566;tid=12566;abi=observed_gp2;behavior=forward_only;errno=0
+10-17 18:15:17.275 12566 12566 I HybridMCPE: block_state_constructor_hook=installed;elf_va=0x101f95a0;pid=12566;tid=12566;abi=observed_gp3;behavior=forward_only;errno=0
+10-17 18:15:57.729 12566 12566 I HybridMCPE: block_state_hooks=cleanup;result=0;handle_retained=0;factory=0;constructor=1;attachment=0;pid=12566
+10-17 18:15:57.729 12566 12566 I HybridMCPE: block_state_hooks=cleanup;result=0;handle_retained=0;factory=1;constructor=0;attachment=0;pid=12566
+10-17 18:15:57.730 12566 12566 I HybridMCPE: block_type_hook_control=3;status=cobblestone_constructor_hook=removed;cleanup=verified;pid=12566;tid=12566
+10-17 18:16:02.601 12566 12566 I HybridMCPE: block_type_hook_control=4;status=cobblestone_constructor_hook=installed;behavior=forward_only;object_dereferences=0;pid=12566;tid=12566
+10-17 18:16:02.725 12566 12566 I HybridMCPE: block_type_hook_control=3;status=cobblestone_constructor_hook=removed;cleanup=verified;pid=12566;tid=12566
+10-17 18:16:07.628 12566 12566 I HybridMCPE: block_type_hook_control=4;status=cobblestone_constructor_hook=installed;behavior=forward_only;object_dereferences=0;pid=12566;tid=12566
+10-17 18:16:07.760 12566 12566 I HybridMCPE: block_type_hook_control=3;status=cobblestone_constructor_hook=removed;cleanup=verified;pid=12566;tid=12566
+10-17 18:16:12.635 12566 12566 I HybridMCPE: block_type_hook_control=4;status=cobblestone_constructor_hook=installed;behavior=forward_only;object_dereferences=0;pid=12566;tid=12566
+10-17 18:16:42.259 12566 12566 I HybridMCPE: native_type_construction=armed;pid=12566;duplicate=0;execution=next_vanilla_constructor_thread;registration=disabled
+10-17 18:16:42.378 12566 12566 I HybridMCPE: native_type_construction=armed;pid=12566;duplicate=1;execution=next_vanilla_constructor_thread;registration=disabled
+10-17 18:19:44.114 12566 12609 I HybridMCPE: block_type_preparation=constructor_return;pid=12566;tid=12609;type=0xb4000077b6d03810;read=1;name=minecraft:cobblestone;material=0xb4000076c75d32b0;numeric14e=4;bits1a4=0;component388=0xb4000076c75d2fb0;control390=0xb4000076d76d2350;attachment398=0x0;control3a0=0x0;primary=0x0;engine_mutation=original_only
+10-17 18:19:44.114 12566 12609 I HybridMCPE: native_type_construction=name_begin;pid=12566;tid=12609
+10-17 18:19:44.114 12566 12609 I HybridMCPE: native_type_construction=constructor_begin;pid=12566;tid=12609;type=0xb4000077b6d033c0
+10-17 18:19:44.114 12566 12609 I HybridMCPE: native_type_construction=return;pid=12566;tid=12609;type=0xb4000077b6d033c0;read=1;name=minecraft:hybridmcpe;numeric_reused_for_unregistered_test=0x4;registered=0;vtable_created_by=engine_constructor
+10-17 18:19:44.114 12566 12609 I HybridMCPE: block_type_attachment=observed;pid=12566;tid=12609;type=0xb4000077b6d03810;caller=0x7626dfacf4;read=1;source0=0xb40000771689e970;source1=0xb4000076d6dbb5e0;source_cleared=1;destination_matches=1;engine_mutation=original_only
+10-17 18:19:44.114 12566 12609 I HybridMCPE: block_type_preparation=after_attachment;pid=12566;tid=12609;type=0xb4000077b6d03810;read=1;name=minecraft:cobblestone;material=0xb4000076c75d32b0;numeric14e=4;bits1a4=0;component388=0xb4000076c75d2fb0;control390=0xb4000076d76d2350;attachment398=0xb40000771689e970;control3a0=0xb4000076d6dbb5e0;primary=0x0;engine_mutation=original_only
+10-17 18:19:44.235 12566 12609 I HybridMCPE: block_type_preparation=before_state_factory;pid=12566;tid=12609;type=0xb4000077b6d03810;read=1;name=minecraft:cobblestone;material=0xb4000076c75d32b0;numeric14e=4;bits1a4=0;component388=0xb4000076c75d2fb0;control390=0xb4000076d76d2350;attachment398=0xb40000771689e970;control3a0=0xb4000076d6dbb5e0;primary=0x0;engine_mutation=original_only
+10-17 18:19:44.235 12566 12609 I HybridMCPE: native_type_state=population_begin;pid=12566;tid=12609;type=0xb4000077b6d033c0
+10-17 18:19:44.235 12566 12609 I HybridMCPE: native_type_state=observed;pid=12566;tid=12609;type=0xb4000077b6d033c0;state=0xb400007777157690;valid=1;context_raw=0x1153c21;registered=0;palette_inserted=0
+10-17 18:19:44.235 12566 12609 I HybridMCPE: native_type_construction=cleanup;pid=12566;tid=12609;type=0xb4000077b6d033c0;engine_destructor_called=1;retained=0;registered=0
+
+Post-destructor registry_sample=done record at 18:24:51.112, PID 12566 TID 14142 (verbatim node1 fragment; other nodes omitted):
+node1=0xb400007706930150,key20_hex=3e82bb986952533e2a6d696e6563726166743a636f62626c6573746f6e6500c10000000000000000,id_candidate=unverified,value48=0xb4000077b6d03810,value_rtti=16CobblestoneBlock;cobblestone_ctor_match=1;
+10-17 18:24:55.882 12566 14142 I HybridMCPE: registry_trigger=complete;phase=world_loaded_manual;elapsed_ns=492754990167424;pid=12566;tid=14142
+10-17 18:30:11.158 12566 12566 I HybridMCPE: block_type_hook_control=3;status=cobblestone_constructor_hook=removed;cleanup=verified;pid=12566;tid=12566
+10-17 18:30:16.067 12566 12566 I HybridMCPE: block_type_hook_control=4;status=cobblestone_constructor_hook=installed;behavior=forward_only;object_dereferences=0;pid=12566;tid=12566
+10-17 18:30:16.203 12566 12566 I HybridMCPE: block_type_hook_control=3;status=cobblestone_constructor_hook=removed;cleanup=verified;pid=12566;tid=12566

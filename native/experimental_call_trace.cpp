@@ -27,6 +27,7 @@ constexpr uint32_t kOriginalCall = 0x94252ee5;
 constexpr uint32_t kTargetPrologue[4]{0xfc190fe8, 0xa9017bfd, 0xa9026ffc, 0xa90367fa};
 constexpr uint32_t kCobblestoneConstructorPrologue[4]{0xa9be7bfd, 0xf9000bf3, 0x910003fd, 0xaa0003f3};
 uint64_t monotonic_ns();
+bool engine_executable(uintptr_t address);
 
 #ifdef HYBRID_EXPERIMENTAL_ENGINE_HOOK
 using CandidateFunction = uintptr_t (*)(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
@@ -50,10 +51,16 @@ void* state_append_stub = nullptr;
 void* palette_append_stub = nullptr;
 StateAppend state_factory_original = nullptr;
 void* state_factory_stub = nullptr;
+StateAppend type_attachment_original = nullptr;
+void* type_attachment_stub = nullptr;
 using StateConstructor = uintptr_t (*)(uintptr_t, uintptr_t, uintptr_t);
 StateConstructor state_constructor_original = nullptr;
 void* state_constructor_stub = nullptr;
 std::atomic<unsigned> state_factory_hits{0}, state_constructor_hits{0};
+std::atomic<unsigned> type_attachment_hits{0};
+std::atomic<bool> construction_contracts_verified{false}, construction_requested{false};
+std::atomic<uintptr_t> unregistered_type{0};
+std::atomic<pid_t> construction_thread{0};
 std::atomic<uintptr_t> state_engine_base{0};
 std::atomic<unsigned> state_append_hits{0}, palette_append_hits{0};
 std::atomic<unsigned> state_append_calls{0}, palette_append_calls{0};
@@ -73,6 +80,118 @@ bool observed_state(const hybrid::SelfMemory& memory, uintptr_t state, uintptr_t
     return state && memory.read(state, &vptr, sizeof vptr) &&
         vptr == state_engine_base.load(std::memory_order_acquire) + 0x130f01c0 &&
         memory.read(state + 0x68, &owner, sizeof owner) && observed_cobblestone(owner);
+}
+
+bool observed_name(const hybrid::SelfMemory& memory, uintptr_t address, char (&text)[97]) {
+    uintptr_t words[3]{};
+    if (!memory.read(address, words, sizeof words)) return false;
+    const auto* bytes = reinterpret_cast<const unsigned char*>(words);
+    const size_t size = bytes[0] & 1 ? words[1] : bytes[0] >> 1;
+    if (size > 96 || (!(bytes[0] & 1) && size > 22)) return false;
+    if (bytes[0] & 1) {
+        if (size && !memory.read(words[2], text, size)) return false;
+    } else std::memcpy(text, bytes + 1, size);
+    for (size_t i = 0; i < size; ++i)
+        if (text[i] < 0x20 || text[i] > 0x7e) return false;
+    text[size] = 0;
+    return true;
+}
+
+void type_preparation_snapshot(const char* phase, uintptr_t type) {
+    hybrid::SelfMemory memory;
+    uintptr_t vptr = 0, material = 0, pairs[4]{}, primary = 0;
+    uint32_t property_bits = 0;
+    uint16_t numeric_id = 0;
+    char name[97]{};
+    const bool valid = memory.read(type, &vptr, sizeof vptr) &&
+        vptr == state_engine_base.load(std::memory_order_acquire) + 0x130d6190 &&
+        observed_name(memory, type + 0xd0, name) &&
+        memory.read(type + 0x20, &material, sizeof material) &&
+        memory.read(type + 0x14e, &numeric_id, sizeof numeric_id) &&
+        memory.read(type + 0x1a4, &property_bits, sizeof property_bits) &&
+        memory.read(type + 0x388, pairs, sizeof pairs) &&
+        memory.read(type + 0x200, &primary, sizeof primary);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "block_type_preparation=%s;pid=%d;tid=%d;type=0x%" PRIxPTR
+        ";read=%d;name=%s;material=0x%" PRIxPTR ";numeric14e=%u;bits1a4=%u"
+        ";component388=0x%" PRIxPTR ";control390=0x%" PRIxPTR
+        ";attachment398=0x%" PRIxPTR ";control3a0=0x%" PRIxPTR
+        ";primary=0x%" PRIxPTR ";engine_mutation=original_only",
+        phase, getpid(), gettid(), type, valid, valid ? name : "unvalidated", material,
+        numeric_id, property_bits, pairs[0], pairs[1], pairs[2], pairs[3], primary);
+}
+
+void destroy_unregistered_type(uintptr_t type) {
+    hybrid::SelfMemory memory;
+    uintptr_t vptr = 0, destructor = 0;
+    const bool valid = memory.read(type, &vptr, sizeof vptr) &&
+        vptr == state_engine_base.load(std::memory_order_acquire) + 0x130d6190 &&
+        memory.read(vptr + 8, &destructor, sizeof destructor) && engine_executable(destructor);
+    if (valid) reinterpret_cast<void (*)(uintptr_t)>(destructor)(type);
+    else unregistered_type.store(type, std::memory_order_release);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "native_type_construction=cleanup;pid=%d;tid=%d;type=0x%" PRIxPTR
+        ";engine_destructor_called=%d;retained=%d;registered=0", getpid(), gettid(), type, valid, !valid);
+}
+
+void construct_unregistered_type(uintptr_t numeric, uintptr_t material) {
+    if (!construction_requested.exchange(false, std::memory_order_acq_rel)) return;
+    if (!construction_contracts_verified.load(std::memory_order_acquire) || unregistered_type.load()) return;
+    const uintptr_t base = state_engine_base.load(std::memory_order_acquire);
+    // Engine string constructor's <=22-byte branch copies size+1 bytes into its 24-byte short representation.
+    alignas(8) unsigned char name[24]{};
+    __android_log_print(ANDROID_LOG_INFO, kTag, "native_type_construction=name_begin;pid=%d;tid=%d", getpid(), gettid());
+    reinterpret_cast<void (*)(void*, const char*, size_t)>(base + 0x85380f0)(name, "hybridmcpe", 10);
+    uintptr_t object = 0;
+    try {
+        object = reinterpret_cast<uintptr_t (*)(size_t)>(base + 0xe49677c)(0x3a8);
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "native_type_construction=constructor_begin;pid=%d;tid=%d;type=0x%" PRIxPTR, getpid(), gettid(), object);
+        cobblestone_constructor_original(object, reinterpret_cast<uintptr_t>(name), numeric, material);
+        hybrid::SelfMemory memory;
+        uintptr_t vptr = 0, actual_material = 0;
+        char actual_name[97]{};
+        const bool valid = memory.read(object, &vptr, sizeof vptr) && vptr == base + 0x130d6190 &&
+            observed_name(memory, object + 0xd0, actual_name) &&
+            memory.read(object + 0x20, &actual_material, sizeof actual_material) && actual_material == material;
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "native_type_construction=return;pid=%d;tid=%d;type=0x%" PRIxPTR
+            ";read=%d;name=%s;numeric_reused_for_unregistered_test=0x%" PRIxPTR
+            ";registered=0;vtable_created_by=engine_constructor", getpid(), gettid(), object,
+            valid, valid ? actual_name : "unvalidated", numeric);
+        // The engine's no-colon branch at 0x10107d68 prefixes the full identifier with "minecraft:".
+        if (valid && std::strcmp(actual_name, "minecraft:hybridmcpe") == 0) {
+            construction_thread.store(gettid(), std::memory_order_relaxed);
+            unregistered_type.store(object, std::memory_order_release);
+        } else destroy_unregistered_type(object);
+    } catch (...) {
+        // Retain any partially constructed allocation; its destructor contract is not valid after a throw.
+        if (object) unregistered_type.store(object, std::memory_order_release);
+        construction_contracts_verified.store(false, std::memory_order_release);
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+            "native_type_construction=exception;pid=%d;retained=0x%" PRIxPTR ";registration=disabled", getpid(), object);
+    }
+}
+
+uintptr_t type_attachment_proxy(uintptr_t type, uintptr_t source) {
+    SHADOWHOOK_STACK_SCOPE();
+    const bool selected = observed_cobblestone(type);
+    hybrid::SelfMemory memory;
+    uintptr_t before[2]{}, after[2]{}, destination[2]{};
+    const bool before_read = selected && memory.read(source, before, sizeof before);
+    const uintptr_t caller = reinterpret_cast<uintptr_t>(SHADOWHOOK_RETURN_ADDRESS());
+    const uintptr_t result = type_attachment_original(type, source);
+    if (!selected || type_attachment_hits.fetch_add(1, std::memory_order_relaxed) >= 8) return result;
+    const bool valid = before_read && memory.read(source, after, sizeof after) &&
+        memory.read(type + 0x398, destination, sizeof destination);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "block_type_attachment=observed;pid=%d;tid=%d;type=0x%" PRIxPTR
+        ";caller=0x%" PRIxPTR ";read=%d;source0=0x%" PRIxPTR ";source1=0x%" PRIxPTR
+        ";source_cleared=%d;destination_matches=%d;engine_mutation=original_only",
+        getpid(), gettid(), type, caller, valid, before[0], before[1],
+        valid && !after[0] && !after[1], valid && before[0] == destination[0] && before[1] == destination[1]);
+    type_preparation_snapshot("after_attachment", type);
+    return result;
 }
 
 // shortcut: GP arguments verified at the vanilla callsites only; no mod-facing callable factory ABI.
@@ -96,6 +215,8 @@ uintptr_t state_constructor_proxy(uintptr_t state, uintptr_t ordinal, uintptr_t 
 uintptr_t state_factory_proxy(uintptr_t type, uintptr_t context) {
     SHADOWHOOK_STACK_SCOPE();
     const bool selected = observed_cobblestone(type);
+    if (selected && state_factory_hits.load(std::memory_order_relaxed) < 8)
+        type_preparation_snapshot("before_state_factory", type);
     const uintptr_t caller = reinterpret_cast<uintptr_t>(SHADOWHOOK_RETURN_ADDRESS());
     const uintptr_t result = state_factory_original(type, context);
     if (!selected || state_factory_hits.fetch_add(1, std::memory_order_relaxed) >= 8) return result;
@@ -111,6 +232,27 @@ uintptr_t state_factory_proxy(uintptr_t type, uintptr_t context) {
         ";type=0x%" PRIxPTR ";context_raw=0x%" PRIxPTR ";caller=0x%" PRIxPTR
         ";state=0x%" PRIxPTR ";owner_matches=%d;primary_is_first=%d;engine_mutation=original_only",
         getpid(), gettid(), monotonic_ns(), type, context, caller, primary, valid, valid && first == primary);
+    const uintptr_t candidate = construction_contracts_verified.load(std::memory_order_acquire) ?
+        unregistered_type.exchange(0, std::memory_order_acq_rel) : 0;
+    if (candidate && valid && construction_thread.load(std::memory_order_relaxed) == gettid()) {
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "native_type_state=population_begin;pid=%d;tid=%d;type=0x%" PRIxPTR, getpid(), gettid(), candidate);
+        state_factory_original(candidate, context);
+        uintptr_t state = 0, state_vptr = 0, candidate_owner = 0;
+        const bool state_valid = memory.read(candidate + 0x200, &state, sizeof state) && state &&
+            memory.read(state, &state_vptr, sizeof state_vptr) &&
+            state_vptr == state_engine_base.load(std::memory_order_acquire) + 0x130f01c0 &&
+            memory.read(state + 0x68, &candidate_owner, sizeof candidate_owner) && candidate_owner == candidate;
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "native_type_state=observed;pid=%d;tid=%d;type=0x%" PRIxPTR ";state=0x%" PRIxPTR
+            ";valid=%d;context_raw=0x%" PRIxPTR ";registered=0;palette_inserted=0",
+            getpid(), gettid(), candidate, state, state_valid, context);
+        destroy_unregistered_type(candidate);
+    } else if (candidate) {
+        unregistered_type.store(candidate, std::memory_order_release);
+        __android_log_print(ANDROID_LOG_ERROR, kTag,
+            "native_type_state=blocked;reason=vanilla_state_or_thread_mismatch;pid=%d;tid=%d;retained=1", getpid(), gettid());
+    }
     return result;
 }
 
@@ -248,6 +390,16 @@ void cobblestone_constructor_proxy(uintptr_t self, uintptr_t arg1, uintptr_t arg
     if (!original) return;
     original(self, arg1, arg2, arg3);
     if (hit < 64) cobblestone_constructor_objects[hit].store(self, std::memory_order_release);
+    if (hit < 8) {
+        hybrid::SelfMemory memory;
+        char name[97]{};
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "block_type_constructor_input=observed;pid=%d;tid=%d;type=0x%" PRIxPTR
+            ";name=%s;numeric_raw=0x%" PRIxPTR ";material=0x%" PRIxPTR,
+            getpid(), gettid(), self, observed_name(memory, arg1, name) ? name : "unvalidated", arg2, arg3);
+        type_preparation_snapshot("constructor_return", self);
+    }
+    construct_unregistered_type(arg2, arg3);
     if (hit < 32) {
         __android_log_print(ANDROID_LOG_INFO, kTag,
             "cobblestone_ctor=return;hit=%u;mono_ns=%" PRIu64 ";this=0x%" PRIxPTR
@@ -290,6 +442,18 @@ int find_engine(dl_phdr_info* info, size_t, void* out) {
             mapping.image.segments.push_back({address, static_cast<size_t>(ph.p_memsz), ph.p_flags});
     }
     return 1;
+}
+
+bool engine_executable(uintptr_t address) {
+#ifdef HYBRID_EXPERIMENTAL_ENGINE_HOOK
+    EngineMapping mapping{};
+    dl_iterate_phdr(find_engine, &mapping);
+    return mapping.found && mapping.base == state_engine_base.load(std::memory_order_acquire) &&
+        mapping.image.contains(address, 4, PF_R | PF_X);
+#else
+    (void)address;
+    return false;
+#endif
 }
 
 const char* start_trace() {
@@ -491,6 +655,9 @@ const char* start_cobblestone_constructor_hook() {
         uint32_t code[4];
     };
     ObservationHook hooks[]{
+        {"block_type_attachment", 0x1010bb6c, reinterpret_cast<void*>(&type_attachment_proxy),
+            reinterpret_cast<void**>(&type_attachment_original), &type_attachment_stub,
+            {0xa9be7bfd, 0xf9000bf3, 0x910003fd, 0x3dc00020}},
         {"block_state_factory", 0x101071e0, reinterpret_cast<void*>(&state_factory_proxy),
             reinterpret_cast<void**>(&state_factory_original), &state_factory_stub,
             {0xd10203ff, 0xa9027bfd, 0xa9036ffc, 0xa90467fa}},
@@ -505,9 +672,21 @@ const char* start_cobblestone_constructor_hook() {
             {0xa9bb7bfd, 0xf9000bf9, 0xa9025ff8, 0xa90357f6}}
     };
     state_engine_base.store(mapping.base, std::memory_order_release);
+    const uint32_t allocator_branch = 0x14000000U | ((0x12911390U - 0xe49677cU) / 4);
+    const uint32_t name_constructor_code[4]{0xa9bd7bfd, 0xa90157f6, 0xa9024ff4, 0x910003fd};
+    uint32_t allocator_runtime = 0, name_runtime[4]{};
+    construction_contracts_verified.store(
+        mapping.image.contains(mapping.base + 0xe49677c, 4, PF_R | PF_X) &&
+        memory.read(mapping.base + 0xe49677c, &allocator_runtime, 4) && allocator_runtime == allocator_branch &&
+        mapping.image.contains(mapping.base + 0x85380f0, sizeof name_runtime, PF_R | PF_X) &&
+        memory.read(mapping.base + 0x85380f0, name_runtime, sizeof name_runtime) &&
+        std::memcmp(name_runtime, name_constructor_code, sizeof name_runtime) == 0,
+        std::memory_order_release);
+    construction_requested.store(false, std::memory_order_release);
     state_append_hits.store(0, std::memory_order_relaxed);
     state_factory_hits.store(0, std::memory_order_relaxed);
     state_constructor_hits.store(0, std::memory_order_relaxed);
+    type_attachment_hits.store(0, std::memory_order_relaxed);
     palette_append_hits.store(0, std::memory_order_relaxed);
     state_append_calls.store(0, std::memory_order_relaxed);
     palette_append_calls.store(0, std::memory_order_relaxed);
@@ -534,11 +713,17 @@ const char* stop_cobblestone_constructor_hook() {
     return "cobblestone_constructor_hook=not_installed;reason=build_gate";
 #else
     std::lock_guard<std::mutex> guard(cobblestone_hook_lock);
-    for (void** stub : {&palette_append_stub, &state_append_stub, &state_constructor_stub, &state_factory_stub}) {
+    construction_requested.store(false, std::memory_order_release);
+    if (unregistered_type.load(std::memory_order_acquire))
+        return "cobblestone_constructor_hook=cleanup_failed;pending_native_object_retained=1";
+    for (void** stub : {&palette_append_stub, &state_append_stub, &state_constructor_stub,
+                       &state_factory_stub, &type_attachment_stub}) {
         if (!*stub) continue;
         const int status = shadowhook_unhook(*stub);
         __android_log_print(ANDROID_LOG_INFO, kTag,
-            "block_state_hooks=cleanup;result=%d;handle_retained=%d;pid=%d", status, status != 0, getpid());
+            "block_state_hooks=cleanup;result=%d;handle_retained=%d;factory=%d;constructor=%d;attachment=%d;pid=%d",
+            status, status != 0, stub == &state_factory_stub, stub == &state_constructor_stub,
+            stub == &type_attachment_stub, getpid());
         if (status) return "cobblestone_constructor_hook=cleanup_failed;state_hook_retained=1";
         *stub = nullptr;
     }
@@ -568,6 +753,20 @@ extern "C" const char* hybrid_experimental_cobblestone_constructor_hook_start() 
 }
 extern "C" const char* hybrid_experimental_cobblestone_constructor_hook_stop() {
     return stop_cobblestone_constructor_hook();
+}
+extern "C" int hybrid_experimental_block_construction_arm() {
+#if defined(HYBRID_EXPERIMENTAL_NATIVE) && defined(HYBRID_EXPERIMENTAL_ENGINE_HOOK)
+    std::lock_guard<std::mutex> guard(cobblestone_hook_lock);
+    if (!cobblestone_hook_stub || !state_factory_stub || !construction_contracts_verified.load() ||
+        unregistered_type.load()) return -4;
+    const bool already = construction_requested.exchange(true, std::memory_order_acq_rel);
+    __android_log_print(ANDROID_LOG_INFO, kTag,
+        "native_type_construction=armed;pid=%d;duplicate=%d;execution=next_vanilla_constructor_thread;registration=disabled",
+        getpid(), already);
+    return already ? -2 : 0;
+#else
+    return -4;
+#endif
 }
 extern "C" int hybrid_experimental_cobblestone_constructor_match(std::uintptr_t object) {
 #if !defined(HYBRID_EXPERIMENTAL_NATIVE) || !defined(HYBRID_EXPERIMENTAL_ENGINE_HOOK)
