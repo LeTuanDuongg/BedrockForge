@@ -1,0 +1,14 @@
+10-17 15:08:35.626 18061 18061 I HybridMCPE: self_hook_stage=unhook_begin;stub=0xb4000077567a3030
+10-17 15:08:35.626 18061 18061 I HybridMCPE: self_hook_stage=cleanup_complete;return=42;proxy_hits=1;original_calls=1;clean=1
+10-17 15:08:35.626 18061 18061 I HybridMCPE: self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified pid=18061
+10-17 15:09:18.337 18061 18061 I HybridMCPE: diagnostic_suspend=0
+10-17 15:10:04.253 18061 18061 I HybridMCPE: self_hook_stage=unhook_begin;stub=0xb4000077567d6e90
+10-17 15:10:04.253 18061 18061 I HybridMCPE: self_hook_stage=cleanup_complete;return=42;proxy_hits=1;original_calls=1;clean=1
+10-17 15:10:04.253 18061 18061 I HybridMCPE: self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified pid=18061
+10-17 15:10:09.536 18061 18061 I HybridMCPE: diagnostic_resume=0
+10-17 15:10:41.801 18061 18061 I HybridMCPE: diagnostic_suspend=0
+10-17 15:10:59.829 18061 18061 I HybridMCPE: self_hook_stage=unhook_begin;stub=0xb400007756bd0890
+10-17 15:10:59.829 18061 18061 I HybridMCPE: self_hook_stage=cleanup_complete;return=42;proxy_hits=1;original_calls=1;clean=1
+10-17 15:10:59.829 18061 18061 I HybridMCPE: self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified pid=18061
+10-17 15:11:08.294 18061 18061 I HybridMCPE: diagnostic_resume=0
+10-17 15:11:12.665 18061 18061 I HybridMCPE: diagnostic_suspend=0

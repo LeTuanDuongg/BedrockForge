@@ -1,0 +1,795 @@
+{
+  "engine_sha256": "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e1",
+  "pid": 15705,
+  "load_bias": "0x761b627000",
+  "identifier": "minecraft:cobblestone",
+  "events": [
+    {
+      "stage": "ordinary_insert_watch_armed",
+      "host_monotonic_ns": 33104015000000,
+      "registry": "0x762eafedb8",
+      "identifier": "minecraft:cobblestone"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33151968000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e968",
+          "elf_va": "0x92e7968",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:air",
+      "attempt": 0,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x7639916130",
+        "x2": "0x761dfe7b17",
+        "x3": "0x7639916190",
+        "x4": "0x7639916180",
+        "x5": "0x8080800000000000",
+        "x6": "0xfefeff7168603973",
+        "x7": "0x7f7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x762ba0e478"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33152531000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e968",
+          "elf_va": "0x92e7968",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:unknown",
+      "attempt": 1,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x7639916130",
+        "x2": "0x761dfe7b17",
+        "x3": "0x7639916190",
+        "x4": "0x7639916180",
+        "x5": "0x80808080808080",
+        "x6": "0x10",
+        "x7": "0x7f7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x762ba0e8e8"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33153046000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e968",
+          "elf_va": "0x92e7968",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:client_request_placeholder_block",
+      "attempt": 2,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x7639916130",
+        "x2": "0x761dfe7b17",
+        "x3": "0x7639916190",
+        "x4": "0x7639916180",
+        "x5": "0x0",
+        "x6": "0x6e676462606b6f5e",
+        "x7": "0x7f7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x762ba0ec58"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33154593000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x76249ea384",
+          "elf_va": "0x93c3384",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:stone",
+      "attempt": 3,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x763990e6e0",
+        "x2": "0x761dfe7b17",
+        "x3": "0x763990e760",
+        "x4": "0x763990e75f",
+        "x5": "0x8000000000000000",
+        "x6": "0xff646d6e73723973",
+        "x7": "0x7f7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x7624afe3c0"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33155109000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:grass_block",
+      "attempt": 4,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x76399160d0",
+        "x2": "0x761dfe7b17",
+        "x3": "0x7639916060",
+        "x4": "0x7639915f28",
+        "x5": "0x80808080808080",
+        "x6": "0x10",
+        "x7": "0x7f7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x76249ea734"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33155656000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x76249eaa5c",
+          "elf_va": "0x93c3a5c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:dirt",
+      "attempt": 5,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x763990e6e0",
+        "x2": "0x761dfe7b17",
+        "x3": "0x763990e760",
+        "x4": "0x763990e75f",
+        "x5": "0x80000000000000",
+        "x6": "0x7eff737168633973",
+        "x7": "0xff7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x7624afe7e0"
+    },
+    {
+      "stage": "registry_insert_entry",
+      "host_monotonic_ns": 33156187000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x7624b1d850",
+      "elf_va": "0x94f6850",
+      "stop_reason": "breakpoint 1.1",
+      "stack": [
+        {
+          "pc": "0x7624b1d850",
+          "elf_va": "0x94f6850",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "key": "minecraft:cobblestone",
+      "attempt": 6,
+      "registers": {
+        "x0": "0x762eafedb8",
+        "x1": "0x76399160d0",
+        "x2": "0x761dfe7b17",
+        "x3": "0x7639916060",
+        "x4": "0x7639915f28",
+        "x5": "0x8080808080808080",
+        "x6": "0x10",
+        "x7": "0x7f7f7f7f7f7f7f7f",
+        "x8": "0x100000001b3"
+      },
+      "lr": "0x76249eae48"
+    },
+    {
+      "stage": "ordinary_insert_return",
+      "host_monotonic_ns": 33156500000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x76249eae48",
+      "elf_va": "0x93c3e48",
+      "stop_reason": "breakpoint 2.1",
+      "stack": [
+        {
+          "pc": "0x76249eae48",
+          "elf_va": "0x93c3e48",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "node": "0x7706dba650",
+      "key": "minecraft:cobblestone"
+    },
+    {
+      "stage": "node_value_watch_armed",
+      "host_monotonic_ns": 33156671000000,
+      "node": "0x7706dba650",
+      "field": "0x7706dba698",
+      "initial_value": "0x0",
+      "key_hex": "3e82bb986952533e2a6d696e6563726166743a636f62626c6573746f6e6500c10000000000000000",
+      "node_hex": "b081a006770000b4303ea006770000b43062a006770000b401799ae6760000b43e82bb986952533e2a6d696e6563726166743a636f62626c6573746f6e6500c100000000000000000000000000000000",
+      "value_already_assigned": false
+    },
+    {
+      "stage": "node_value_write",
+      "host_monotonic_ns": 33157187000000,
+      "tid": 15770,
+      "thread": "Thread-13",
+      "pc": "0x76249eae54",
+      "elf_va": "0x93c3e54",
+      "stop_reason": "watchpoint 1",
+      "stack": [
+        {
+          "pc": "0x76249eae54",
+          "elf_va": "0x93c3e54",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490e974",
+          "elf_va": "0x92e7974",
+          "symbol": null
+        },
+        {
+          "pc": "0x762490d308",
+          "elf_va": "0x92e6308",
+          "symbol": null
+        },
+        {
+          "pc": "0x762a25ca7c",
+          "elf_va": "0xec35a7c",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624e09618",
+          "elf_va": "0x97e2618",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc9c08",
+          "elf_va": "0x97a2c08",
+          "symbol": null
+        },
+        {
+          "pc": "0x7624dc82f8",
+          "elf_va": "0x97a12f8",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de5686c",
+          "elf_va": "0x1282f86c",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de56514",
+          "elf_va": "0x1282f514",
+          "symbol": null
+        },
+        {
+          "pc": "0x762de7dae4",
+          "elf_va": "0x12856ae4",
+          "symbol": null
+        },
+        {
+          "pc": "0x79490f0d58",
+          "elf_va": null,
+          "symbol": null
+        },
+        {
+          "pc": "0x794908d374",
+          "elf_va": null,
+          "symbol": null
+        }
+      ],
+      "node": "0x7706dba650",
+      "value_before": "0x0",
+      "value_after": "0xb4000077b6d22c50",
+      "key_unchanged": true,
+      "value": {
+        "raw_pointer": "0xb4000077b6d22c50",
+        "canonical_pointer": "0x77b6d22c50",
+        "vptr": "0x762e6fd190",
+        "vtable_elf_va": "0x130d6190",
+        "typeinfo": "0x762e6ff918",
+        "rtti": "16CobblestoneBlock",
+        "validation": "engine_itanium_rtti_chain",
+        "ownership": "unknown"
+      }
+    },
+    {
+      "stage": "detach",
+      "host_monotonic_ns": 33157203000000,
+      "success": true,
+      "detail": "success"
+    }
+  ],
+  "engine_memory_writes": 0,
+  "result": "observed_value_write"
+}

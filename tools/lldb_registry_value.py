@@ -3,6 +3,8 @@
 Import inside NDK LLDB after gdb-remote attaches at the Minecraft menu, then call
 run(lldb.debugger, local_engine_path, output_json, verified_load_bias). Hardware watchpoints alter
 debug state only; this module never calls an engine function or writes memory.
+Pass identifier="minecraft:cobblestone" to follow a bounded set of registry
+insertions using hardware execution breakpoints, then watch that node's value.
 """
 import hashlib
 import json
@@ -14,11 +16,30 @@ ENGINE_SHA256 = "fac2be5b17ef79419ebd66fe4f9e362a48d7b2067d5e1f649e65c36edf2927e
 REGISTRY_VA = 0x134D7DB8
 GETTER_VA = 0x103E2D54
 WRITER_VA = 0x94F691C
+INSERT_VA = 0x94F6850
 POINTER_MASK = 0x00FFFFFFFFFFFFFF
 
 
 def canonical_pointer(raw):
     return raw & POINTER_MASK
+
+
+def registry_key_name(data, read):
+    """Observed hash64 + libc++ string, bounded to the diagnostic's vanilla keys."""
+    if len(data) != 0x28:
+        raise ValueError("incomplete registry key")
+    header = data[8]
+    if header & 1:
+        size, pointer = struct.unpack_from("<QQ", data, 16)
+        if size > 96:
+            return None
+        value = read(pointer, size)
+    else:
+        size = header >> 1
+        if size > 22:
+            return None
+        value = data[9:9 + size]
+    return value.decode("ascii", errors="replace")
 
 
 def engine_layout(path):
@@ -52,7 +73,7 @@ def engine_layout(path):
     raise ValueError("writer outside executable file-backed PT_LOAD")
 
 
-def run(debugger, engine_path, output_path, load_bias, timeout=180):
+def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="minecraft:air"):
     import lldb
 
     segments = []
@@ -61,8 +82,10 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180):
     process = target.GetProcess()
     events = []
     report = {"engine_sha256": ENGINE_SHA256, "pid": process.GetProcessID(),
-              "load_bias": hex(load_bias), "events": events, "engine_memory_writes": 0}
+              "load_bias": hex(load_bias), "identifier": identifier,
+              "events": events, "engine_memory_writes": 0}
     watches = []
+    breakpoints = []
     old_async = debugger.GetAsync()
 
     def emit(stage, **fields):
@@ -107,7 +130,7 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180):
         watches.append(item.GetID())
         return item.GetID()
 
-    def resume_until_stop(seconds):
+    def resume_until_stop(seconds, reason=lldb.eStopReasonWatchpoint):
         stop_id = process.GetStopID()
         error = process.Continue()
         if error.Fail():
@@ -119,15 +142,35 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180):
             if state in (lldb.eStateExited, lldb.eStateDetached, lldb.eStateInvalid):
                 raise RuntimeError("target left debug session: " + str(state))
             if state == lldb.eStateStopped and process.GetStopID() > stop_id:
-                stopped = [t for t in process if t.GetStopReason() == lldb.eStopReasonWatchpoint]
+                stopped = [t for t in process if t.GetStopReason() == reason]
                 if not stopped:
                     emit("unexpected_stop", threads=[context(t) for t in process
                          if t.GetStopReason() not in (lldb.eStopReasonNone, lldb.eStopReasonInvalid)])
-                    raise RuntimeError("non-watchpoint stop; preserving original signal behavior")
+                    raise RuntimeError("unexpected stop; preserving original signal behavior")
                 return stopped[0]
             event = lldb.SBEvent()
             listener.WaitForEvent(1, event)
         raise TimeoutError("bounded hardware-watchpoint observation timed out")
+
+    def hardware_break(address):
+        before = {target.GetBreakpointAtIndex(i).GetID() for i in range(target.GetNumBreakpoints())}
+        result = lldb.SBCommandReturnObject()
+        debugger.GetCommandInterpreter().HandleCommand(
+            "breakpoint set --hardware --address " + hex(address), result)
+        created = [target.GetBreakpointAtIndex(i) for i in range(target.GetNumBreakpoints())
+                   if target.GetBreakpointAtIndex(i).GetID() not in before]
+        breakpoints.extend(item.GetID() for item in created)
+        if not result.Succeeded() or len(created) != 1 or not created[0].IsHardware():
+            raise RuntimeError("hardware execution breakpoint unavailable: " + result.GetError())
+        return created[0].GetID()
+
+    def remove_break(item):
+        if not target.BreakpointDelete(item):
+            raise RuntimeError("hardware breakpoint cleanup failed")
+        breakpoints.remove(item)
+
+    def key_name(address):
+        return registry_key_name(read(address, 0x28), read)
 
     def describe_value(raw):
         value = canonical_pointer(raw)
@@ -157,6 +200,8 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180):
             return {**data, "validation": "unvalidated", "error": str(error)}
 
     try:
+        if identifier not in ("minecraft:air", "minecraft:cobblestone", "minecraft:stone"):
+            raise ValueError("only the three predefined vanilla observations are supported")
         segments, writer_bytes = engine_layout(engine_path)
         if process.GetState() != lldb.eStateStopped or not report["pid"]:
             raise RuntimeError("requires an attached stopped process")
@@ -178,21 +223,69 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180):
         root_before = word(root_field)
         if root_before:
             raise ValueError("registry already populated; start at the menu in a fresh test process")
-        root_watch = watch(root_field)
-        emit("root_watch_armed", registry=hex(registry), root_field=hex(root_field), root_before=hex(root_before))
-        thread = resume_until_stop(timeout)
-        frame = thread.GetFrameAtIndex(0)
-        pc = frame.GetPC()
-        node = canonical_pointer(frame.FindRegister("x21").GetValueAsUnsigned())
-        link = canonical_pointer(frame.FindRegister("x23").GetValueAsUnsigned())
-        root = canonical_pointer(word(root_field))
-        emit("root_write", **context(thread), root_after=hex(root), x21=hex(node), x23=hex(link))
-        if pc - load_bias not in (WRITER_VA, WRITER_VA + 4) or link != root_field or node != root or not node:
-            raise ValueError("root write does not establish the pinned new-node provenance")
+        if identifier == "minecraft:air":
+            root_watch = watch(root_field)
+            emit("root_watch_armed", registry=hex(registry), root_field=hex(root_field), root_before=hex(root_before))
+            thread = resume_until_stop(timeout)
+            frame = thread.GetFrameAtIndex(0)
+            pc = frame.GetPC()
+            node = canonical_pointer(frame.FindRegister("x21").GetValueAsUnsigned())
+            link = canonical_pointer(frame.FindRegister("x23").GetValueAsUnsigned())
+            root = canonical_pointer(word(root_field))
+            emit("root_write", **context(thread), root_after=hex(root), x21=hex(node), x23=hex(link))
+            if pc - load_bias not in (WRITER_VA, WRITER_VA + 4) or link != root_field or node != root or not node:
+                raise ValueError("root write does not establish the pinned new-node provenance")
+            if not target.DeleteWatchpoint(root_watch):
+                raise RuntimeError("root watchpoint cleanup failed")
+            watches.remove(root_watch)
+        else:
+            for va, _, flags, file_offset, file_size in segments:
+                if flags & 1 and va <= INSERT_VA and INSERT_VA + 16 <= va + file_size:
+                    with Path(engine_path).open("rb") as source:
+                        source.seek(file_offset + INSERT_VA - va)
+                        if read(load_bias + INSERT_VA, 16) != source.read(16):
+                            raise ValueError("runtime insertion entry bytes mismatch")
+                    break
+            else:
+                raise ValueError("insertion entry outside executable file-backed segment")
+            entry = hardware_break(load_bias + INSERT_VA)
+            emit("ordinary_insert_watch_armed", registry=hex(registry), identifier=identifier)
+            deadline = time.monotonic() + timeout
+            for attempt in range(256):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise TimeoutError("ordinary block insertion not observed in time")
+                thread = resume_until_stop(remaining, lldb.eStopReasonBreakpoint)
+                frame = thread.GetFrameAtIndex(0)
+                if frame.GetPC() != load_bias + INSERT_VA:
+                    raise ValueError("unexpected insertion breakpoint PC")
+                reg = lambda name: frame.FindRegister(name).GetValueAsUnsigned()
+                if canonical_pointer(reg("x0")) != registry:
+                    continue
+                name = key_name(reg("x1"))
+                emit("registry_insert_entry", **context(thread), key=name, attempt=attempt,
+                     registers={"x" + str(i): hex(reg("x" + str(i))) for i in range(9)},
+                     lr=hex(reg("x30")))
+                if name == identifier:
+                    break
+            else:
+                raise RuntimeError("bounded insertion hit limit reached")
+            owner_tid = thread.GetThreadID()
+            return_pc = canonical_pointer(reg("x30"))
+            if not in_engine(return_pc, 4):
+                raise ValueError("insertion return PC outside engine")
+            remove_break(entry)
+            returned = hardware_break(return_pc)
+            thread = resume_until_stop(30, lldb.eStopReasonBreakpoint)
+            if thread.GetThreadID() != owner_tid or thread.GetFrameAtIndex(0).GetPC() != return_pc:
+                raise ValueError("insertion return thread/PC mismatch")
+            node = canonical_pointer(thread.GetFrameAtIndex(0).FindRegister("x0").GetValueAsUnsigned())
+            if not node or key_name(node + 0x20) != identifier:
+                raise ValueError("returned node key does not match observed insertion arguments")
+            emit("ordinary_insert_return", **context(thread), node=hex(node), key=identifier)
+            remove_break(returned)
         snapshot = read(node, 0x50)
         initial_value = struct.unpack_from("<Q", snapshot, 0x48)[0]
-        target.DeleteWatchpoint(root_watch)
-        watches.remove(root_watch)
         value_watch = watch(node + 0x48)
         emit("node_value_watch_armed", node=hex(node), field=hex(node + 0x48),
              initial_value=hex(initial_value), key_hex=snapshot[0x20:0x48].hex(),
@@ -218,6 +311,8 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180):
                 time.sleep(0.05)
         for item in watches:
             target.DeleteWatchpoint(item)
+        for item in breakpoints:
+            target.BreakpointDelete(item)
         if process.GetState() == lldb.eStateStopped:
             error = process.Detach()
             emit("detach", success=error.Success(), detail=str(error))
