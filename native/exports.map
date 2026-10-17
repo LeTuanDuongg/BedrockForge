@@ -8,6 +8,7 @@
     hybrid_diagnostic_registry_snapshot;
     hybrid_experimental_registry_getter_probe;
     hybrid_experimental_vanilla_block_lookup_probe;
+    hybrid_experimental_registry_lifecycle_snapshot;
     hybrid_experimental_candidate_trace_start;
     hybrid_experimental_candidate_trace_stop;
     hybrid_experimental_hook_self_test;

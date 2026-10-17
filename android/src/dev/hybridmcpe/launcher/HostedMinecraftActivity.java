@@ -71,15 +71,22 @@ public final class HostedMinecraftActivity extends com.mojang.minecraftpe.MainAc
                     return;
                 }
                 if (!"dev.hybridmcpe.launcher.EXPERIMENTAL_REGISTRY_PROBE".equals(action)) return;
+                int phase = intent.getIntExtra("phase", -1);
+                if (phase != 1 && phase != 2) {
+                    Log.w("HybridMCPE", "registry_trigger=rejected;reason=invalid_phase;phase=" + phase);
+                    setResultCode(-1);
+                    return;
+                }
+                String phaseName = phase == 1 ? "main_menu_manual" : "world_loaded_manual";
                 Log.i("HybridMCPE", "registry_trigger=request;elapsed_ns=" +
                     android.os.SystemClock.elapsedRealtimeNanos() + ";pid=" + android.os.Process.myPid() +
-                    ";tid=" + android.os.Process.myTid());
+                    ";tid=" + android.os.Process.myTid() + ";phase=" + phaseName);
                 int result = !destroyed && resumed && diagnosticActive ?
-                    MainActivity.triggerExperimentalRegistryProbe() : -1;
+                    MainActivity.triggerExperimentalRegistryProbe(phase) : -1;
                 Log.i("HybridMCPE", "registry_trigger=received;result=" + result +
                     ";elapsed_ns=" + android.os.SystemClock.elapsedRealtimeNanos() +
                     ";pid=" + android.os.Process.myPid() + ";tid=" + android.os.Process.myTid() +
-                    ";thread=android_main;world_state=externally_confirmed_only");
+                    ";thread=android_main;phase=" + phaseName + ";world_state=externally_confirmed_only");
                 setResultCode(result);
             }
         };

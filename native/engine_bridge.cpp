@@ -104,10 +104,18 @@ std::string experimental_registry_getter_probe(){
 #endif
 }
 
-std::string experimental_vanilla_block_lookup_probe(){
+std::string experimental_registry_lifecycle_snapshot(unsigned phase){
 #ifndef HYBRID_EXPERIMENTAL_NATIVE
+    (void)phase;
     return "vanilla_block_lookup=disabled";
 #else
+    const char* phase_name=nullptr;
+    switch(phase){
+        case 0: phase_name="native_mod_abi_start"; break;
+        case 1: phase_name="main_menu_manual"; break;
+        case 2: phase_name="world_loaded_manual"; break;
+        default: return "registry_sample=blocked;reason=invalid_phase";
+    }
     const auto verified=verify_loaded_engine();
     if(!verified.verified||!verified.profile)return "vanilla_block_lookup=blocked;reason=engine_not_verified";
     if(std::strcmp(verified.profile->id,"bedrock-1.26.50.4-arm64"))
@@ -157,8 +165,8 @@ std::string experimental_vanilla_block_lookup_probe(){
     };
     char header[512];
     std::snprintf(header,sizeof header,
-        "registry_sample=done;pid=%d;tid=%d;profile=%s;engine_sha256=%s;phase=explicit_manual_probe;registry=0x%llx;root=0x%llx;engine_calls=0;mutation=none;key_encoding=unverified_raw_hex;value_ownership=unverified",
-        getpid(),gettid(),verified.profile->id,verified.profile->sha256,
+        "registry_sample=done;pid=%d;tid=%d;profile=%s;engine_sha256=%s;phase=%s;registry=0x%llx;root=0x%llx;engine_calls=0;mutation=none;key_encoding=observed_hash64_plus_inline_ascii;value_ownership=unverified",
+        getpid(),gettid(),verified.profile->id,verified.profile->sha256,phase_name,
         static_cast<unsigned long long>(registry),static_cast<unsigned long long>(root));
     std::string result=header;
     uintptr_t queue[9]{root},visited[4]{};
@@ -178,13 +186,23 @@ std::string experimental_vanilla_block_lookup_probe(){
         std::memcpy(&left,bytes,sizeof left);
         std::memcpy(&right,bytes+8,sizeof right);
         std::memcpy(&value,bytes+0x48,sizeof value);
-        char key_hex[81]{},type[128]{},entry[512];
+        char key_hex[81]{},id_candidate[33]{},type[128]{},entry[576];
         constexpr char hex[]="0123456789abcdef";
         for(size_t i=0;i<40;++i){key_hex[2*i]=hex[bytes[0x20+i]>>4];key_hex[2*i+1]=hex[bytes[0x20+i]&15];}
+        bool id_valid=true;
+        size_t id_len=0;
+        for(size_t i=8;i<40;++i){
+            const unsigned char c=bytes[0x20+i];
+            if(!c)break;
+            if(!((c>='a'&&c<='z')||(c>='A'&&c<='Z')||(c>='0'&&c<='9')||c==':'||c=='_'||c=='-')){id_valid=false;break;}
+            if(id_len+1>=sizeof id_candidate){id_valid=false;break;}
+            id_candidate[id_len++]=static_cast<char>(c);
+        }
+        if(!id_len)id_valid=false;
         const bool typed=describe(value,value_vptr,type,sizeof type);
         std::snprintf(entry,sizeof entry,
-            ";node%zu=0x%llx,key20_hex=%s,value48=0x%llx,value_rtti=%s",
-            count,static_cast<unsigned long long>(node),key_hex,
+            ";node%zu=0x%llx,key20_hex=%s,id_candidate=%s,value48=0x%llx,value_rtti=%s",
+            count,static_cast<unsigned long long>(node),key_hex,id_valid?id_candidate:"unverified",
             static_cast<unsigned long long>(value),typed?type:"unvalidated");
         result+=entry;
         visited[count++]=node;
@@ -197,6 +215,10 @@ std::string experimental_vanilla_block_lookup_probe(){
     result+=";sampled_nodes="+std::to_string(count)+";root_unchanged=1;snapshot=best_effort_not_locked;lookup=not_invoked_key_abi_unverified";
     return result;
 #endif
+}
+
+std::string experimental_vanilla_block_lookup_probe(){
+    return experimental_registry_lifecycle_snapshot(2);
 }
 
 std::string observe_block_registry(){
@@ -255,4 +277,10 @@ extern "C" const char* hybrid_experimental_vanilla_block_lookup_probe(){
     thread_local std::string result;
     try{result=hybrid::experimental_vanilla_block_lookup_probe();return result.c_str();}
     catch(...){return "vanilla_block_lookup=failed;reason=exception";}
+}
+
+extern "C" const char* hybrid_experimental_registry_lifecycle_snapshot(unsigned phase){
+    thread_local std::string result;
+    try{result=hybrid::experimental_registry_lifecycle_snapshot(phase);return result.c_str();}
+    catch(...){return "registry_sample=failed;reason=exception";}
 }

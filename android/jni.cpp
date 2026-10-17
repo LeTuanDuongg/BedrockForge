@@ -76,15 +76,17 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe(JNIEnv
 #endif
 }
 extern "C" JNIEXPORT jint JNICALL
-Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger(JNIEnv*, jclass) {
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger(JNIEnv*, jclass, jint phase) {
 #ifdef HYBRID_EXPERIMENTAL_NATIVE
+    if (phase != 1 && phase != 2) return -1;
     void* module=dlopen("libhybrid_experimental_registry_probe.so",RTLD_NOW|RTLD_NOLOAD);
     if(!module)return -4;
-    auto trigger=reinterpret_cast<int (*)()>(dlsym(module,"hybrid_experimental_trigger_registry_sample"));
-    const int result=trigger?trigger():-4;
+    auto trigger=reinterpret_cast<int (*)(unsigned)>(dlsym(module,"hybrid_experimental_trigger_registry_sample"));
+    const int result=trigger?trigger(static_cast<unsigned>(phase)):-4;
     dlclose(module);
     return result;
 #else
+    (void)phase;
     return -4;
 #endif
 }
