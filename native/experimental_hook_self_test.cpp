@@ -25,11 +25,12 @@ __attribute__((noinline, used, visibility("hidden"))) int test_target(int left, 
 }
 
 __attribute__((noinline)) int test_proxy(int left, int right) {
+    SHADOWHOOK_STACK_SCOPE();
     g_proxy_hits.fetch_add(1, std::memory_order_relaxed);
     const TestFunction original = g_original;
     if (!original) return -1;
     g_original_calls.fetch_add(1, std::memory_order_relaxed);
-    return original(left, right);
+    return SHADOWHOOK_CALL_PREV(test_proxy, left, right);
 }
 
 const char* fail(const char* stage, int error) {
@@ -79,6 +80,8 @@ extern "C" const char* hybrid_experimental_hook_self_test() {
         if (g_stub) {
             const int unhook = shadowhook_unhook(g_stub);
             if (unhook == 0) g_stub = nullptr;
+            __android_log_print(ANDROID_LOG_INFO, kTag,
+                "self_hook_stage=install_failure_cleanup;unhook=%d;retained=%d", unhook, g_stub != nullptr);
         }
         return fail("install", error);
     }
@@ -95,6 +98,9 @@ extern "C" const char* hybrid_experimental_hook_self_test() {
         const int error = shadowhook_get_errno();
         const int unhook = shadowhook_unhook(g_stub);
         if (unhook == 0) { g_stub = nullptr; g_original = nullptr; }
+        __android_log_print(ANDROID_LOG_INFO, kTag,
+            "self_hook_stage=behavior_failure_cleanup;run=%u;unhook=%d;retained=%d",
+            run, unhook, g_stub != nullptr);
         return fail("behavior_check", error);
     }
 

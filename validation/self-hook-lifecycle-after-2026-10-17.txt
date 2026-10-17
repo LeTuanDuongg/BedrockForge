@@ -1,0 +1,3 @@
+hook_lifecycle run=1 result=self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified
+hook_lifecycle run=2 result=self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified
+hook_lifecycle run=3 result=self_hook_test=passed;proxy_hits=1;original_calls=1;return=42;cleanup=verified
