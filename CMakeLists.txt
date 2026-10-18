@@ -7,7 +7,9 @@ option(HYBRID_EXPERIMENTAL_BLOCK_REGISTRATION "Build the gated 1.26.50.4 native 
 set(HYBRID_MODIFIED_PROFILE_DIR "" CACHE PATH "Generated modified-game fingerprint header directory")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_library(hybridmcpe SHARED native/runtime.cpp native/engine_bridge.cpp)
+add_library(hybridmcpe SHARED native/runtime.cpp native/engine_bridge.cpp native/sdk_runtime.cpp
+  native/engine_bridge/block_read_126504.cpp
+  native/engine_bridge/world_read_126504.cpp)
 target_include_directories(hybridmcpe PUBLIC sdk PRIVATE native)
 target_link_libraries(hybridmcpe PRIVATE ${CMAKE_DL_LIBS})
 target_compile_options(hybridmcpe PRIVATE -Wall -Wextra -Werror)
@@ -19,8 +21,39 @@ if(ANDROID)
   add_library(hybrid_diagnostic SHARED mods/diagnostic.cpp)
   target_include_directories(hybrid_diagnostic PRIVATE sdk native)
   target_link_libraries(hybrid_diagnostic PRIVATE hybridmcpe log)
-  target_link_options(hybridmcpe PRIVATE "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/native/exports.map")
-  set_property(TARGET hybridmcpe APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/native/exports.map")
+  set(_hybrid_exports
+    hybrid_probe hybrid_load_mod hybrid_enable_mods hybrid_disable_mods hybrid_shutdown
+    hybrid_diagnostic_registry_snapshot hybrid_experimental_registry_getter_probe
+    hybrid_experimental_vanilla_block_lookup_probe hybrid_experimental_registry_lifecycle_snapshot
+    hybrid_experimental_candidate_trace_start hybrid_experimental_candidate_trace_stop
+    hybrid_experimental_hook_self_test hybrid_experimental_engine_candidate_hook_start
+    hybrid_experimental_engine_candidate_hook_stop hybrid_experimental_button_control
+    hybrid_engine_button_schedule_126504_control
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeProfile
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnostic
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnosticLifecycle
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnosticShutdown
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalEnabled
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonTrigger
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonModLoad
+    Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalCandidateTraceStart)
+  if(HYBRID_EXPERIMENTAL_NATIVE)
+    list(APPEND _hybrid_exports
+      hybrid_experimental_block_registration_126504_probe
+      hybrid_experimental_cobblestone_constructor_hook_start
+      hybrid_experimental_cobblestone_constructor_hook_stop)
+  endif()
+  if(HYBRID_BOOTSTRAP_PRELOADER)
+    list(APPEND _hybrid_exports PLGetModRegistration)
+  endif()
+  string(REPLACE ";" ";\n    " _hybrid_export_list "${_hybrid_exports}")
+  set(_hybrid_export_map "${CMAKE_CURRENT_BINARY_DIR}/hybridmcpe.exports.map")
+  file(WRITE "${_hybrid_export_map}" "{ global:\n    ${_hybrid_export_list};\n  local: *;\n};\n")
+  target_link_options(hybridmcpe PRIVATE "-Wl,--version-script=${_hybrid_export_map}")
+  set_property(TARGET hybridmcpe APPEND PROPERTY LINK_DEPENDS "${_hybrid_export_map}")
   target_sources(hybridmcpe PRIVATE android/jni.cpp)
   if(HYBRID_EXPERIMENTAL_NATIVE)
     target_compile_definitions(hybridmcpe PRIVATE HYBRID_EXPERIMENTAL_NATIVE=1)
@@ -88,6 +121,12 @@ if(ANDROID)
 endif()
 add_library(iron_chest SHARED mods/iron_chest.cpp)
 target_include_directories(iron_chest PRIVATE sdk)
+add_library(hybrid_sdk_events_example MODULE mods/sdk_lifecycle_example.cpp)
+target_include_directories(hybrid_sdk_events_example PRIVATE sdk)
+target_compile_options(hybrid_sdk_events_example PRIVATE -Wall -Wextra -Werror)
+add_library(hybrid_sdk_player_world_example MODULE mods/sdk_player_world_example.cpp)
+target_include_directories(hybrid_sdk_player_world_example PRIVATE sdk)
+target_compile_options(hybrid_sdk_player_world_example PRIVATE -Wall -Wextra -Werror)
 add_library(hybrid_container_core STATIC native/iron_chest_container.cpp)
 target_include_directories(hybrid_container_core PUBLIC native)
 target_compile_options(hybrid_container_core PRIVATE -Wall -Wextra -Werror)
@@ -108,6 +147,31 @@ if(BUILD_TESTING)
   target_include_directories(hybrid_native_tests PRIVATE sdk native)
   target_link_libraries(hybrid_native_tests PRIVATE hybridmcpe)
   add_test(NAME hybrid_native_tests COMMAND hybrid_native_tests)
+  add_executable(hybrid_sdk_tests native/sdk_runtime.cpp tests/sdk_runtime_tests.cpp
+    native/engine_bridge/block_read_126504.cpp
+    native/engine_bridge/world_read_126504.cpp)
+  if(ANDROID)
+    target_sources(hybrid_sdk_tests PRIVATE native/engine_bridge.cpp)
+    target_link_libraries(hybrid_sdk_tests PRIVATE log ${CMAKE_DL_LIBS})
+  endif()
+  target_include_directories(hybrid_sdk_tests PRIVATE sdk native)
+  target_compile_options(hybrid_sdk_tests PRIVATE -Wall -Wextra -Werror)
+  add_test(NAME hybrid_sdk_tests COMMAND hybrid_sdk_tests)
+  add_executable(hybrid_sdk_block_api_tests native/sdk_runtime.cpp
+    native/engine_bridge/world_read_126504.cpp tests/sdk_block_api_tests.cpp)
+  target_include_directories(hybrid_sdk_block_api_tests PRIVATE sdk native)
+  target_compile_options(hybrid_sdk_block_api_tests PRIVATE -Wall -Wextra -Werror)
+  if(ANDROID)
+    target_link_libraries(hybrid_sdk_block_api_tests PRIVATE log)
+  endif()
+  add_test(NAME hybrid_sdk_block_api_tests COMMAND hybrid_sdk_block_api_tests)
+  add_executable(hybrid_sdk_world_api_tests native/sdk_runtime.cpp tests/sdk_world_api_tests.cpp)
+  target_include_directories(hybrid_sdk_world_api_tests PRIVATE sdk native)
+  target_compile_options(hybrid_sdk_world_api_tests PRIVATE -Wall -Wextra -Werror)
+  if(ANDROID)
+    target_link_libraries(hybrid_sdk_world_api_tests PRIVATE log)
+  endif()
+  add_test(NAME hybrid_sdk_world_api_tests COMMAND hybrid_sdk_world_api_tests)
   if(ANDROID)
     if(HYBRID_EXPERIMENTAL_NATIVE)
       add_executable(hybrid_hook_lifecycle_tests tests/hook_lifecycle_tests.cpp)
@@ -121,6 +185,9 @@ if(BUILD_TESTING)
     target_compile_options(hybrid_runtime_test_mod PRIVATE -Wall -Wextra -Werror -fexceptions)
     add_executable(hybrid_runtime_lifecycle_tests
       native/runtime.cpp
+      native/sdk_runtime.cpp
+      native/engine_bridge/block_read_126504.cpp
+      native/engine_bridge/world_read_126504.cpp
       bootstrap/preloader/adapter.cpp
       tests/runtime_engine_stub.cpp
       tests/runtime_lifecycle_tests.cpp)
@@ -129,5 +196,18 @@ if(BUILD_TESTING)
     target_compile_options(hybrid_runtime_lifecycle_tests PRIVATE -Wall -Wextra -Werror -fexceptions)
     add_test(NAME hybrid_runtime_lifecycle_tests COMMAND hybrid_runtime_lifecycle_tests
       $<TARGET_FILE:hybrid_runtime_test_mod>)
+    add_executable(hybrid_sdk_loader_tests
+      native/runtime.cpp
+      native/sdk_runtime.cpp
+      native/engine_bridge/block_read_126504.cpp
+      native/engine_bridge/world_read_126504.cpp
+      tests/runtime_engine_stub.cpp
+      tests/sdk_loader_tests.cpp)
+    target_include_directories(hybrid_sdk_loader_tests PRIVATE sdk native)
+    target_link_libraries(hybrid_sdk_loader_tests PRIVATE ${CMAKE_DL_LIBS} log)
+    target_compile_options(hybrid_sdk_loader_tests PRIVATE -Wall -Wextra -Werror -fexceptions)
+    add_dependencies(hybrid_sdk_loader_tests hybrid_sdk_events_example hybrid_sdk_player_world_example)
+    add_test(NAME hybrid_sdk_loader_tests COMMAND hybrid_sdk_loader_tests
+      $<TARGET_FILE:hybrid_sdk_events_example> $<TARGET_FILE:hybrid_sdk_player_world_example>)
   endif()
 endif()

@@ -37,8 +37,18 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnostic(JNIEnv* env, jclass, 
     const char* text = env->GetStringUTFChars(path, nullptr);
     if (!text) return nullptr;
     int code = hybrid_load_mod(text);
+    std::string sdk_result;
+    if (code == 0) {
+        const std::string diagnostic_path(text);
+        const auto slash = diagnostic_path.rfind('/');
+        if (slash != std::string::npos) {
+            const auto example = diagnostic_path.substr(0, slash + 1) + "libhybrid_sdk_events_example.so";
+            const int sdk_code = hybrid_load_mod(example.c_str());
+            sdk_result = ";sdk_example_load=" + std::to_string(sdk_code);
+        }
+    }
     env->ReleaseStringUTFChars(path, text);
-    std::string result = before + ";diagnostic_load=" + std::to_string(code);
+    std::string result = before + sdk_result + ";diagnostic_load=" + std::to_string(code);
     __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "native_diagnostic %s", result.c_str());
     return env->NewStringUTF(result.c_str());
 }
@@ -86,7 +96,7 @@ Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger(JNIE
         __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "block_type_hook_control=%d;status=%s;pid=%d;tid=%d",
                             phase, status, getpid(), gettid());
         const std::string result(status);
-        return result.find(phase == 3 ? "cleanup=verified" : "=installed") != std::string::npos ? 0 : -5;
+        return result.find(phase == 3 ? "cleanup=verified" : "cobblestone_constructor_hook=installed;") != std::string::npos ? 0 : -5;
     }
     if (phase != 1 && phase != 2) return -1;
     void* module=dlopen("libhybrid_experimental_registry_probe.so",RTLD_NOW|RTLD_NOLOAD);

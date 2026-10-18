@@ -33,6 +33,10 @@ The [block contract record](../targets/bedrock-1.26.52.3-arm64-block-contracts.j
 
 Analysis reused the existing copied Ghidra project, with no full Auto Analysis. The new script verifies exact target bytes, finds bounded adjacent ADRP/ADD references and temporarily disassembles/decompiles the getter within unwind bounds. All program edits are rolled back. `llvm-objdump` independently corroborated instructions; its nearest-export labels must not be treated as function names for these stripped ranges.
 
+The caller follow-up decoded AArch64 direct `BL` immediates across `.text`: 179 sites target the getter. The first sampled site, ELF `0x086f1cb0`, is inside an unwind-bounded 7340-byte caller at `0x086f16cc`. Its instructions pass the getter result through a helper and compare it with another value. This is consistent with lookup/use of existing block state. The caller decompilation reports PIC-construction and unreachable-block warnings, so it does not establish a reliable source identity. The 179 calls do not imply 179 registrations; getter calls can serve ordinary lookup paths. The scan does not recover indirect calls.
+
+**Registration trace result: not established.** No constructor-to-insertion path for any vanilla block was recovered. There is no verified registration function ABI, registry acquisition/ownership, identifier or block-type construction contract, factory ownership, finalization point, initialization window, or thread rule. The sampled `ServerInstance::_postLevelInitialization` diagnostic remains a required-definition check reached through an indirect virtual call, not a registration callback. Gameplay registration stays disabled, and no bridge code is added from this evidence.
+
 ## Validation and next prerequisite
 
 | Stage | Result |
@@ -45,6 +49,6 @@ Analysis reused the existing copied Ghidra project, with no full Auto Analysis. 
 
 Before any gameplay call, a host must first keep this exact engine running with HybridMCPE in the same process, preserve licensing/integrity and leave the original installation/worlds separate. Then capture PID, module identity, five-layout validation, zero capabilities and Mod ABI lifecycle while the game stays responsive. Historical transient bootstrap execution does not pass this gate.
 
-The next engine prerequisite is a verified registry object acquisition and construction/insertion contract, including ownership, allowed initialization phase and game-thread dispatch. Only then can a small native diagnostic mod register the identifier once, verify lookup and placement in a disposable world, and observe teardown/reload. No further APK clone, launcher, block stub or Iron Chest gameplay subsystem was added here.
+The remaining evidence must identify one vanilla block's construction and the exact call that inserts it, with an unwind-bounded caller chain and enough data flow to establish object ownership, function ABI, finalization order and thread context. Until then, a callable registration contract cannot be added safely. No block stub or experimental engine address was added here.
 
 Reproduce the static evidence using the existing Ghidra installation and copied project: run `InspectBlockRegistration.java` with an output path, `-process libminecraftpe.so -noanalysis -readOnly`, and the repository's `tools/ghidra` script path. Set Java home and Ghidra app-data paths to the existing local build directories, as used by this validation. The script rejects the wrong engine SHA and incompatible seed/unwind bytes.

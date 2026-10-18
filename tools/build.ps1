@@ -4,7 +4,8 @@ param(
     [string]$Python = 'C:/Users/letua/AppData/Local/Programs/Python/Python314/python.exe',
     [switch]$PreloaderAdapter,
     [switch]$ExperimentalNative,
-    [switch]$ExperimentalEngineHook
+    [switch]$ExperimentalEngineHook,
+    [switch]$ExperimentalDebugger
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
@@ -15,7 +16,12 @@ $cmake = Join-Path $Sdk 'cmake/4.1.2/bin/cmake.exe'
 $ninja = Join-Path $Sdk 'cmake/4.1.2/bin/ninja.exe'
 $ndk = Join-Path $Sdk 'ndk/28.2.13676358/build/cmake/android.toolchain.cmake'
 function Run([string]$program, [string[]]$arguments) {
-    & $program @arguments
+    # Native tools emit successful compiler notes/progress on stderr too.
+    $ErrorActionPreference = 'Continue'
+    & $program @arguments 2>&1 | ForEach-Object {
+        if ($_ -is [System.Management.Automation.ErrorRecord]) { $_.Exception.Message }
+        else { $_.ToString() }
+    }
     if ($LASTEXITCODE -ne 0) { throw "$program failed with exit code $LASTEXITCODE" }
 }
 New-Item -ItemType Directory -Force -Path "$build/java", "$build/game-api", "$build/dex", "$build/tmp", "$root/dist" | Out-Null
@@ -34,7 +40,10 @@ $sources = @(Get-ChildItem -LiteralPath "$root/android/src" -Filter '*.java' -Re
 Run "$Jdk/bin/javac.exe" (@('--release', '17', '-classpath', "$android;$build/apksig.jar;$build/game-api", '-d', "$build/java") + $sources)
 Run $Python @("$root/tools/package_apk.py", 'classes')
 Run "$tools/d8.bat" @('--min-api', '31', '--lib', $android, '--classpath', "$build/game-api", '--output', "$build/dex", "$build/launcher-classes.jar", "$build/apksig.jar")
-Run "$tools/aapt2.exe" @('link', '-I', $android, '--manifest', "$root/android/AndroidManifest.xml", '-o', "$build/launcher-unsigned.apk")
+$manifestArgs = @('link', '-I', $android, '--manifest', "$root/android/AndroidManifest.xml")
+if ($ExperimentalDebugger) { $manifestArgs += '--debug-mode' }
+$manifestArgs += @('-o', "$build/launcher-unsigned.apk")
+Run "$tools/aapt2.exe" $manifestArgs
 Run $Python @("$root/tools/package_apk.py")
 Run "$tools/zipalign.exe" @('-f', '-P', '16', '4', "$build/launcher-unsigned.apk", "$build/launcher-aligned.apk")
 $key = "$build/debug.keystore"

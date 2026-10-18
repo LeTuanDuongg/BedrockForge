@@ -36,6 +36,28 @@
       "invocation_allowed": false
     },
     {
+      "id": "direct_getter_callers",
+      "classification": "PARTIALLY VERIFIED",
+      "target_elf_va": "0x103e7800",
+      "scan": "Raw AArch64 BL immediate decoding across the existing Ghidra .text memory block",
+      "direct_call_count": 179,
+      "sample_callsite_elf_va": "0x086f1cb0",
+      "sample_caller_fde_elf_va": "0x086f16cc",
+      "sample_caller_fde_bytes": 7340,
+      "assembly": [
+        "0x086f1cac: mov x0,x22",
+        "0x086f1cb0: bl 0x103e7800",
+        "0x086f1cb4: ldr x0,[x0]",
+        "0x086f1cb8: bl 0x102093a4",
+        "0x086f1cbc: cmp x26,x0"
+      ],
+      "observation": "This sample obtains the getter result, dereferences it through a helper and compares the result. It supports accessor use, not block registration or initialization.",
+      "decompilation_limit": "The 7340-byte caller produces PIC-construction and unreachable-block warnings; no reliable source-level caller identity or complete data flow is established.",
+      "coverage": "All .text words were scanned for direct BL encodings; 179 sites found. Caller unwind details and decompilation are sampled. Indirect calls are not covered.",
+      "status": "research_only",
+      "invocation_allowed": false
+    },
+    {
       "id": "post_level_block_definitions_dependency",
       "classification": "PARTIALLY VERIFIED",
       "string_reference_elf_va": "0x0ec39f6c",
@@ -53,12 +75,15 @@
     "Acquisition and ownership of the actual BlockTypeRegistry instance",
     "Custom block definition construction and registry insertion/duplicate handling",
     "Registry initialization timing and game-thread dispatch",
+    "Concrete vanilla block constructor-to-registration call chain and registration finalization",
     "World/Level access, lookup, placement and block lifecycle callbacks",
     "Block actor factory, destruction and persistence callbacks"
   ],
   "limits": [
     "Static evidence only; neither candidate was invoked or hooked.",
     "Adjacent ADRP/ADD scan is deliberately incomplete for other reference encodings.",
+    "Direct BL scan covers direct immediate calls only; indirect calls, relocatable dispatch and callback edges are not recovered.",
+    "Sample caller decompilation has PIC-recovery warnings and cannot establish source identity or registration semantics.",
     "Unwind bounds identify a code range, not argument types or safe execution timing.",
     "llvm-objdump nearest-export labels are not function identities for these stripped ranges.",
     "The absence of readable matching dynamic symbols does not establish the absence of internal registration functions."

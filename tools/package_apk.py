@@ -42,7 +42,8 @@ with zipfile.ZipFile(apk, "a", compression=zipfile.ZIP_DEFLATED) as out:
         out.write(root / "third_party/shadowhook/LICENSE", "assets/third-party/shadowhook-LICENSE.txt")
         out.write(root / "third_party/shadowhook/third_party/xdl/LICENSE", "assets/third-party/shadowhook-xdl-LICENSE.txt")
         out.write(root / "third_party/shadowhook/third_party/lss/LICENSE", "assets/third-party/shadowhook-lss-LICENSE.txt")
-    names = ["libhybridmcpe.so", "libiron_chest.so", "libhybrid_diagnostic.so"]
+    names = ["libhybridmcpe.so", "libiron_chest.so", "libhybrid_diagnostic.so",
+             "libhybrid_sdk_events_example.so"]
     if "HYBRID_EXPERIMENTAL_NATIVE:BOOL=ON" in cache:
         names.extend(["libhybrid_experimental_registry_probe.so", "libhybrid_button_duration_mod.so", "libshadowhook.so", "libshadowhook_nothing.so"])
     for name in names:

@@ -7,7 +7,7 @@ struct BlockDescriptor {
     const char* identifier;
 };
 
-constexpr BlockDescriptor target_block{"hybridmcpe"};
+[[maybe_unused]] constexpr BlockDescriptor target_block{"hybridmcpe"};
 
 std::string probe() {
 #ifndef HYBRID_EXPERIMENTAL_BLOCK_REGISTRATION

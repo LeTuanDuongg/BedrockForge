@@ -70,6 +70,8 @@ public class InspectBlockRegistration extends GhidraScript {
                 }
                 for (int i = 0; i < terms.length; ++i) out.println("defined_string_matches " + terms[i] + "=" + matches[i]);
                 scanAdjacentAddressPairs(seeds, dec, out);
+                for (MemoryBlock block : currentProgram.getMemory().getBlocks())
+                    if (block.getName().contains("eh_frame")) out.println("UNWIND_BLOCK name=" + block.getName() + " start=" + block.getStart() + " bytes=" + block.getSize());
                 inspectUnwindBoundedGetter(dec, out);
                 out.println("Limit: missing references or named functions in this database do not prove runtime absence.");
             } finally { dec.dispose(); }
@@ -142,6 +144,9 @@ public class InspectBlockRegistration extends GhidraScript {
         MemoryBlock text = currentProgram.getMemory().getBlock(".text");
         if (text == null) throw new IllegalStateException("Missing .text block");
         Map<Long, Integer> counts = new LinkedHashMap<>();
+        Address getter = currentProgram.getImageBase().add(0x103e7800L);
+        int getterCalls = 0;
+        List<Address> getterCallSites = new ArrayList<>();
         out.println("SCAN text_start=" + text.getStart() + " bytes=" + text.getSize());
         for (long offset = 0; offset < text.getSize() && !monitor.isCancelled(); offset += 1048576) {
             int length = (int) Math.min(1048580, text.getSize() - offset);
@@ -149,6 +154,16 @@ public class InspectBlockRegistration extends GhidraScript {
             currentProgram.getMemory().getBytes(text.getStart().add(offset), bytes);
             for (int i = 0; i + 8 <= length && i < 1048576; i += 4) {
                 int adrp = word(bytes, i), add = word(bytes, i + 4);
+                if ((adrp & 0xfc000000) == 0x94000000) {
+                    int imm26 = adrp & 0x03ffffff;
+                    if ((imm26 & 0x02000000) != 0) imm26 |= 0xfc000000;
+                    Address pc = text.getStart().add(offset + i);
+                    Address target = pc.add(((long) imm26) << 2);
+                    if (target.equals(getter)) {
+                        ++getterCalls;
+                        getterCallSites.add(pc);
+                    }
+                }
                 if ((adrp & 0x9f000000) != 0x90000000 || (add & 0xff000000) != 0x91000000 ||
                     (adrp & 31) == 31 || (adrp & 31) != ((add >>> 5) & 31)) continue;
                 long imm = (((adrp >>> 5) & 0x7ffffL) << 2) | ((adrp >>> 29) & 3);
@@ -168,8 +183,81 @@ public class InspectBlockRegistration extends GhidraScript {
                 inspectFunction(getFunctionContaining(pc), dec, out);
             }
         }
+        out.println("direct_bl_to_getter_count=" + getterCalls + " target_analysis_va=" + getter);
+        inspectGetterCallers(getterCallSites, dec, out);
         for (var seed : seeds.entrySet()) out.println("adjacent_pair_count " + seed.getValue() + "=" + counts.getOrDefault(seed.getKey(), 0));
+        out.println("Raw .text BL scan finds direct calls only; indirect calls and unrecognized control flow remain unresolved.");
         out.println("Pair scan covers adjacent ADRP/ADD only; it does not establish function identity or invocation safety.");
+    }
+
+    private String functionLabel(Function function) {
+        return function == null ? "unknown" : function.getEntryPoint() + " " + function.getName();
+    }
+
+    private void inspectGetterCallers(List<Address> callSites, DecompInterface dec, PrintWriter out) throws Exception {
+        MemoryBlock header = currentProgram.getMemory().getBlock(".eh_frame_hdr");
+        if (header == null) {
+            out.println("CALLER_UNWIND=unavailable; .eh_frame_hdr missing");
+            return;
+        }
+        long count = Integer.toUnsignedLong(currentProgram.getMemory().getInt(header.getStart().add(8)));
+        if (count == 0 || count > 1000000) throw new IllegalStateException("Unexpected unwind table count " + count);
+        out.println("CALLER_UNWIND_TABLE header=" + header.getStart() + " entries=" + count + " encoding=datarel_sdata4,pcrel_sdata4");
+        Set<Address> sampledFunctions = new HashSet<>();
+        for (Address callSite : callSites) {
+            long low = 0, high = count;
+            while (low < high) {
+                long mid = (low + high) >>> 1;
+                Address entry = header.getStart().add(12 + mid * 8);
+                Address functionStart = header.getStart().add(currentProgram.getMemory().getInt(entry));
+                if (functionStart.compareTo(callSite) <= 0) low = mid + 1;
+                else high = mid;
+            }
+            if (low == 0) continue;
+            Address entry = header.getStart().add(12 + (low - 1) * 8);
+            Address functionStart = header.getStart().add(currentProgram.getMemory().getInt(entry));
+            Address fde = header.getStart().add(currentProgram.getMemory().getInt(entry.add(4)));
+            long cieDistance = Integer.toUnsignedLong(currentProgram.getMemory().getInt(fde.add(4)));
+            Address cie = fde.add(4).subtract(cieDistance);
+            long cieLength = Integer.toUnsignedLong(currentProgram.getMemory().getInt(cie));
+            int encoding = currentProgram.getMemory().getByte(cie.add(16)) & 0xff;
+            Address fdeStart = fde.add(8).add(currentProgram.getMemory().getInt(fde.add(8)));
+            long bytes = Integer.toUnsignedLong(currentProgram.getMemory().getInt(fde.add(12)));
+            if (cieLength != 16 || currentProgram.getMemory().getByte(cie.add(8)) != 1 ||
+                currentProgram.getMemory().getByte(cie.add(9)) != 'z' || currentProgram.getMemory().getByte(cie.add(10)) != 'R' ||
+                encoding != 0x1b || !functionStart.equals(fdeStart) || bytes == 0 || bytes > 1048576 ||
+                callSite.compareTo(functionStart) < 0 || callSite.compareTo(functionStart.add(bytes)) >= 0) {
+                out.println("CALLER_FDE_SKIPPED_UNSUPPORTED callsite=" + callSite + " table_start=" + functionStart + " fde_start=" + fdeStart +
+                    " bytes=" + bytes + " cie_length=" + cieLength + " encoding=0x" + Integer.toHexString(encoding));
+                continue;
+            }
+            if (!sampledFunctions.add(functionStart)) continue;
+            out.println("CALLER_FDE callsite=" + callSite + " elf_callsite=0x" + Long.toHexString(callSite.getOffset() - currentProgram.getImageBase().getOffset()) +
+                " start=" + functionStart + " elf_start=0x" + Long.toHexString(functionStart.getOffset() - currentProgram.getImageBase().getOffset()) +
+                " bytes=" + bytes + " fde=" + fde);
+            if (sampledFunctions.size() > 4) continue;
+            int tx = currentProgram.startTransaction("Temporary unwind-bounded getter caller analysis");
+            try {
+                AddressSet body = new AddressSet(functionStart, functionStart.add(bytes - 1));
+                DisassembleCommand command = new DisassembleCommand(functionStart, body, true);
+                if (!command.applyTo(currentProgram, monitor)) {
+                    out.println("CALLER_DISASSEMBLY=failed start=" + functionStart);
+                    continue;
+                }
+                Function function = getFunctionAt(functionStart);
+                if (function == null) function = currentProgram.getFunctionManager().createFunction(
+                    "research_getter_caller", functionStart, body, SourceType.ANALYSIS);
+                Instruction instruction = getInstructionAt(callSite.add(-16));
+                for (int n = 0; n < 12 && instruction != null && body.contains(instruction.getAddress()); ++n, instruction = instruction.getNext())
+                    out.println("CALLER_ASM " + instruction.getAddress() + " " + instruction);
+                dec.flushCache();
+                inspectFunction(function, dec, out);
+            } finally {
+                currentProgram.endTransaction(tx, false);
+                dec.flushCache();
+            }
+        }
+        out.println("Caller scan covers all direct call sites; detailed decompilation is limited to 4 unwind-validated functions and is not a complete call graph.");
     }
 
     private void inspectFunction(Function function, DecompInterface dec, PrintWriter out) {

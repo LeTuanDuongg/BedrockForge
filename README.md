@@ -47,7 +47,7 @@ Modified engine SHA-256: `a8942061e3743fce10952627c76615c9e5c0cb07b897efc33f8dab
 
 The launcher copies source APKs into its private version repository and creates an imported-engine process through Android's AppComponentFactory and ResourcesLoader APIs. It does not inject into or overwrite the separately installed Minecraft application. The [apksig dependency](android/APKSIG.md) and import-only tests document signature validation and distribution boundaries.
 
-The native runtime selects an exact full-SHA-256, size and AArch64 match from `native/engine_profiles.h`. The two preserved 1.26.52.3 profiles require all five recorded layout checks. The exact 1.26.50.4 profile is fingerprint-only, validates zero gameplay layouts and exposes zero capabilities. There are no wildcard fingerprints or fallback layouts. Importing an unknown fingerprint does not enroll it in this trusted runtime table. `sdk/hybrid_mod.h` defines the unchanged C ABI; plugin loading uses `dlopen`, validates ABI/capabilities and handles lifecycle shutdown. This is not a gameplay SDK yet.
+The native runtime selects an exact full-SHA-256, size and AArch64 match from `native/engine_profiles.h`. The two preserved 1.26.52.3 profiles require all five recorded layout checks. The exact 1.26.50.4 profile retains zero legacy gameplay capabilities; its SDK now separately admits read-only Block lookup after additional registry/getter checks. There are no wildcard fingerprints or fallback layouts. Importing an unknown fingerprint does not enroll it in this trusted runtime table. `sdk/hybrid_mod.h` defines the unchanged Mod ABI 1; plugin loading uses `dlopen`, validates ABI/capabilities and handles lifecycle shutdown.
 
 `mods/iron_chest.cpp` is a blocked native mod descriptor, not a working chest. Container, GUI and persistence capabilities are all unavailable. Even if those flags were mistakenly enabled, its start function fails until real registration code exists. No entity-inventory substitute or simulated game backend is included.
 
@@ -86,3 +86,7 @@ The Preloader package remains a preserved adapter artifact, not the primary depl
 Research version-specific Container/Inventory contracts from the existing Ghidra project. Build fail-closed native Engine Bridge foundations only around verified contracts. Registration, 54-slot ownership, transactions, chest UI, touch interaction and persistent storage remain unverified and unavailable; Iron Chest has not passed in-game testing.
 
 All source research artifacts under `C:/MCPE_Research` were treated as read-only. No previous Bedrock Forge project is used.
+
+## Native SDK status
+
+The existing `HybridSdkV1` provides lifecycle events, dependency manifests, logging and read-only `blocks.find` on exact 1.26.50.4 ARM64. The public SDK example returned real `minecraft:cobblestone` default-state metadata on M51 ([evidence](validation/sdk-gameplay-2026-10-18.md)). Custom registration, Player/World, commands, items, inventories, entities, GUI and rendering remain unsupported. Run `tools/test-host.ps1` without ADB. See [SDK coverage and examples](docs/native-sdk.md).

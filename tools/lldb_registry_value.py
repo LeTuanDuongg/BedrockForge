@@ -17,6 +17,9 @@ REGISTRY_VA = 0x134D7DB8
 GETTER_VA = 0x103E2D54
 WRITER_VA = 0x94F691C
 INSERT_VA = 0x94F6850
+REGISTRATION_CALL_VA = 0x92E7970
+REGISTRATION_CALL_WORD = 0x94036E51
+REGISTRATION_FUNCTION_VA = 0x93C32B4
 POINTER_MASK = 0x00FFFFFFFFFFFFFF
 
 
@@ -373,6 +376,133 @@ def run(debugger, engine_path, output_path, load_bias, timeout=180, identifier="
         if process.GetState() == lldb.eStateStopped:
             error = process.Detach()
             emit("detach", success=error.Success(), detail=str(error))
+        else:
+            emit("detach_unavailable", process_state=process.GetState())
+        debugger.SetAsync(old_async)
+
+
+def capture_registration_call(debugger, engine_path, output_path, load_bias, timeout=300):
+    """Capture the live argument provenance at the pinned vanilla registration callsite."""
+    import lldb
+
+    segments, _ = engine_layout(engine_path)
+    call_bytes = struct.pack("<I", REGISTRATION_CALL_WORD)
+    instruction = REGISTRATION_CALL_WORD
+    immediate = instruction & 0x03FFFFFF
+    if immediate & 0x02000000:
+        immediate -= 0x04000000
+    if REGISTRATION_CALL_VA + immediate * 4 != REGISTRATION_FUNCTION_VA:
+        raise ValueError("registration callsite BL does not target the pinned coordinator")
+    if not any(flags & 1 and va <= REGISTRATION_CALL_VA and
+               REGISTRATION_CALL_VA + 4 <= va + file_size
+               for va, _, flags, _, file_size in segments):
+        raise ValueError("registration callsite is outside executable ELF bytes")
+    with Path(engine_path).open("rb") as source:
+        va, _, flags, file_offset, file_size = next(
+            segment for segment in segments
+            if segment[2] & 1 and segment[0] <= REGISTRATION_CALL_VA and
+            REGISTRATION_CALL_VA + 4 <= segment[0] + segment[4])
+        source.seek(file_offset + REGISTRATION_CALL_VA - va)
+        if source.read(4) != call_bytes:
+            raise ValueError("registration callsite bytes do not match the pinned BL")
+
+    target = debugger.GetSelectedTarget()
+    process = target.GetProcess()
+    pid = process.GetProcessID()
+    if process.GetState() != lldb.eStateStopped or not pid:
+        raise RuntimeError("requires a stopped LLDB attachment at the game menu")
+
+    output = Path(output_path)
+    report = {"engine_sha256": ENGINE_SHA256, "pid": pid, "load_bias": hex(load_bias),
+              "callsite_elf_va": hex(REGISTRATION_CALL_VA),
+              "target_elf_va": hex(REGISTRATION_FUNCTION_VA), "events": []}
+    breakpoints = []
+
+    def emit(stage, **fields):
+        event = {"stage": stage, "host_monotonic_ns": time.monotonic_ns(), **fields}
+        report["events"].append(event)
+        temporary = output.with_suffix(".tmp")
+        temporary.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        temporary.replace(output)
+        print("registration_call_capture=" + json.dumps(event), flush=True)
+
+    def engine_address(address):
+        return any(flags & 1 and load_bias + va <= address < load_bias + va + length
+                   for va, length, flags, _, _ in segments)
+
+    def wait_for_breakpoint():
+        stop_id = process.GetStopID()
+        error = process.Continue()
+        if error.Fail():
+            raise RuntimeError("continue failed: " + str(error))
+        deadline = time.monotonic() + timeout
+        listener = debugger.GetListener()
+        while time.monotonic() < deadline:
+            state = process.GetState()
+            if state in (lldb.eStateExited, lldb.eStateDetached, lldb.eStateInvalid):
+                raise RuntimeError("target left debug session: " + str(state))
+            if state == lldb.eStateStopped and process.GetStopID() > stop_id:
+                stopped = [thread for thread in process
+                           if thread.GetStopReason() == lldb.eStopReasonBreakpoint]
+                if stopped:
+                    return stopped[0]
+                raise RuntimeError("process stopped for another reason; preserving original signal behavior")
+            event = lldb.SBEvent()
+            listener.WaitForEvent(1, event)
+        raise TimeoutError("bounded registration-call breakpoint timed out")
+
+    old_async = debugger.GetAsync()
+    try:
+        error = lldb.SBError()
+        if process.ReadMemory(load_bias, 6, error) != b"\x7fELF\x02\x01" or error.Fail():
+            raise ValueError("runtime engine load-bias header mismatch")
+        error = lldb.SBError()
+        if process.ReadMemory(load_bias + REGISTRATION_CALL_VA, 4, error) != call_bytes or error.Fail():
+            raise ValueError("runtime registration callsite bytes differ from the exact ELF")
+        before = {target.GetBreakpointAtIndex(i).GetID()
+                  for i in range(target.GetNumBreakpoints())}
+        result = lldb.SBCommandReturnObject()
+        debugger.GetCommandInterpreter().HandleCommand(
+            "breakpoint set --hardware --address " + hex(load_bias + REGISTRATION_CALL_VA), result)
+        created = [target.GetBreakpointAtIndex(i) for i in range(target.GetNumBreakpoints())
+                   if target.GetBreakpointAtIndex(i).GetID() not in before]
+        breakpoints.extend(item.GetID() for item in created)
+        if not result.Succeeded() or len(created) != 1 or not created[0].IsHardware():
+            raise RuntimeError("hardware execution breakpoint unavailable: " + result.GetError())
+        emit("armed", runtime_pc=hex(load_bias + REGISTRATION_CALL_VA),
+             breakpoint_id=created[0].GetID(), breakpoint_kind="hardware-execution")
+
+        thread = wait_for_breakpoint()
+        frame = thread.GetFrameAtIndex(0)
+        pc = frame.GetPC()
+        if pc != load_bias + REGISTRATION_CALL_VA:
+            raise RuntimeError("breakpoint stopped at unexpected PC: " + hex(pc))
+        names = ("x0", "x1", "x23", "x24", "sp", "lr")
+        registers = {name: frame.FindRegister(name).GetValueAsUnsigned()
+                     for name in names}
+        stack = []
+        for index in range(min(thread.GetNumFrames(), 16)):
+            item = thread.GetFrameAtIndex(index)
+            frame_pc = item.GetPC()
+            stack.append({"pc": hex(frame_pc),
+                          "elf_va": hex(frame_pc - load_bias) if engine_address(frame_pc) else None,
+                          "symbol": item.GetFunctionName()})
+        emit("hit_before_call", tid=thread.GetThreadID(), thread=thread.GetName(),
+             runtime_pc=hex(pc), callsite_elf_va=hex(pc - load_bias),
+             caller_lr=hex(registers["lr"]), registers={k: hex(v) for k, v in registers.items()},
+             x0_equals_x23=registers["x0"] == registers["x23"],
+             x1_equals_x24=registers["x1"] == registers["x24"], stack=stack,
+             target_memory_reads=10, target_memory_writes=0, engine_calls=0)
+        report["result"] = "captured"
+    except Exception as error:
+        report["result"] = "incomplete"
+        emit("error", error=str(error))
+    finally:
+        for item in breakpoints:
+            target.BreakpointDelete(item)
+        if process.GetState() == lldb.eStateStopped:
+            detach_error = process.Detach()
+            emit("detached", success=detach_error.Success(), detail=str(detach_error))
         else:
             emit("detach_unavailable", process_state=process.GetState())
         debugger.SetAsync(old_async)

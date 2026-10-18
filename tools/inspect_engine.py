@@ -71,9 +71,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("engine", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--expected-sha256",
+        default=TARGET_SHA256,
+        help="Exact expected ELF SHA-256 (defaults to the original 1.26.52.3 target)",
+    )
     args = parser.parse_args()
     data = args.engine.read_bytes()
-    if hashlib.sha256(data).hexdigest() != TARGET_SHA256:
+    if hashlib.sha256(data).hexdigest() != args.expected_sha256.lower():
         raise SystemExit("Engine SHA-256 mismatch; target profile rejected")
     result = inspect(data)
     args.output.parent.mkdir(parents=True, exist_ok=True)

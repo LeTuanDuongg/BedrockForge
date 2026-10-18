@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     fail_stop(false);
     hybrid_shutdown();
     check(stops() == 4, "shutdown retry stops retained module");
-    check(std::strcmp(hybrid_probe(), "engine_verified:1.26.52.3;layout_validated=5;profile=isolated_test_stub;capabilities=0") == 0,
+    check(std::strcmp(hybrid_probe(), "engine_verified:1.26.52.3;layout_validated=5;profile=isolated_test_stub;capabilities=0;gameplay_binding=unavailable") == 0,
           "successful retry completes shutdown and permits fresh verification");
 
     auto* registration = PLGetModRegistration();
