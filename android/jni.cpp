@@ -1,0 +1,153 @@
+#include <jni.h>
+#include <string>
+#include <cstdio>
+#include <android/log.h>
+#include <unistd.h>
+#include <dlfcn.h>
+#include "engine_profiles.h"
+#include "experimental_hooks.h"
+extern "C" const char* hybrid_probe();
+extern "C" int hybrid_load_mod(const char*);
+extern "C" int hybrid_enable_mods();
+extern "C" int hybrid_disable_mods();
+extern "C" void hybrid_shutdown();
+extern "C" int hybrid_load_mod(const char*);
+extern "C" const char* hybrid_experimental_candidate_trace_start();
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+extern "C" int hybrid_experimental_button_control(unsigned) { return -4; }
+extern "C" int hybrid_engine_button_schedule_126504_control(unsigned) { return -4; }
+#endif
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeProbe(JNIEnv* env, jclass) {
+    return env->NewStringUTF(hybrid_probe());
+}
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeProfile(JNIEnv* env, jclass, jstring hash, jlong size, jint machine) {
+    if (!hash || size < 0 || machine != hybrid::elf_machine_aarch64) return env->NewStringUTF("");
+    const char* text = env->GetStringUTFChars(hash, nullptr);
+    if (!text) return nullptr;
+    const auto* profile = hybrid::select_engine_profile(text, static_cast<size_t>(size), static_cast<uint16_t>(machine));
+    env->ReleaseStringUTFChars(hash, text);
+    return env->NewStringUTF(profile ? profile->id : "");
+}
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnostic(JNIEnv* env, jclass, jstring path) {
+    std::string before = hybrid_probe();
+    if (!path || before.rfind("engine_verified:", 0) != 0) return env->NewStringUTF(before.c_str());
+    const char* text = env->GetStringUTFChars(path, nullptr);
+    if (!text) return nullptr;
+    int code = hybrid_load_mod(text);
+    env->ReleaseStringUTFChars(path, text);
+    std::string result = before + ";diagnostic_load=" + std::to_string(code);
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "native_diagnostic %s", result.c_str());
+    return env->NewStringUTF(result.c_str());
+}
+extern "C" JNIEXPORT jint JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnosticLifecycle(JNIEnv*, jclass, jboolean active) {
+    return active ? hybrid_enable_mods() : hybrid_disable_mods();
+}
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeDiagnosticShutdown(JNIEnv* env, jclass) {
+    hybrid_shutdown();
+    return env->NewStringUTF(hybrid_probe());
+}
+extern "C" JNIEXPORT jboolean JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalEnabled(JNIEnv*, jclass) {
+#ifdef HYBRID_EXPERIMENTAL_NATIVE
+    return JNI_TRUE;
+#else
+    return JNI_FALSE;
+#endif
+}
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryProbe(JNIEnv* env, jclass, jstring path) {
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+    (void)path;
+    return env->NewStringUTF("experimental_module_load=disabled");
+#else
+    if (!path) return env->NewStringUTF("experimental_module_load=failed;reason=missing_path");
+    const char* text = env->GetStringUTFChars(path, nullptr);
+    if (!text) return nullptr;
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "experimental_module_load=begin;pid=%d;tid=%d", getpid(), gettid());
+    const int code = hybrid_load_mod(text);
+    env->ReleaseStringUTFChars(path, text);
+    const std::string result = std::string("experimental_module_load=") + std::to_string(code);
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s", result.c_str());
+    return env->NewStringUTF(result.c_str());
+#endif
+}
+extern "C" JNIEXPORT jint JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalRegistryTrigger(JNIEnv*, jclass, jint phase) {
+#ifdef HYBRID_EXPERIMENTAL_NATIVE
+    if (phase == 5) return hybrid_experimental_block_construction_arm();
+    if (phase == 3 || phase == 4) {
+        const char* status = phase == 3 ? hybrid_experimental_cobblestone_constructor_hook_stop() :
+                                        hybrid_experimental_cobblestone_constructor_hook_start();
+        __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "block_type_hook_control=%d;status=%s;pid=%d;tid=%d",
+                            phase, status, getpid(), gettid());
+        const std::string result(status);
+        return result.find(phase == 3 ? "cleanup=verified" : "cobblestone_constructor_hook=installed;") != std::string::npos ? 0 : -5;
+    }
+    if (phase != 1 && phase != 2) return -1;
+    void* module=dlopen("libhybrid_experimental_registry_probe.so",RTLD_NOW|RTLD_NOLOAD);
+    if(!module)return -4;
+    auto trigger=reinterpret_cast<int (*)(unsigned)>(dlsym(module,"hybrid_experimental_trigger_registry_sample"));
+    const int result=trigger?trigger(static_cast<unsigned>(phase)):-4;
+    dlclose(module);
+    return result;
+#else
+    (void)phase;
+    return -4;
+#endif
+}
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalCandidateTraceStart(JNIEnv* env, jclass) {
+#ifdef HYBRID_EXPERIMENTAL_NATIVE
+    const char* result = hybrid_experimental_candidate_trace_start();
+#else
+    const char* result = "candidate_trace=disabled";
+#endif
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s", result);
+    return env->NewStringUTF(result);
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonModLoad(JNIEnv* env, jclass, jstring path) {
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+    (void)path;
+    return env->NewStringUTF("button_mod_load=disabled");
+#else
+    if (!path) return env->NewStringUTF("button_mod_load=failed;reason=missing_path");
+    const char* text = env->GetStringUTFChars(path, nullptr);
+    if (!text) return nullptr;
+    const int result = hybrid_load_mod(text);
+    env->ReleaseStringUTFChars(path, text);
+    char message[96];
+    std::snprintf(message, sizeof message, "button_mod_load=%d", result);
+    __android_log_print(ANDROID_LOG_INFO, "HybridMCPE", "%s;pid=%d", message, getpid());
+    return env->NewStringUTF(message);
+#endif
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_dev_hybridmcpe_launcher_MainActivity_nativeExperimentalButtonTrigger(JNIEnv*, jclass, jint operation) {
+#ifdef HYBRID_EXPERIMENTAL_NATIVE
+    if (operation < 0 || operation > 2) return -1;
+    void* module=dlopen("libhybrid_button_duration_mod.so",RTLD_NOW|RTLD_NOLOAD);
+    if (!module) return -4;
+    auto trigger=reinterpret_cast<int (*)(unsigned)>(dlsym(module,"hybrid_button_duration_mod_control"));
+    const int result=trigger?trigger(static_cast<unsigned>(operation)):-4;
+    dlclose(module);
+    return result;
+#else
+    (void)operation;
+    return -4;
+#endif
+}
+#ifndef HYBRID_EXPERIMENTAL_NATIVE
+extern "C" const char* hybrid_experimental_candidate_trace_start() { return "candidate_trace=disabled"; }
+extern "C" const char* hybrid_experimental_candidate_trace_stop() { return "candidate_trace=disabled"; }
+extern "C" const char* hybrid_experimental_hook_self_test() { return "self_hook_test=disabled"; }
+extern "C" const char* hybrid_experimental_engine_candidate_hook_start() { return "engine_candidate_hook=disabled"; }
+extern "C" const char* hybrid_experimental_engine_candidate_hook_stop() { return "engine_candidate_hook=disabled"; }
+#endif

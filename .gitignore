@@ -1,8 +1,6 @@
-.research/
-.tools/
-build*/
+build/
+dist/
+local.properties
+*.log
 __pycache__/
-*.levipack
-*.bfmod
-test-data/
-/mods/
+*.keystore
